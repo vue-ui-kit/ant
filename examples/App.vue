@@ -1,5 +1,7 @@
 <template>
-  <p-grid v-bind="gridSetting" />
+  <div style="height: 100vh; width: 100%">
+    <p-grid v-bind="gridSetting" />
+  </div>
 </template>
 <script lang="ts" setup name="App">
   import { computed } from 'vue';
