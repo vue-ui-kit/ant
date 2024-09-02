@@ -1,0 +1,462 @@
+<script generic="D = Recordable, F = Recordable" lang="ts" name="PGrid" setup>
+  import { ColumnProps, PFormItemProps, PGridProps, ResponsePathConfig } from '#/antProxy';
+  import { computed, useAttrs, ref, Ref, reactive, onMounted, watch, toRefs } from 'vue';
+  import { debounce, get, isArray, isFunction, isString, merge, omit, toNumber } from 'lodash-es';
+  import { eachTree } from '@/utils/treeHelper';
+  import { message as $message } from 'ant-design-vue';
+  import RenderAntItem from '@/components/RenderAntItem';
+  import RenderTitleSlots from '@/components/RenderTitleSlots';
+  import RenderDefaultSlots from '@/components/RenderDefaultSlots';
+  import { v4 as uuid_v4 } from 'uuid';
+  import { valued } from '@/utils/is';
+  import RenderItemSlots from '@/components/RenderItemSlots';
+  import { cleanCol, defaultItemResponsive, defaultLabelCol } from '@/utils/core';
+  import Icon from '@/renders/Icon';
+  import { $confirm } from '@/hooks/useMessage';
+
+  const props = defineProps<PGridProps<D, F>>();
+  const {
+    formConfig,
+    pageConfig,
+    columns,
+    toolbarConfig,
+    proxyConfig,
+    tableConfig,
+    selectConfig,
+    scrollMode,
+  } = toRefs(props);
+  const loading = reactive({
+    table: false,
+    form: false,
+  });
+  const submitOnReset = false;
+  const boxEl = ref<HTMLDivElement>();
+  const renderHeight = ref(500);
+  const selectedRowKeys = ref<string[] | number[]>([]);
+  const innerToolbarHandler = (code: string) => {
+    const { ajax } = proxyConfig.value!;
+    switch (code) {
+      case 'multiDelete':
+        if (ajax.multiDelete) {
+          if (selectedRowKeys.value.length > 0) {
+            $confirm({
+              title: '警告',
+              content: '确认删除选中的数据吗？',
+            }).then(() => {
+              loading.table = true;
+              ajax.multiDelete!(selectedRowKeys.value)
+                .then(() => {
+                  $message.success('删除成功');
+                  resetPage();
+                })
+                .catch(() => {
+                  $message.error('删除失败');
+                })
+                .finally(() => {
+                  loading.table = false;
+                });
+            });
+          } else {
+            $message.warn('请选择要删除的数据');
+          }
+        }
+        break;
+    }
+  };
+  const slotTitleColumns = computed(() => {
+    const cols: ColumnProps<D>[] = [];
+    eachTree(columns.value, (col) => {
+      if (col.slots && col.slots.title) {
+        if (!col.field) {
+          col.field = '__holder__' + cols.length;
+        }
+        cols.push(col);
+      }
+    });
+    return cols;
+  });
+  const formEl = ref();
+  const tableEl = ref();
+  const renderFormKey = ref(uuid_v4());
+  const renderTableKey = ref(uuid_v4());
+  const refreshForm = () => {
+    renderFormKey.value = uuid_v4();
+  };
+  const refreshTable = () => {
+    renderTableKey.value = uuid_v4();
+  };
+  const debounceRefreshForm = debounce(refreshForm, 100);
+  const debounceRefreshTable = debounce(refreshTable, 100);
+  const slotDefaultColumns = computed(() => {
+    const cols: ColumnProps<D>[] = [];
+    eachTree(columns.value, (col) => {
+      if ((col.slots && col.slots.default) || col.formatter || col.cellRender) {
+        if (!col.field) {
+          col.field = '__holder__' + cols.length;
+        }
+        cols.push(col);
+      }
+    });
+    return cols;
+  });
+  const pagination = reactive<IPage>({
+    page: 1,
+    size: pageConfig.value?.pageSize ?? 10,
+  });
+  const dataSeed = ref(0);
+  const totalCount = ref(0);
+  const tableData = ref<D[]>([]) as Ref<D[]>;
+  const mode = computed<'list' | 'pagination' | 'bad'>(() =>
+    proxyConfig.value && proxyConfig.value.ajax
+      ? pageConfig.value
+        ? 'pagination'
+        : 'list'
+      : 'bad',
+  );
+  const attrs = useAttrs();
+  const emit = defineEmits([
+    'query',
+    'reset',
+    'update:tableData',
+    'toolbarButtonClick',
+    'toolbarToolClick',
+    'pick',
+  ]);
+  const toolBtnClick = (code: string) => {
+    emit('toolbarButtonClick', {
+      data: tableData.value,
+      code,
+      selectedKeys: selectedRowKeys.value,
+    });
+    innerToolbarHandler(code);
+  };
+  const toolToolClick = (code: string) => {
+    emit('toolbarToolClick', { data: tableData.value, code, selectedKeys: selectedRowKeys.value });
+    innerToolbarHandler(code);
+  };
+  const queryFormData = ref<Partial<F>>({}) as Ref<Partial<F>>;
+  const pickRow = ({ row, field }: { row: D; field: string }) => {
+    emit('pick', { row, field });
+  };
+  const resetQueryFormData = (lazy?: boolean) => {
+    if (formConfig.value && formConfig.value.items.length > 0) {
+      if (formConfig.value.customReset) {
+        formConfig.value.customReset();
+      } else {
+        const obj: Partial<F> = {};
+        eachTree(formConfig.value.items, (item) => {
+          if (item.field && item.itemRender) {
+            if (valued(item.itemRender.defaultValue)) {
+              obj[item.field] = item.itemRender.defaultValue;
+            } else {
+              obj[item.field] = undefined;
+            }
+          }
+        });
+        queryFormData.value = obj;
+      }
+      refreshForm();
+    }
+
+    pagination.page = 1;
+    if (!lazy) {
+      debounceFetchData();
+    }
+  };
+  const handleResponse = (response: Recordable, pathConfig?: ResponsePathConfig<D>) =>
+    pathConfig
+      ? {
+          list: isString(pathConfig.list)
+            ? get(response, pathConfig.list)
+            : isFunction(pathConfig.list)
+              ? pathConfig.list(response)
+              : undefined,
+          total: isString(pathConfig.total)
+            ? get(response, pathConfig.total)
+            : isFunction(pathConfig.total)
+              ? pathConfig.total(response)
+              : undefined,
+          result: isString(pathConfig.result)
+            ? get(response, pathConfig.result)
+            : isFunction(pathConfig.result)
+              ? pathConfig.result(response)
+              : undefined,
+          message: isString(pathConfig.message)
+            ? get(response, pathConfig.message)
+            : isFunction(pathConfig.message)
+              ? pathConfig.message(response)
+              : undefined,
+        }
+      : {
+          list: response,
+        };
+  const enoughSpacing = ref(true);
+  const reload = () => {
+    return resetQueryFormData();
+  };
+  const resetPage = () => {
+    pagination.page = 1;
+    selectedRowKeys.value = [];
+    return fetchData();
+  };
+  /**
+   * @description
+   * @param p
+   * @param _filters todo filters
+   * @param _sorter todo sorter
+   */
+  const handleTableChange = (p: { current: number; pageSize: number }, _filters, _sorter) => {
+    pagination.page = p.current;
+    pagination.size = p.pageSize;
+    return fetchData();
+  };
+
+  const fetchData = () =>
+    new Promise<D[]>((resolve) => {
+      if (mode.value !== 'bad') {
+        loading.form = true;
+        loading.table = true;
+        const { ajax } = proxyConfig.value!;
+        ajax
+          .query({
+            form: queryFormData.value,
+            page: pagination,
+          })
+          .then((response) => {
+            const { list, total, result, message } = handleResponse(
+              response,
+              proxyConfig.value!.response,
+            );
+            if (list) {
+              tableData.value = list as D[];
+              dataSeed.value++;
+            } else if (result) {
+              tableData.value = result as D[];
+              totalCount.value = total ?? result.length;
+              dataSeed.value++;
+            } else {
+              tableData.value = [];
+              dataSeed.value++;
+              if (message) {
+                $message.warn(message);
+              }
+            }
+            resolve(tableData.value as D[]);
+          })
+          .catch((e) => {
+            console.error('fetchData error', e);
+            resolve([] as D[]);
+          })
+          .finally(() => {
+            loading.form = false;
+            loading.table = false;
+          });
+      }
+    });
+  const debounceFetchData = debounce(fetchData, 160);
+  const passQuery = (params: Partial<F>) => {
+    Object.assign(queryFormData.value, params);
+    pagination.page = 1;
+    return debounceFetchData();
+  };
+  const pg = computed(() =>
+    mode.value === 'pagination'
+      ? {
+          current: pagination.page,
+          total: totalCount.value,
+          pageSize: pagination.size,
+          responsive: false,
+          showSizeChanger: true,
+          showTotal: (total: number) => `共${total}条数据`,
+        }
+      : false,
+  );
+  const defaultTableConfig = {
+    size: 'small',
+    sticky: true,
+    transformCellText: ({ text }) => {
+      return isArray(text) && text.length === 0 ? '-' : text;
+    },
+  };
+  const tc = computed(() =>
+    merge(
+      {},
+      defaultTableConfig,
+      tableConfig?.value ?? {},
+      selectConfig.value
+        ? {
+            rowSelection: {
+              type: selectConfig.value.multiple ? 'checkbox' : 'radio',
+              preserveSelectedRowKeys: true,
+              selectedRowKeys: selectedRowKeys.value,
+              onChange: (selectedKeys: string[] | number[]) => {
+                selectedRowKeys.value = selectedKeys;
+              },
+            },
+          }
+        : {},
+    ),
+  );
+  /*omit({labelCol:defaultLabelCol,...formConfig},['items'])*/
+  const fc = computed(() => omit({ labelCol: defaultLabelCol, ...formConfig.value }, ['items']));
+  const handleFormSubmit = () => {
+    resetPage();
+  };
+
+  watch(
+    () => formConfig.value,
+    () => {
+      debounceRefreshForm();
+    },
+    { deep: true },
+  );
+  watch(
+    () => [columns.value, proxyConfig.value, toolbarConfig.value],
+    () => {
+      debounceRefreshTable();
+    },
+    { deep: true },
+  );
+  defineExpose({
+    commitProxy: {
+      query: debounceFetchData,
+      reload,
+      reloadPage: resetPage,
+      passQuery,
+    },
+    $table: computed(() => tableEl.value),
+    selectedRowKeys: computed(() => selectedRowKeys.value),
+    $form: computed(() => formEl.value),
+  });
+  onMounted(() => {
+    /*判断本组件所在容器DOM*/
+    const pNode = boxEl.value?.parentElement;
+    const ph = pNode ? window.getComputedStyle(pNode).height : '0px';
+    renderHeight.value = toNumber(ph.replace('px', '')) - 200;
+    enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
+    resetQueryFormData(props.manualFetch);
+  });
+</script>
+<template>
+  <div ref="boxEl" class="h-full p-wrapper flex flex-col gap-8px overflow-y-auto" v-bind="attrs">
+    <div v-if="mode === 'bad'">请检查配置</div>
+    <template v-else>
+      <div
+        v-if="formConfig?.items?.some((s: PFormItemProps<F>) => s.field && s.itemRender)"
+        class="p-pane p-form-wrapper"
+      >
+        <a-spin :spinning="loading.form">
+          <a-form
+            :key="renderFormKey"
+            ref="formEl"
+            :model="queryFormData"
+            v-bind="fc"
+            @submit="handleFormSubmit"
+          >
+            <a-row :gutter="[6, 12]">
+              <a-col
+                v-for="(item, idx) in formConfig!.items"
+                :key="'_col_' + idx"
+                v-bind="item.col ?? (item.span ? { span: item.span } : defaultItemResponsive)"
+              >
+                <a-form-item
+                  :key="'_item_' + idx"
+                  :class="`p-content-align-${item.align ?? 'left'}`"
+                  :label="item.title"
+                  :name="item.field"
+                  v-bind="omit(item, ['field', 'title', 'span', 'col', 'itemRender'])"
+                >
+                  <render-item-slots
+                    v-if="item.slots?.default"
+                    :form-data="queryFormData"
+                    :item="item"
+                  />
+                  <render-ant-item
+                    v-else-if="item.itemRender?.name"
+                    :key="'_re_' + idx"
+                    :default-handler="{
+                      reset: () => {
+                        resetQueryFormData(!submitOnReset);
+                      },
+                    }"
+                    :item-render="item.itemRender"
+                    :render-form-params="{ data: queryFormData, field: item.field }"
+                  />
+                  <span v-else></span>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-spin>
+      </div>
+      <div
+        v-if="toolbarConfig"
+        class="p-toolbar-wrapper flex items-center w-full justify-between p-theme-bg pt-8px px-16px"
+      >
+        <div class="flex items-center flex-1 gap-4px">
+          <template v-if="toolbarConfig.buttons && toolbarConfig.buttons.length > 0">
+            <a-button
+              v-for="(btn, idx) in toolbarConfig.buttons"
+              :key="idx"
+              :type="btn.type"
+              size="small"
+              @click="toolBtnClick(btn.code)"
+            >
+              <Icon v-if="btn.icon" :icon="btn.icon" />
+              {{ btn.content }}
+            </a-button>
+          </template>
+        </div>
+        <span class="flex items-center gap-4px">
+          <template v-if="toolbarConfig.tools && toolbarConfig.tools.length > 0">
+            <a-button
+              v-for="(tool, idx) in toolbarConfig.tools"
+              :key="idx"
+              :type="tool.type"
+              size="small"
+              @click="toolToolClick(tool.code)"
+            >
+              <Icon :icon="tool.icon" />
+            </a-button>
+          </template>
+        </span>
+      </div>
+      <div :class="`p-pane flex-1 ${enoughSpacing ? 'h-0' : ''} p-${scrollMode ?? 'inner'}-scroll`">
+        <a-table
+          :key="renderTableKey + '_table'"
+          :row-key="rowKey ?? 'id'"
+          ref="tableEl"
+          :columns="columns.map((c) => cleanCol(c as Recordable))"
+          :data-source="tableData"
+          :loading="loading.table"
+          :pagination="pg"
+          v-bind="tc"
+          :scroll="{
+            x: 'max-content',
+            y: renderHeight,
+          }"
+          @change="handleTableChange"
+        >
+          <template v-if="slotTitleColumns.length > 0" #headerCell="{ column }">
+            <render-title-slots
+              v-if="slotTitleColumns.some((s) => column.key && s.field === column.key)"
+              :key="renderTableKey + '_title_' + dataSeed + '_slot_' + column.key"
+              :column="slotTitleColumns.find((f) => column.key && f.field === column.key)!"
+            />
+          </template>
+          <template v-if="slotDefaultColumns.length > 0" #bodyCell="{ column, record, index }">
+            <render-default-slots
+              v-if="slotDefaultColumns.some((s) => column.key && s.field === column.key)"
+              :key="renderTableKey + '_cell_' + dataSeed + '_slot_' + column.key"
+              :column="slotDefaultColumns.find((f) => column.key && f.field === column.key)!"
+              :default-handler="{ pick: pickRow }"
+              :row="record"
+              :row-index="index"
+              :table-data="tableData as Recordable[]"
+            />
+          </template>
+        </a-table>
+      </div>
+    </template>
+  </div>
+</template>

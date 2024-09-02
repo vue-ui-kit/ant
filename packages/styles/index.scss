@@ -1,0 +1,184 @@
+@import 'variables';
+
+.p-pane {
+  background-color: var(--p-theme-bg);
+  padding: 16px;
+  border-radius: 4px;
+}
+
+//region patch for env without unocss/tailwind/windicss
+.w-full {
+  width: 100%;
+}
+
+.h-0 {
+  height: 0;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-4px {
+  gap: 4px;
+}
+
+.gap-8px {
+  gap: 8px;
+}
+
+.pt-8px {
+  padding-top: 8px;
+}
+
+.px-16px {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.mt-4px {
+  margin-top: 4px;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+//endregion
+
+//region P family styles
+.p-theme-bg {
+  background-color: var(--p-theme-bg);
+}
+
+.p-wrapper {
+  .p-form-wrapper {
+    z-index: 4;
+  }
+
+  .p-toolbar-wrapper {
+    box-shadow: 0 8px #fff;
+    border-radius: 0.5em 0.5em 0 0;
+    margin-bottom: -0.5em;
+  }
+
+  .ant-form {
+    .ant-form-item {
+      margin-bottom: 0;
+
+      .ant-form-item-label {
+        display: flex;
+        align-items: start;
+        justify-content: flex-end;
+
+        & > label {
+          white-space: break-spaces;
+          align-items: flex-start;
+          height: fit-content;
+          padding-top: 0.36em;
+
+          &:after {
+            padding-left: 4px;
+            margin-inline-start: unset;
+          }
+        }
+      }
+    }
+
+    &.ant-form-vertical {
+      .ant-form-item {
+        .ant-form-item-label {
+          justify-content: flex-start;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .ant-table-sticky-scroll {
+    visibility: hidden;
+  }
+
+  .ant-table-header.ant-table-sticky-holder {
+    //overflow: unset !important;
+
+    &:before {
+      content: '';
+      width: 100%;
+      position: absolute;
+      height: 22px;
+      display: block;
+      backdrop-filter: blur(2px);
+      top: -16px;
+    }
+  }
+
+  .ant-table-wrapper .ant-table-pagination.ant-pagination {
+    margin: unset;
+    padding: 16px 0;
+  }
+
+  .p-inner-scroll {
+    & > .ant-table-wrapper {
+      height: 100%;
+
+      & > .ant-spin-nested-loading {
+        height: 100%;
+
+        & > .ant-spin-container {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+
+          & > .ant-table {
+            //flex: 1;
+            //height: 0;
+            //overflow: auto;
+            /*border-radius: unset; 修复模糊问题 according to https://stackoverflow.com/questions/49349337/chrome-text-blur-with-overflow-yscroll-and-fixed-height*/
+            border-radius: unset;
+          }
+        }
+      }
+    }
+  }
+}
+
+//endregion
+
+@each $align in right center {
+  /**/
+  .p-content-align-#{$align}.ant-form-item .ant-form-item-control-input-content {
+    display: flex;
+    @if $align == right {
+      justify-content: flex-end;
+    } @else {
+      justify-content: center;
+    }
+    align-items: center;
+    text-align: #{$align};
+  }
+}
