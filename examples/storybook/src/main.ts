@@ -1,10 +1,11 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
-import UIKit from '@vue-ui-kit/ant'
-import Antd from 'ant-design-vue'
-import 'ant-design-vue/dist/reset.css'
+import { createApp } from 'vue';
+import './style.css';
+import App from './App.vue';
+import UIKit from '@vue-ui-kit/ant';
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/reset.css';
+import '@vue-ui-kit/ant/scss';
 
-UIKit.addFormatter({ test: () => 'test' })
+UIKit.addFormatter({ test: () => 'test' });
 
-createApp(App).use(Antd).use(UIKit).mount('#app')
+createApp(App).use(Antd).use(UIKit).mount('#app');

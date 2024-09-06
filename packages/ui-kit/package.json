@@ -8,7 +8,8 @@
     ".": {
       "require": "./dist/cjs/index.js",
       "import": "./dist/es/index.js"
-    }
+    },
+    "./scss": "./src/packages/styles/index.scss"
   },
   "files": [
     "dist",
