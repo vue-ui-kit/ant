@@ -6,8 +6,8 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/umd/index.js",
-      "import": "./dist/esm/index.js"
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/es/index.js"
     }
   },
   "files": [

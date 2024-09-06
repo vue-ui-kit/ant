@@ -1,8 +1,9 @@
-import type { Rule } from 'ant-design-vue/lib/form';
-import { ButtonProps } from 'ant-design-vue/lib/button';
-import { ColProps } from 'ant-design-vue/lib/grid/Col';
-import { FormProps } from 'ant-design-vue/lib/form/Form';
-import { TableColumnType, TableProps } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/lib/form'
+import { ButtonProps } from 'ant-design-vue/lib/button'
+import { ColProps } from 'ant-design-vue/lib/grid/Col'
+import { FormProps } from 'ant-design-vue/lib/form/Form'
+import { TableColumnType, TableProps } from 'ant-design-vue'
+import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes'
 
 export interface CellFuncArg<D = Recordable> {
   row: D;
@@ -105,7 +106,7 @@ export interface ColumnProps<D = Recordable> extends TableColumnType {
 export interface PButtonProps extends ButtonProps {
   content?: string;
   icon?: string;
-  type?: string;
+  type?: ButtonType;
 }
 
 export interface ToolbarButtonProps extends PButtonProps {
@@ -114,7 +115,7 @@ export interface ToolbarButtonProps extends PButtonProps {
 
 export interface ToolbarConfig {
   buttons?: Array<ToolbarButtonProps>;
-  tools?: Array<{ code: string; icon: string; type?: string }>;
+  tools?: Array<{ code: string; icon: string; type?: ButtonType }>;
 }
 
 export interface ResponsePathConfig<D = Recordable> {

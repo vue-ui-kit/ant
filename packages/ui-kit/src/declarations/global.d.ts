@@ -8,13 +8,13 @@ type DeepPick<T extends Record<string, any>, U extends string> = (
   U extends string
     ? U extends `${infer F}.${infer R}`
       ? (arg: {
-          [K in F]: DeepPick<T[F], R>;
-        }) => void
+        [K in F]: DeepPick<T[F], R>;
+      }) => void
       : U extends keyof T
         ? (arg: Pick<T, U>) => void
         : (arg: unknown) => void
     : never
-) extends (arg: infer Z) => void
+  ) extends (arg: infer Z) => void
   ? Z
   : never;
 
@@ -119,6 +119,13 @@ interface ISchema {
   creator?: string;
 }
 
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
+  
+  // biome-ignore lint/complexity/noBannedTypes: reason
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
 declare module '*.png';
 declare module '*.svg';
 declare module '*.jpeg';

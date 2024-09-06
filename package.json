@@ -8,7 +8,8 @@
     "examples/*"
   ],
   "scripts": {
-    "dev": "vue-tsc --noEmit --skipLibCheck & vite",
+    "pkg": "yarn workspace @vue-ui-kit/ant install",
+    "dev": "yarn workspace storybook dev",
     "build": "vite build",
     "prepare": "husky",
     "lint:lint-staged": "lint-staged",

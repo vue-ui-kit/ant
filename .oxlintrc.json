@@ -2,9 +2,13 @@
   "rules": {
     "no-unused-vars": [
       "warn",
-      { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
+      {
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      }
     ],
     "unicorn/prefer-node-protocol": "error",
+    "@typescript-eslint/no-explicit-any": "off",
     "import/namespace": [
       "error",
       {

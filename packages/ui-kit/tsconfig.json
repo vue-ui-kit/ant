@@ -5,21 +5,37 @@
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
     "emitDeclarationOnly": true,
-    "types": ["vite/client", "node"],
+    "noImplicitAny": false,
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "jsx": "preserve",
     "jsxImportSource": "vue",
     "paths": {
-      "@/*": ["./src/packages/*"],
-      "#/*": ["./src/declarations/*"]
+      "@/*": [
+        "./src/packages/*"
+      ],
+      "#/*": [
+        "./src/declarations/*"
+      ]
     },
     "plugins": [
       // Transform paths in output .js files
-      { "transform": "typescript-transform-paths" },
-
+      {
+        "transform": "typescript-transform-paths"
+      },
       // Transform paths for declarations files
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
     ]
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

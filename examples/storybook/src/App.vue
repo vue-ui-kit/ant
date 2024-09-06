@@ -1,23 +1,81 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import { moduleTest } from '@vue-ui-kit/ant'
+import { computed } from 'vue'
+import { Student } from './Mock/apis/type'
+import { queryStudents } from './Mock/apis/school'
+import { PGridProps } from '@vue-ui-kit/ant'
 
-console.log(moduleTest);
+interface IPage {
+  /**
+   * 第几页
+   */
+  page: number;
+  /**
+   * 一页显示的数量
+   */
+  size: number;
+}
+
+const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
+  columns: [
+    {
+      field: 'name',
+      width: 200,
+      title: '姓名',
+    },
+    {
+      field: 'enName',
+      width: 200,
+      title: '姓名',
+      formatter: 'capitalize',
+    },
+    {
+      field: 'id',
+      width: 200,
+      title: 'ID',
+    },
+    {
+      field: 'score',
+      width: 200,
+      title: '分数',
+    },
+  ],
+  formConfig: {
+    items: [
+      {
+        field: 'keyword',
+        title: '关键字',
+        itemRender: {
+          name: '$input',
+          props: {
+            placeholder: '请输入关键字',
+          },
+        },
+      },
+    ],
+  },
+  pageConfig: {
+    pageSize: 10,
+  },
+  proxyConfig: {
+    response: {
+      result: 'list',
+      total: 'total',
+    },
+    ajax: {
+      query: ({ form, page }) =>
+          queryStudents({
+            ...form,
+            ...page,
+          } as IPage & { keyword?: string }),
+    },
+  },
+}))
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div style="height: 100vh; width: 100%">
+    <p-grid v-bind="gridSetting"/>
   </div>
-  <div>
-    imported module {{ moduleTest }}
-  </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
@@ -27,9 +85,11 @@ console.log(moduleTest);
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
 }
