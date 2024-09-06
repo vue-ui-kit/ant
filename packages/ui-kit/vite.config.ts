@@ -4,12 +4,10 @@ import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import vueSetupExtend from 'unplugin-vue-setup-extend-plus/vite';
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
-import { resolve } from 'path';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig((): UserConfig => {
-  function pathResolve(dir: string) {
-    return resolve(process.cwd(), '.', dir);
-  }
   return {
     base: './',
     server: {
@@ -20,6 +18,7 @@ export default defineConfig((): UserConfig => {
       pure: ['console.log', 'debugger'],
     },
     plugins: [
+      tsconfigPaths(),
       vue(),
       // have to
       vueJsx({
@@ -29,17 +28,12 @@ export default defineConfig((): UserConfig => {
         /* enableAutoExpose 允许自动抛出 */
       }),
       cssInjectedByJsPlugin(),
+      dts(),
     ],
-    resolve: {
-      alias: {
-        '@': pathResolve('packages') + '/',
-        '#': pathResolve('types') + '/',
-      },
-    },
     build: {
       outDir: 'dist',
       lib: {
-        entry: 'index.ts',
+        entry: 'src/index.ts',
         name: 'vue-ui-kit_ant',
         fileName: (format) => `index.${format}.js`,
       },
@@ -53,6 +47,6 @@ export default defineConfig((): UserConfig => {
           },
         },
       },
-    },
+    }
   };
 });

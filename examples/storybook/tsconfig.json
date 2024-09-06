@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "outDir": "dist",
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "paths": {
+      "@vue-ui-kit/ant": ["../../packages/ui-kit/src"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "references": [
+    {
+      "path": "../../packages/ui-kit"
+    }
+  ]
+}
