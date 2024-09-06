@@ -19,5 +19,4 @@ export default {
   addRender,
 };
 
-export const moduleTest = 'moduleTest-ui-kit';
 export * from '#/antProxy';
