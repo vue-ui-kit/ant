@@ -63,10 +63,7 @@
     "sass": "^1.77.8",
     "ts-patch": "^3.2.1",
     "typescript-transform-paths": "^3.5.0",
-    "unplugin-vue-setup-extend-plus": "^1.0.1",
     "vite": "^5.4.2",
-    "vite-aliases": "^0.11.7",
-    "vite-plugin-css-injected-by-js": "^3.5.1",
     "vite-plugin-dts": "^4.1.0",
     "vue": "^3.4.38"
   }
