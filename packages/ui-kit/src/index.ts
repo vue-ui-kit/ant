@@ -18,3 +18,6 @@ export default {
   addFormatter,
   addRender,
 };
+
+export const moduleTest = 'moduleTest-ui-kit';
+export * from '#/antProxy';
