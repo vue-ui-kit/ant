@@ -11,6 +11,7 @@ export default {
   install(app: App) {
     app.component('PForm', PForm);
     app.component('PGrid', PGrid);
+    // @ts-ignore
     app.component('PFormGroup', PFormGroup);
     app.component('PGroupBlock', PGroupBlock);
     app.component('PromisePicker', PromisePicker);
