@@ -1,9 +1,9 @@
-import type { Rule } from 'ant-design-vue/lib/form'
-import { ButtonProps } from 'ant-design-vue/lib/button'
-import { ColProps } from 'ant-design-vue/lib/grid/Col'
-import { FormProps } from 'ant-design-vue/lib/form/Form'
-import { TableColumnType, TableProps } from 'ant-design-vue'
-import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes'
+import type { Rule } from 'ant-design-vue/lib/form';
+import { ButtonProps } from 'ant-design-vue/lib/button';
+import { ColProps } from 'ant-design-vue/lib/grid/Col';
+import { FormProps } from 'ant-design-vue/lib/form/Form';
+import { TableColumnType, TableProps } from 'ant-design-vue';
+import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
 
 export interface CellFuncArg<D = Recordable> {
   row: D;
@@ -58,6 +58,17 @@ export interface PFormItemProps<F = Recordable> {
 export interface PFormProps<F = Recordable> extends FormProps {
   items: PFormItemProps<F>[];
   customReset?: () => void;
+}
+
+export interface PBlockProps<F = Recordable> {
+  getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
+  source: Partial<F>;
+}
+
+export interface PromisePickerProps<D = Recordable, F = Recordable> {
+  gridSetting: PGridProps<D, F>;
+  title?: string;
+  width?: string | number;
 }
 
 export type GroupMenuItemHandler<F = Recordable> = ({

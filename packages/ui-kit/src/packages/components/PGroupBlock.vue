@@ -1,14 +1,9 @@
 <script lang="ts" setup name="PGroupBlock" generic="F = Recordable">
-  import { PFormProps } from '#/antProxy';
+  import { PBlockProps, PFormProps } from '#/antProxy';
   import { computed, toRefs } from 'vue';
   import PForm from '@/components/PForm.vue';
 
-  interface IProps {
-    getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
-    source: Partial<F>;
-  }
-
-  const props = defineProps<IProps>();
+  const props = defineProps<PBlockProps<F>>();
   const { source } = toRefs(props);
   const formSetting = computed<PFormProps<Partial<F>>>(() => props.getFormSetting(source.value));
 </script>

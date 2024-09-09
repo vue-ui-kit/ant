@@ -10,11 +10,11 @@
       required: true,
     },
     title: {
-      type: String,
+      type: String as PropType<string>,
       default: '数据选择',
     },
     width: {
-      type: [String, Number],
+      type: [String, Number] as PropType<string | number>,
       default: '70%',
     },
   });
