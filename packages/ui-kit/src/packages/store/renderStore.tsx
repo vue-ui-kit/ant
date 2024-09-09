@@ -1,4 +1,3 @@
-import { componentsMap, renderBasic } from '@/store/basicRenders';
 import { RenderFormParams, RenderOptions, RenderTableParams } from '#/antProxy';
 import {
   Button,
@@ -7,11 +6,24 @@ import {
   CheckboxGroup,
   TypographyParagraph,
   Switch,
+  AutoComplete,
+  Cascader,
+  Checkbox,
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  RangePicker,
+  Mentions,
+  Rate,
+  Slider,
+  Textarea,
+  TimePicker,
   TreeSelect,
 } from 'ant-design-vue';
 import { set, isFunction, merge, omit } from 'lodash-es';
 import { ButtonProps } from 'ant-design-vue/lib/button';
-import { valued } from '@/utils/is';
+import { noValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
 import { computed } from 'vue';
@@ -24,6 +36,55 @@ interface BtnOptions extends ButtonProps {
   clickEvt?: (p: RenderTableParams) => any;
 }
 
+const antDefaultProps = {
+  AInput: {
+    autocomplete: 'off',
+  },
+  $input: {
+    autocomplete: 'off',
+    allowClear: true,
+  },
+  AInputNumber: {
+    min: 0,
+    controls: false,
+    precision: 0,
+  },
+  $number: {
+    min: 0,
+    controls: false,
+    precision: 0,
+  },
+  $date: {
+    format: 'YYYY-MM-DD',
+    valueFormat: 'YYYY-MM-DD',
+  },
+  ADatePicker: {
+    format: 'YYYY-MM-DD',
+    valueFormat: 'YYYY-MM-DD',
+  },
+  $range: {
+    format: 'YYYY-MM-DD',
+    valueFormat: 'YYYY-MM-DD',
+  },
+  ARangePicker: {
+    format: 'YYYY-MM-DD',
+    valueFormat: 'YYYY-MM-DD',
+  },
+  $select: {
+    getPopupContainer: (triggerNode: HTMLElement) => triggerNode.parentNode,
+    allowClear: true,
+    showSearch: true,
+    filterOption: (input: string, option: IOption) =>
+      option.label && option.label.toLowerCase().includes(input.toLowerCase()),
+  },
+  ASelect: {
+    getPopupContainer: (triggerNode: HTMLElement) => triggerNode.parentNode,
+    allowClear: true,
+    showSearch: true,
+    filterOption: (input: string, option: IOption) =>
+      option.label && option.label.toLowerCase().includes(input.toLowerCase()),
+  },
+};
 const defaultProps: Recordable = {
   PercentInput: {
     controls: false,
@@ -31,6 +92,80 @@ const defaultProps: Recordable = {
     max: 100,
     addonAfter: '%',
   },
+};
+const componentsMap = {
+  $input: Input,
+  AInput: Input,
+  $textarea: Textarea,
+  Textarea: Textarea,
+  $number: InputNumber,
+  AInputNumber: InputNumber,
+  $select: Select,
+  ASelect: Select,
+  $date: DatePicker,
+  ADatePicker: DatePicker,
+  $range: RangePicker,
+  ARangePicker: RangePicker,
+  AAutoComplete: AutoComplete,
+  $Cascader: Cascader,
+  ACascader: Cascader,
+  ACheckbox: Checkbox,
+  AMentions: Mentions,
+  ARate: Rate,
+  ASlider: Slider,
+  /*switch 用的是checked不是value🙄*/
+  /*  '$switch': Switch,
+    'ASwitch': Switch,*/
+  $time: TimePicker,
+  ATimePicker: TimePicker,
+  ATreeSelect: TreeSelect,
+};
+const renderBasic = (name: string) => {
+  const DynamicComponent = componentsMap[name];
+  return {
+    renderItemContent(
+      { props = {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
+      { data, field }: RenderFormParams,
+    ) {
+      if (valued(defaultValue) && valued(field) && noValue(data[field!])) {
+        data[field!] = defaultValue;
+      }
+      return field ? (
+        <DynamicComponent
+          is={name}
+          v-model:value={data[field]}
+          {...attrs}
+          {...merge({}, antDefaultProps[name], props)}
+          onChange={(...arg) => {
+            events.change?.({ data, field }, ...arg);
+          }}
+        />
+      ) : (
+        <DynamicComponent is={name} {...props} />
+      );
+    },
+    renderDefault(
+      { props = antDefaultProps[name] ?? {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
+      { data, row, field }: RenderTableParams,
+    ) {
+      if (valued(defaultValue) && valued(field) && noValue(row[field!])) {
+        row[field!] = defaultValue;
+      }
+      return field ? (
+        <DynamicComponent
+          is={name}
+          v-model:value={row[field]}
+          {...attrs}
+          {...merge({}, antDefaultProps[name], props)}
+          onChange={(...arg) => {
+            events.change?.({ data, row, field }, ...arg);
+          }}
+        />
+      ) : (
+        <DynamicComponent is={name} {...props} />
+      );
+    },
+  };
 };
 
 const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
