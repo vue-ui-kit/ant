@@ -3,9 +3,20 @@ import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
+import { resolve } from 'path';
+
+function pathResolve(dir: string) {
+  return resolve(process.cwd(), '.', dir);
+}
 
 export default defineConfig({
   plugins: [tsconfigPaths(), vue(), vueJsx(), dts()],
+  resolve: {
+    alias: {
+      '@': pathResolve('src/packages') + '/',
+      '#': pathResolve('src/declarations') + '/',
+    },
+  },
   build: {
     outDir: 'dist',
     lib: {
