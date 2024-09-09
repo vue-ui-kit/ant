@@ -1,13 +1,14 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.0",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
-      "import": "./dist/es/index.js"
+      "import": "./dist/es/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./scss": "./src/packages/styles/index.scss"
   },
