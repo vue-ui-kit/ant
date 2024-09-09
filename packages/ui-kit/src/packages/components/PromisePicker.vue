@@ -17,6 +17,10 @@
       type: [String, Number] as PropType<string | number>,
       default: '70%',
     },
+    bodyStyle: {
+      type: Object,
+      default: () => ({}),
+    },
   });
   let resolvePromise: (
     value: { row: D; field?: string } | PromiseLike<{ row: D; field?: string }>,
@@ -53,6 +57,7 @@
     :width="width"
     :footer="null"
     @cancel="handleCancel"
+    :body-style="bodyStyle"
   >
     <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
   </a-modal>

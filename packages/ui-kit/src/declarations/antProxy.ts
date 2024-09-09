@@ -51,7 +51,10 @@ export interface PFormItemProps<F = Recordable> {
   rule?: Rule[];
   itemRender?: ItemRender;
   slots?: {
-    default?: ({ data, field }: ItemFuncArg<F>) => any;
+    default?: (
+      { data, field }: ItemFuncArg<F>,
+      passTrigger?: (cusFields?: string | string[]) => void,
+    ) => any;
   };
 }
 
