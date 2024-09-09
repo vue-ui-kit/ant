@@ -2,7 +2,7 @@
   import { computed } from 'vue';
   import { Student } from './Mock/apis/type';
   import { queryStudents } from './Mock/apis/school';
-  import { PGridProps } from '@vue-ui-kit/ant';
+  import { PGridProps, labelColDict } from '@vue-ui-kit/ant';
 
   interface IPage {
     /**
@@ -44,6 +44,7 @@
         {
           field: 'keyword',
           title: '关键字',
+          labelCol: labelColDict[3],
           itemRender: {
             name: '$input',
             props: {

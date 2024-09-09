@@ -6,6 +6,7 @@ import PGroupBlock from '@/components/PGroupBlock.vue';
 import PromisePicker from '@/components/PromisePicker.vue';
 import { addFormatter } from '@/utils/AFormatters';
 import { addRender } from '@/store/renderStore';
+import * as utils from '@/utils/core';
 
 export default {
   install(app: App) {
@@ -21,3 +22,4 @@ export default {
 };
 
 export * from '#/antProxy';
+export * from '@/utils/core';

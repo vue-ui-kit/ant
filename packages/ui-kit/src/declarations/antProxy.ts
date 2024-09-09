@@ -100,7 +100,7 @@ export interface PFormGroupProps<F = Recordable> {
   menuHandler?: GroupMenuItemHandler<F>;
 }
 
-export interface ColumnProps<D = Recordable> extends TableColumnType {
+export interface ColumnProps<D = Recordable> extends Omit<TableColumnType, 'slots'> {
   field?: string;
   children?: ColumnProps<D>[];
   formatter?:
