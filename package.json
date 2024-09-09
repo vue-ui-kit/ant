@@ -10,7 +10,8 @@
   "scripts": {
     "pkg": "yarn workspace @vue-ui-kit/ant install",
     "dev": "yarn workspace storybook dev",
-    "build": "vite build",
+    "build": "yarn workspace @vue-ui-kit/ant build",
+    "publish:lib": "yarn workspace @vue-ui-kit/ant npm publish --access=public",
     "prepare": "husky",
     "lint:lint-staged": "lint-staged",
     "lint:prettier": "prettier --write  \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\""
