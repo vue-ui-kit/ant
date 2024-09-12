@@ -39,7 +39,7 @@
     table: false,
     form: false,
   });
-  const submitOnReset = false;
+  const submitOnReset = true;
   const boxEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   const selectedRowKeys = ref<string[] | number[]>([]);
@@ -342,7 +342,12 @@
     /*判断本组件所在容器DOM*/
     const pNode = boxEl.value?.parentElement;
     const ph = pNode ? window.getComputedStyle(pNode).height : '0px';
-    renderHeight.value = toNumber(ph.replace('px', '')) - 200;
+    renderHeight.value =
+      props.renderY ??
+      toNumber(ph.replace('px', '')) -
+        (props.fitHeight ?? 170) -
+        (!!props.toolbarConfig ? 30 : 0) -
+        Math.ceil((props.formConfig?.items?.length ?? 0) / 4) * 35;
     enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
     resetQueryFormData(props.manualFetch);
   });
@@ -378,13 +383,14 @@
                 >
                   <render-item-slots
                     v-if="item.slots?.default"
+                    :key="'_sl_' + (item.field ?? '_') + '_' + idx"
                     :form-data="queryFormData"
                     :item="item"
                     :pass-trigger="() => {}"
                   />
                   <render-ant-item
                     v-else-if="item.itemRender?.name"
-                    :key="'_re_' + idx"
+                    :key="'_re_' + (item.field ?? '_') + '_' + idx"
                     :default-handler="{
                       reset: () => {
                         resetQueryFormData(!submitOnReset);

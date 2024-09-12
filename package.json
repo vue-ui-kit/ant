@@ -1,7 +1,7 @@
 {
   "name": "ui-kit",
   "type": "module",
-  "version": "1.0.1-alpha.0",
+  "version": "1.2.0",
   "description": "Vue3 UI Kit based on Ant Design",
   "workspaces": [
     "packages/*",

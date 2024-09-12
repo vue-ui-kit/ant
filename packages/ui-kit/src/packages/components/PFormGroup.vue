@@ -1,6 +1,6 @@
 <script lang="ts" generic="F = Recordable" setup name="PFormGroup">
   import { computed, PropType, ref } from 'vue';
-  import { PFormGroupProps } from '#/antProxy';
+  import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
   import { cloneDeep, toString, isFunction, omit } from 'lodash-es';
   import PGroupBlock from '@/components/PGroupBlock.vue';
@@ -20,6 +20,7 @@
     default: () => [],
   });
   const activeKey = ref(0);
+  const blockInstance = ref<PFormBlockInstance[]>([]);
   const setActiveKey = (key: number) => {
     activeKey.value = key;
   };
@@ -49,6 +50,11 @@
   defineExpose({
     activeKey: computed(() => activeKey.value),
     setActiveKey,
+    validateAll: () => {
+      return Promise.all(
+        blockInstance.value.map((block) => block.$form?.validate() ?? Promise.resolve()),
+      );
+    },
   });
 </script>
 <template>
@@ -65,7 +71,12 @@
           </a-button>
         </slot>
       </template>
-      <a-tab-pane v-for="(item, idx) in model" :key="idx" :tab="`${tabLabel} ${idx + 1}`">
+      <a-tab-pane
+        v-for="(item, idx) in model"
+        :key="idx"
+        :tab="`${tabLabel} ${idx + 1}`"
+        force-render
+      >
         <template #closeIcon>
           <a-dropdown v-if="editAble && itemMenus?.length">
             <MoreOutlined />
@@ -83,7 +94,21 @@
             </template>
           </a-dropdown>
         </template>
-        <p-group-block :key="idx" :source="item" :get-form-setting="getFormSetting" />
+        <!-- @vue-ignore -->
+        <p-group-block
+          :ref="
+            (i: PFormBlockInstance) => {
+              if (i) {
+                blockInstance[idx] = i;
+              } else if (blockInstance) {
+                blockInstance = blockInstance.filter((_, i) => i !== idx);
+              }
+            }
+          "
+          :key="idx"
+          :source="item"
+          :get-form-setting="getFormSetting"
+        />
       </a-tab-pane>
     </a-tabs>
   </a-card>

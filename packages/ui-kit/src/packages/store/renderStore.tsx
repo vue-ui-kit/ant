@@ -92,6 +92,9 @@ const defaultProps: Recordable = {
     max: 100,
     addonAfter: '%',
   },
+  autoComplete: {
+    inputProps: {},
+  },
 };
 const componentsMap = {
   $input: Input,
@@ -342,6 +345,30 @@ const renders = {
           {...props}
           options={props.options ?? options ?? []}
         />
+      ) : null;
+    },
+  },
+  $autoComplete: {
+    renderItemContent(
+      { props = {}, events = {} }: RenderOptions,
+      { data, field }: RenderFormParams,
+    ) {
+      return valued(field) ? (
+        <AutoComplete
+          v-model:value={data[field!]}
+          {...props}
+          onChange={(...arg) => {
+            events.change?.({ data, field }, ...arg);
+          }}
+        >
+          {{
+            default: () => (
+              <a-input
+                {...Object.assign({}, defaultProps.autoComplete.inputProps, props.inputProps ?? {})}
+              />
+            ),
+          }}
+        </AutoComplete>
       ) : null;
     },
   },

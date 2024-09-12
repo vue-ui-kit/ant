@@ -46,6 +46,7 @@ export interface PFormItemProps<F = Recordable> {
   field?: string;
   title?: string;
   span?: number;
+  colon?: boolean;
   align?: 'left' | 'right' | 'center';
   col?: ColProps;
   rule?: Rule[];
@@ -177,6 +178,14 @@ export type PGridProps<D = Recordable, F = Recordable> = {
   proxyConfig?: ProxyConfig<D, F>;
   tableConfig?: TableProps<D>;
   scrollMode?: 'outer' | 'inner';
+  /**
+   * 适应展示区到页面顶部的高度，通常和容器最上的y值有关（正比）
+   */
+  fitHeight?: number;
+  /**
+   * 虚拟列表 Y区计算高度
+   */
+  renderY?: number;
 };
 
 export interface RenderOptions {
@@ -249,7 +258,12 @@ export interface PromisePickerInstance<D = Recordable> {
   pick: () => Promise<{ row: D; field?: string }>;
 }
 
+export interface PFormBlockInstance {
+  $form: Recordable;
+}
+
 export interface PFormGroupInstance<F = Recordable> {
   activeKey: number;
   setActiveKey: (activeKey: number) => void;
+  validateAll: () => Promise<void>;
 }

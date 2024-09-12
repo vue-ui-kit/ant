@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "1.0.1-alpha.0",
+  "version": "1.2.0",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -21,7 +21,6 @@
     "build": "ts-patch install && vite build",
     "prepack": "rimraf dist && yarn build",
     "prepare": "husky",
-    "publish": "npm publish",
     "lint:lint-staged": "lint-staged",
     "lint:prettier": "prettier --write  \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\""
   },

@@ -89,11 +89,12 @@
               v-if="item.slots?.default"
               :form-data="formData"
               :item="item"
+              :key="'_sl_' + (item.field ?? '_') + '_' + idx"
               :pass-trigger="handleTrigger"
             />
             <render-ant-item
               v-else-if="item.itemRender?.name"
-              :key="'_re_' + idx"
+              :key="'_re_' + (item.field ?? '_') + '_' + idx"
               :default-handler="{ reset: resetFormData }"
               :item-render="item.itemRender"
               @trigger="handleTrigger"
