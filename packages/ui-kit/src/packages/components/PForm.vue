@@ -1,14 +1,21 @@
 <script generic="F = Recordable" lang="ts" name="PForm" setup>
   import { PFormItemProps, PFormProps } from '#/antProxy';
   import { computed, onMounted, ref, toRefs, watch } from 'vue';
-  import { debounce, omit } from 'lodash-es';
+  import { debounce, omit, isFunction } from 'lodash-es';
   import { v4 as uuid_v4 } from 'uuid';
   import RenderAntItem from '@/components/RenderAntItem';
   import RenderItemSlots from '@/components/RenderItemSlots';
   import { valued } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
   import { defaultItemResponsive } from '@/utils/core';
-  import { Form as AForm, Row as ARow, Col as ACol, FormItem as AFormItem } from 'ant-design-vue';
+  import {
+    Form as AForm,
+    Row as ARow,
+    Col as ACol,
+    FormItem as AFormItem,
+    Tooltip as ATooltip,
+  } from 'ant-design-vue';
+  import { InfoCircleOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps<PFormProps<F> & { data: F }>();
   const emit = defineEmits(['apply', 'reset']);
@@ -82,8 +89,19 @@
             :name="item.field"
             :wrapper-col="item.wrapperCol ?? (item.title ? undefined : { span: 24 })"
             colon
-            :class="`p-content-align-${item.align ?? 'left'}`"
-            v-bind="omit(item, ['field', 'title', 'span', 'col', 'wrapperCol', 'itemRender'])"
+            :class="`p-content-align-${item.align ?? 'left'} ${item.forceRequired ? 'p-required' : ''}`"
+            v-bind="
+              omit(item, [
+                'field',
+                'title',
+                'span',
+                'col',
+                'wrapperCol',
+                'itemRender',
+                'forceRequired',
+                'tooltip',
+              ])
+            "
           >
             <render-item-slots
               v-if="item.slots?.default"
@@ -101,6 +119,20 @@
               :render-form-params="{ data: formData, field: item.field }"
             />
             <span v-else></span>
+            <template #tooltip v-if="item.tooltipConfig">
+              <a-tooltip
+                v-if="isFunction(item.tooltipConfig.title)"
+                v-bind="omit(item.tooltipConfig, ['title'])"
+              >
+                <InfoCircleOutlined class="cursor-pointer py-4x px-2x" />
+                <template #title>
+                  <div v-html="item.tooltipConfig.title()"></div>
+                </template>
+              </a-tooltip>
+              <a-tooltip v-else v-bind="item.tooltipConfig">
+                <InfoCircleOutlined class="cursor-pointer py-4x px-2x" />
+              </a-tooltip>
+            </template>
           </a-form-item>
         </a-col>
       </a-row>

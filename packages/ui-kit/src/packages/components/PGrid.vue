@@ -21,8 +21,10 @@
     Row as ARow,
     Col as ACol,
     Spin as ASpin,
+    Tooltip as ATooltip,
   } from 'ant-design-vue';
   import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
+  import { InfoCircleOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps<PGridProps<D, F>>();
   const {
@@ -376,10 +378,20 @@
               >
                 <a-form-item
                   :key="'_item_' + idx"
-                  :class="`p-content-align-${item.align ?? 'left'}`"
+                  :class="`p-content-align-${item.align ?? 'left'} ${item.forceRequired ? 'p-required' : ''}`"
                   :label="item.title"
                   :name="item.field"
-                  v-bind="omit(item, ['field', 'title', 'span', 'col', 'itemRender'])"
+                  v-bind="
+                    omit(item, [
+                      'field',
+                      'title',
+                      'span',
+                      'col',
+                      'itemRender',
+                      'forceRequired',
+                      'tooltip',
+                    ])
+                  "
                 >
                   <render-item-slots
                     v-if="item.slots?.default"
@@ -400,6 +412,20 @@
                     :render-form-params="{ data: queryFormData, field: item.field }"
                   />
                   <span v-else></span>
+                  <template #tooltip v-if="item.tooltipConfig">
+                    <a-tooltip
+                      v-if="isFunction(item.tooltipConfig.title)"
+                      v-bind="omit(item.tooltipConfig, ['title'])"
+                    >
+                      <InfoCircleOutlined class="cursor-pointer py-4x px-2x" />
+                      <template #title>
+                        <div v-html="item.tooltipConfig.title()"></div>
+                      </template>
+                    </a-tooltip>
+                    <a-tooltip v-else v-bind="item.tooltipConfig">
+                      <InfoCircleOutlined class="cursor-pointer py-4x px-2x" />
+                    </a-tooltip>
+                  </template>
                 </a-form-item>
               </a-col>
             </a-row>

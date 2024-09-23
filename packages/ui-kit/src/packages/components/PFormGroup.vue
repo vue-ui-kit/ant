@@ -1,5 +1,5 @@
 <script lang="ts" generic="F = Recordable" setup name="PFormGroup">
-  import { computed, PropType, ref } from 'vue';
+  import { computed, nextTick, PropType, ref } from 'vue';
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
   import { cloneDeep, toString, isFunction, omit } from 'lodash-es';
@@ -40,6 +40,12 @@
       switch (key) {
         case 'delete':
           model.value = model.value.filter((_, i) => i !== idx);
+          nextTick(() => {
+            blockInstance.value = blockInstance.value.filter((f) => !!f);
+            if (idx <= activeKey.value && activeKey.value > 0) {
+              activeKey.value--;
+            }
+          });
           break;
         case 'copy':
           model.value = [...model.value, cloneDeep(omit(item, ['id']))];

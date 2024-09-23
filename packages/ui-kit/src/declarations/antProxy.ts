@@ -2,7 +2,7 @@ import type { Rule } from 'ant-design-vue/lib/form';
 import { ButtonProps } from 'ant-design-vue/lib/button';
 import { ColProps } from 'ant-design-vue/lib/grid/Col';
 import { FormProps } from 'ant-design-vue/lib/form/Form';
-import { TableColumnType, TableProps } from 'ant-design-vue';
+import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
 import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
 
 export interface CellFuncArg<D = Recordable> {
@@ -42,15 +42,21 @@ export interface Responsive {
   xxl?: number;
 }
 
+export interface TooltipConfig extends TooltipProps {
+  title: TooltipProps['title'] | (() => any);
+}
+
 export interface PFormItemProps<F = Recordable> {
   field?: string;
   title?: string;
   span?: number;
   colon?: boolean;
+  forceRequired?: boolean; // 在页面需要必填标示，但field不需要必填校验时使用
   align?: 'left' | 'right' | 'center';
   col?: ColProps;
   rule?: Rule[];
   itemRender?: ItemRender;
+  tooltipConfig?: TooltipConfig;
   slots?: {
     default?: (
       { data, field }: ItemFuncArg<F>,
