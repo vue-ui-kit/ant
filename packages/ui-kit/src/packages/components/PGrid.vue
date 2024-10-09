@@ -77,7 +77,7 @@
   };
   const slotTitleColumns = computed(() => {
     const cols: ColumnProps<D>[] = [];
-    eachTree(columns.value, (col) => {
+    eachTree(columns.value ?? [], (col) => {
       if (col.slots && col.slots.title) {
         if (!col.field) {
           col.field = '__holder__' + cols.length;
@@ -101,7 +101,7 @@
   const debounceRefreshTable = debounce(refreshTable, 100);
   const slotDefaultColumns = computed(() => {
     const cols: ColumnProps<D>[] = [];
-    eachTree(columns.value, (col) => {
+    eachTree(columns.value ?? [], (col) => {
       if ((col.slots && col.slots.default) || col.formatter || col.cellRender) {
         if (!col.field) {
           col.field = '__holder__' + cols.length;
@@ -469,7 +469,7 @@
           :key="renderTableKey + '_table'"
           :row-key="rowKey ?? 'id'"
           ref="tableEl"
-          :columns="columns.map((c) => cleanCol(c as Recordable))"
+          :columns="(columns ?? []).map((c) => cleanCol(c as Recordable))"
           :data-source="tableData"
           :loading="loading.table"
           :pagination="pg"

@@ -178,7 +178,7 @@ export type PGridProps<D = Recordable, F = Recordable> = {
   rowKey?: string;
   manualFetch?: boolean;
   formConfig?: PFormProps<F>;
-  columns: ColumnProps<D>[];
+  columns?: ColumnProps<D>[];
   toolbarConfig?: ToolbarConfig;
   pageConfig?: PageConfig;
   proxyConfig?: ProxyConfig<D, F>;
