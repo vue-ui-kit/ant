@@ -248,7 +248,7 @@ export interface PGridInstance<D = Recordable, F = Recordable> {
     query: () => Promise<D[]>;
     reload: () => Promise<D[]>;
     reloadPage: () => Promise<D[]>;
-    passQuery: (query: Partial<F>) => Promise<D[]>;
+    passQuery: (query: Partial<F>, lazy?: boolean) => Promise<void | D[]>;
   };
   selectedRowKeys: string[] | number[];
   $table: Recordable;

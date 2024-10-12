@@ -266,10 +266,10 @@
       }
     });
   const debounceFetchData = debounce(fetchData, 160);
-  const passQuery = (params: Partial<F>) => {
+  const passQuery = (params: Partial<F>, lazy?: boolean) => {
     Object.assign(queryFormData.value, params);
     pagination.page = 1;
-    return debounceFetchData();
+    return lazy ? Promise.resolve() : debounceFetchData();
   };
   const pg = computed(() =>
     mode.value === 'pagination'
