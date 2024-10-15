@@ -169,12 +169,13 @@ export interface PageConfig {
   pageSize?: number;
 }
 
-export interface SelectConfig {
+export interface SelectConfig<D = Recordable> {
   multiple?: boolean;
+  getCheckboxProps?: (record: D) => { disabled?: boolean };
 }
 
 export type PGridProps<D = Recordable, F = Recordable> = {
-  selectConfig?: SelectConfig;
+  selectConfig?: SelectConfig<D>;
   rowKey?: string;
   manualFetch?: boolean;
   formConfig?: PFormProps<F>;

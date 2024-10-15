@@ -304,6 +304,7 @@
               onChange: (selectedKeys: string[] | number[]) => {
                 selectedRowKeys.value = selectedKeys;
               },
+              getCheckboxProps: selectConfig.value.getCheckboxProps,
             },
           }
         : {},
