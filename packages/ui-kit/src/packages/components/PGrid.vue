@@ -444,12 +444,12 @@
               <a-dropdown v-if="btn.dropdowns && btn.dropdowns.length">
                 <template #overlay>
                   <a-menu @click="toolBtnMenuClick">
-                    <a-menu-item v-for="sub in btn.dropdowns" :key="sub.code">{{
-                      sub.content
-                    }}</a-menu-item>
+                    <a-menu-item v-for="sub in btn.dropdowns" :key="sub.code"
+                      >{{ sub.content }}
+                    </a-menu-item>
                   </a-menu>
                 </template>
-                <a-button :type="btn.type" size="small">
+                <a-button :type="btn.type" :size="btn.size ?? 'small'">
                   <Icon v-if="btn.icon" :icon="btn.icon" />
                   {{ btn.content }}
                   <DownOutlined />
@@ -458,7 +458,7 @@
               <a-button
                 v-else-if="btn.code"
                 :type="btn.type"
-                size="small"
+                :size="btn.size ?? 'small'"
                 @click="toolBtnClick(btn.code)"
               >
                 <Icon v-if="btn.icon" :icon="btn.icon" />

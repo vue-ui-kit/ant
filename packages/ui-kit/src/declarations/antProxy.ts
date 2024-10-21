@@ -133,6 +133,7 @@ export interface PButtonProps extends ButtonProps {
 export interface ToolbarButtonProps extends PButtonProps {
   code: string;
   dropdowns?: ToolbarButtonProps[];
+  size?: 'small' | 'large' | 'middle';
 }
 
 export interface ToolbarConfig {
