@@ -24,7 +24,7 @@
     Tooltip as ATooltip,
   } from 'ant-design-vue';
   import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
-  import { InfoCircleOutlined } from '@ant-design/icons-vue';
+  import { InfoCircleOutlined, DownOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps<PGridProps<D, F>>();
   const {
@@ -142,6 +142,7 @@
     });
     innerToolbarHandler(code);
   };
+  const toolBtnMenuClick = ({ key }) => toolBtnClick(key);
   const toolToolClick = (code: string) => {
     emit('toolbarToolClick', { data: tableData.value, code, selectedKeys: selectedRowKeys.value });
     innerToolbarHandler(code);
@@ -439,16 +440,32 @@
       >
         <div class="flex items-center flex-1 gap-4px">
           <template v-if="toolbarConfig.buttons && toolbarConfig.buttons.length > 0">
-            <a-button
-              v-for="(btn, idx) in toolbarConfig.buttons"
-              :key="idx"
-              :type="btn.type"
-              size="small"
-              @click="toolBtnClick(btn.code)"
-            >
-              <Icon v-if="btn.icon" :icon="btn.icon" />
-              {{ btn.content }}
-            </a-button>
+            <template v-for="(btn, idx) in toolbarConfig.buttons" :key="idx">
+              <a-dropdown v-if="btn.dropdowns && btn.dropdowns.length">
+                <template #overlay>
+                  <a-menu @click="toolBtnMenuClick">
+                    <a-menu-item v-for="sub in btn.dropdowns" :key="sub.code">{{
+                      sub.content
+                    }}</a-menu-item>
+                  </a-menu>
+                </template>
+                <a-button :type="btn.type" size="small">
+                  <Icon v-if="btn.icon" :icon="btn.icon" />
+                  {{ btn.content }}
+                  <DownOutlined />
+                </a-button>
+              </a-dropdown>
+              <a-button
+                v-else-if="btn.code"
+                :type="btn.type"
+                size="small"
+                @click="toolBtnClick(btn.code)"
+              >
+                <Icon v-if="btn.icon" :icon="btn.icon" />
+                {{ btn.content }}
+              </a-button>
+              <div v-else></div>
+            </template>
           </template>
         </div>
         <span class="flex items-center gap-4px">
