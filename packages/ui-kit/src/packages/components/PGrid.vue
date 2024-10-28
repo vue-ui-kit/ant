@@ -341,6 +341,10 @@
     $table: computed(() => tableEl.value),
     selectedRowKeys: computed(() => selectedRowKeys.value),
     $form: computed(() => formEl.value),
+    setLoadings: (value: boolean) => {
+      loading.form = value;
+      loading.table = value;
+    },
   });
   onMounted(() => {
     /*判断本组件所在容器DOM*/

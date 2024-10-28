@@ -256,6 +256,7 @@ export interface PGridInstance<D = Recordable, F = Recordable> {
   selectedRowKeys: string[] | number[];
   $table: Recordable;
   $form: Recordable;
+  setLoadings: (value: boolean) => void;
 }
 
 export interface PFormInstance {
