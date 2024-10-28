@@ -39,6 +39,7 @@
   } = toRefs(props);
   const loading = reactive({
     table: false,
+    toolbar: false,
     form: false,
   });
   const submitOnReset = true;
@@ -56,6 +57,7 @@
               content: '确认删除选中的数据吗？',
             }).then(() => {
               loading.table = true;
+              loading.toolbar = true;
               ajax.multiDelete!(selectedRowKeys.value)
                 .then(() => {
                   $message.success('删除成功');
@@ -66,6 +68,7 @@
                 })
                 .finally(() => {
                   loading.table = false;
+                  loading.toolbar = false;
                 });
             });
           } else {
@@ -142,11 +145,13 @@
     });
     innerToolbarHandler(code);
   };
-  const toolBtnMenuClick = ({ key }) => toolBtnClick(key);
+  const debounceToolBtnClick = debounce(toolBtnClick, 100);
+  const toolBtnMenuClick = ({ key }) => debounceToolBtnClick(key);
   const toolToolClick = (code: string) => {
     emit('toolbarToolClick', { data: tableData.value, code, selectedKeys: selectedRowKeys.value });
     innerToolbarHandler(code);
   };
+  const debounceToolToolClick = debounce(toolToolClick, 100);
   const queryFormData = ref<Partial<F>>({}) as Ref<Partial<F>>;
   const pickRow = ({ row, field }: { row: D; field: string }) => {
     emit('pick', { row, field });
@@ -344,6 +349,7 @@
     setLoadings: (value: boolean) => {
       loading.form = value;
       loading.table = value;
+      loading.toolbar = value;
     },
   });
   onMounted(() => {
@@ -453,7 +459,7 @@
                     </a-menu-item>
                   </a-menu>
                 </template>
-                <a-button :type="btn.type" :size="btn.size ?? 'small'">
+                <a-button :type="btn.type" :size="btn.size ?? 'small'" :loading="loading.toolbar">
                   <Icon v-if="btn.icon" :icon="btn.icon" />
                   {{ btn.content }}
                   <DownOutlined />
@@ -463,7 +469,8 @@
                 v-else-if="btn.code"
                 :type="btn.type"
                 :size="btn.size ?? 'small'"
-                @click="toolBtnClick(btn.code)"
+                :loading="loading.toolbar"
+                @click="debounceToolBtnClick(btn.code)"
               >
                 <Icon v-if="btn.icon" :icon="btn.icon" />
                 {{ btn.content }}
@@ -479,7 +486,8 @@
               :key="idx"
               :type="tool.type"
               size="small"
-              @click="toolToolClick(tool.code)"
+              @click="debounceToolToolClick(tool.code)"
+              :loading="loading.toolbar"
             >
               <Icon :icon="tool.icon" />
             </a-button>
