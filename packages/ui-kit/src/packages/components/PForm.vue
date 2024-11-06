@@ -5,7 +5,7 @@
   import { v4 as uuid_v4 } from 'uuid';
   import RenderAntItem from '@/components/RenderAntItem';
   import RenderItemSlots from '@/components/RenderItemSlots';
-  import { valued } from '@/utils/is';
+  import { isGoodValue, valued } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
   import { defaultItemResponsive } from '@/utils/core';
   import {
@@ -39,7 +39,7 @@
       const obj: Partial<F> = {};
       eachTree(items.value, (item) => {
         if (item.field && item.itemRender) {
-          if (valued(item.itemRender.defaultValue)) {
+          if (isGoodValue(item.itemRender.defaultValue)) {
             obj[item.field] = item.itemRender.defaultValue;
           } else {
             obj[item.field] = undefined;

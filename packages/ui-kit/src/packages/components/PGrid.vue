@@ -8,7 +8,7 @@
   import RenderTitleSlots from '@/components/RenderTitleSlots';
   import RenderDefaultSlots from '@/components/RenderDefaultSlots';
   import { v4 as uuid_v4 } from 'uuid';
-  import { valued } from '@/utils/is';
+  import { isGoodValue, valued } from '@/utils/is';
   import RenderItemSlots from '@/components/RenderItemSlots';
   import { cleanCol, defaultItemResponsive, defaultLabelCol } from '@/utils/core';
   import Icon from '@/renders/Icon';
@@ -164,7 +164,7 @@
         const obj: Partial<F> = {};
         eachTree(formConfig.value.items, (item) => {
           if (item.field && item.itemRender) {
-            if (valued(item.itemRender.defaultValue)) {
+            if (isGoodValue(item.itemRender.defaultValue)) {
               obj[item.field] = item.itemRender.defaultValue;
             } else {
               obj[item.field] = undefined;

@@ -23,7 +23,7 @@ import {
 } from 'ant-design-vue';
 import { set, isFunction, merge, omit } from 'lodash-es';
 import { ButtonProps } from 'ant-design-vue/lib/button';
-import { noValue, valued } from '@/utils/is';
+import { isBadValue, isGoodValue, noValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
 import { computed } from 'vue';
@@ -130,7 +130,7 @@ const renderBasic = (name: string) => {
       { props = {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
       { data, field }: RenderFormParams,
     ) {
-      if (valued(defaultValue) && valued(field) && noValue(data[field!])) {
+      if (isGoodValue(defaultValue) && valued(field) && isBadValue(data[field!])) {
         data[field!] = defaultValue;
       }
       return field ? (
@@ -151,7 +151,7 @@ const renderBasic = (name: string) => {
       { props = antDefaultProps[name] ?? {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
       { data, row, field }: RenderTableParams,
     ) {
-      if (valued(defaultValue) && valued(field) && noValue(row[field!])) {
+      if (isGoodValue(defaultValue) && valued(field) && isBadValue(row[field!])) {
         row[field!] = defaultValue;
       }
       return field ? (
