@@ -214,6 +214,7 @@
   };
   const resetPage = () => {
     pagination.page = 1;
+    selectedCaches.value = [];
     selectedRowKeys.value = [];
     return fetchData();
   };
