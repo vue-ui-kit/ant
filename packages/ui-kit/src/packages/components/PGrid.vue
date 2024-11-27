@@ -149,11 +149,11 @@
   const emit = defineEmits<{
     (
       event: 'toolbarButtonClick',
-      data: { data: D[]; code: string; selectedKeys: string[]; records: D[] },
+      data: { data: D[]; code: string; selectedKeys: Array<string | number>; records: D[] },
     ): void;
     (
       event: 'toolbarToolClick',
-      data: { data: D[]; code: string; selectedKeys: string[]; records: D[] },
+      data: { data: D[]; code: string; selectedKeys: Array<string | number>; records: D[] },
     ): void;
     (event: 'pick', data: { row: D; field: string }): void;
   }>();

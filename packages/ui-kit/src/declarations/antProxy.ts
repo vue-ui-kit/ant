@@ -154,7 +154,7 @@ export interface ResponsePathConfig<D = Recordable> {
     | ((res: Recordable) => string | { status: string; content: string; icon?: string });
 }
 
-declare type HandlerMulti = (ids: string[] | number[]) => any;
+declare type HandlerMulti = (ids: Array<string | number>) => any;
 
 export interface AjaxConfig<F = Recordable> {
   query: (Q: { page?: IPage; form: Partial<F> }) => Promise<Recordable>;
