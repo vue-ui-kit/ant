@@ -45,7 +45,7 @@
   const submitOnReset = true;
   const boxEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
-  const selectedRowKeys = ref<string[] | number[]>([]);
+  const selectedRowKeys = ref<Array<string | number>>([]);
   const selectedCaches = ref<D[]>([]);
   const innerToolbarHandler = (code: string) => {
     const { ajax } = proxyConfig.value!;
@@ -146,14 +146,17 @@
       : 'bad',
   );
   const attrs = useAttrs();
-  const emit = defineEmits([
-    'query',
-    'reset',
-    'update:tableData',
-    'toolbarButtonClick',
-    'toolbarToolClick',
-    'pick',
-  ]);
+  const emit = defineEmits<{
+    (
+      event: 'toolbarButtonClick',
+      data: { data: D[]; code: string; selectedKeys: string[]; records: D[] },
+    ): void;
+    (
+      event: 'toolbarToolClick',
+      data: { data: D[]; code: string; selectedKeys: string[]; records: D[] },
+    ): void;
+    (event: 'pick', data: { row: D; field: string }): void;
+  }>();
   // @ts-ignore
   const selectedRecords = computed<D[]>(() =>
     selectedCaches.value.filter((f) =>

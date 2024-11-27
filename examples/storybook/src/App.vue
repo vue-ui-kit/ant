@@ -57,6 +57,18 @@
     pageConfig: {
       pageSize: 10,
     },
+    selectConfig: {
+      multiple: true,
+    },
+    toolbarConfig: {
+      buttons: [
+        {
+          type: 'primary',
+          code: 'test',
+          content: '测试',
+        },
+      ],
+    },
     proxyConfig: {
       response: {
         result: 'list',
@@ -71,10 +83,17 @@
       },
     },
   }));
+  const handleToolbarBtn = ({ code, records }) => {
+    switch (code) {
+      case 'test':
+        console.log('test', records);
+        break;
+    }
+  };
 </script>
 
 <template>
   <div style="height: 100vh; width: 100%">
-    <p-grid v-bind="gridSetting" />
+    <p-grid v-bind="gridSetting" @toolbar-button-click="handleToolbarBtn" />
   </div>
 </template>
