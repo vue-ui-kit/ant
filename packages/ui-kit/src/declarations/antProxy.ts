@@ -58,6 +58,7 @@ export interface PFormItemProps<F = Recordable> {
   itemRender?: ItemRender;
   tooltipConfig?: TooltipConfig;
   slots?: {
+    title?: () => any;
     default?: (
       { data, field }: ItemFuncArg<F>,
       passTrigger?: (cusFields?: string | string[]) => void,

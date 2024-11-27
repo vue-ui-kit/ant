@@ -103,6 +103,9 @@
               ])
             "
           >
+            <template v-if="item.slots?.title" #label>
+              <component :is="item.slots.title" />
+            </template>
             <render-item-slots
               v-if="item.slots?.default"
               :form-data="formData"
