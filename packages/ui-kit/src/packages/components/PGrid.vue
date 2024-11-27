@@ -46,6 +46,7 @@
   const boxEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   const selectedRowKeys = ref<string[] | number[]>([]);
+  const selectedCaches = ref<D[]>([]);
   const innerToolbarHandler = (code: string) => {
     const { ajax } = proxyConfig.value!;
     switch (code) {
@@ -69,6 +70,7 @@
                 .finally(() => {
                   loading.table = false;
                   loading.toolbar = false;
+                  codeLoadings.multiDelete = false;
                 });
             });
           } else {
@@ -96,6 +98,21 @@
   const renderTableKey = ref(uuid_v4());
   const refreshForm = () => {
     renderFormKey.value = uuid_v4();
+  };
+  const codeLoadings = reactive<Record<string, boolean>>(
+    [
+      ...(props.toolbarConfig?.buttons?.map((m) => m.code) ?? []).filter((f) => f),
+      ...(props.toolbarConfig?.tools?.map((m) => m.code) ?? []).filter((f) => f),
+    ].reduce(
+      (acc, cur) => {
+        acc[cur!] = false;
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    ),
+  );
+  const setBtnLoading = (code: string, value: boolean) => {
+    codeLoadings[code] = value;
   };
   const refreshTable = () => {
     renderTableKey.value = uuid_v4();
@@ -137,18 +154,30 @@
     'toolbarToolClick',
     'pick',
   ]);
+  // @ts-ignore
+  const selectedRecords = computed<D[]>(() =>
+    selectedCaches.value.filter((f) =>
+      selectedRowKeys.value.includes(f[props.rowKey ?? 'id'] as string | number),
+    ),
+  );
   const toolBtnClick = (code: string) => {
     emit('toolbarButtonClick', {
       data: tableData.value,
       code,
       selectedKeys: selectedRowKeys.value,
+      records: selectedRecords.value,
     });
     innerToolbarHandler(code);
   };
   const debounceToolBtnClick = debounce(toolBtnClick, 100);
   const toolBtnMenuClick = ({ key }) => debounceToolBtnClick(key);
   const toolToolClick = (code: string) => {
-    emit('toolbarToolClick', { data: tableData.value, code, selectedKeys: selectedRowKeys.value });
+    emit('toolbarToolClick', {
+      data: tableData.value,
+      code,
+      selectedKeys: selectedRowKeys.value,
+      records: selectedRecords.value,
+    });
     innerToolbarHandler(code);
   };
   const debounceToolToolClick = debounce(toolToolClick, 100);
@@ -310,6 +339,14 @@
               selectedRowKeys: selectedRowKeys.value,
               onChange: (selectedKeys: string[] | number[]) => {
                 selectedRowKeys.value = selectedKeys;
+                const primaryKey = props.rowKey ?? 'id';
+                const cachedKeys = selectedCaches.value.map((m) => m[primaryKey]);
+                const newKeys = selectedKeys.filter((f) => !cachedKeys.includes(f));
+                const newRecords: D[] = newKeys
+                  .map((m) => tableData.value.find((f) => f[primaryKey] === m))
+                  .filter((f) => !!f) as D[];
+                // @ts-ignore
+                selectedCaches.value = [...selectedCaches.value, ...newRecords];
               },
               getCheckboxProps: selectConfig.value.getCheckboxProps,
             },
@@ -346,6 +383,8 @@
     },
     $table: computed(() => tableEl.value),
     selectedRowKeys: computed(() => selectedRowKeys.value),
+    setBtnLoading,
+    selectedRecords,
     $form: computed(() => formEl.value),
     setLoadings: (value: boolean) => {
       loading.form = value;
@@ -460,7 +499,11 @@
                     </a-menu-item>
                   </a-menu>
                 </template>
-                <a-button :type="btn.type" :size="btn.size ?? 'small'" :loading="loading.toolbar">
+                <a-button
+                  :type="btn.type"
+                  :size="btn.size ?? 'small'"
+                  :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
+                >
                   <Icon v-if="btn.icon" :icon="btn.icon" />
                   {{ btn.content }}
                   <DownOutlined />
@@ -470,7 +513,7 @@
                 v-else-if="btn.code"
                 :type="btn.type"
                 :size="btn.size ?? 'small'"
-                :loading="loading.toolbar"
+                :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
                 @click="debounceToolBtnClick(btn.code)"
               >
                 <Icon v-if="btn.icon" :icon="btn.icon" />
@@ -488,7 +531,7 @@
               :type="tool.type"
               size="small"
               @click="debounceToolToolClick(tool.code)"
-              :loading="loading.toolbar"
+              :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
               <Icon :icon="tool.icon" />
             </a-button>
