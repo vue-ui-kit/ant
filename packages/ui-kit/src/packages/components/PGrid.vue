@@ -505,6 +505,7 @@
                 <a-button
                   :type="btn.type"
                   :size="btn.size ?? 'small'"
+                  :disabled="toolbarConfig.disabled || btn.disabled"
                   :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
                 >
                   <Icon v-if="btn.icon" :icon="btn.icon" />
@@ -516,6 +517,7 @@
                 v-else-if="btn.code"
                 :type="btn.type"
                 :size="btn.size ?? 'small'"
+                :disabled="toolbarConfig.disabled || btn.disabled"
                 :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
                 @click="debounceToolBtnClick(btn.code)"
               >
@@ -533,6 +535,7 @@
               :key="idx"
               :type="tool.type"
               size="small"
+              :disabled="toolbarConfig.disabled || tool.disabled"
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >

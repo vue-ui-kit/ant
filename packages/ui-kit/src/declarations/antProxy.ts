@@ -139,7 +139,8 @@ export interface ToolbarButtonProps extends PButtonProps {
 
 export interface ToolbarConfig {
   buttons?: Array<ToolbarButtonProps>;
-  tools?: Array<{ code: string; icon: string; type?: ButtonType }>;
+  tools?: Array<{ code: string; icon: string; type?: ButtonType; disabled?: boolean }>;
+  disabled?: boolean;
 }
 
 export interface ResponsePathConfig<D = Recordable> {
