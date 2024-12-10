@@ -1,6 +1,16 @@
 <script generic="D = Recordable, F = Recordable" lang="ts" name="PGrid" setup>
   import { ColumnProps, PFormItemProps, PGridProps, ResponsePathConfig } from '#/antProxy';
-  import { computed, useAttrs, ref, Ref, reactive, onMounted, watch, toRefs } from 'vue';
+  import {
+    computed,
+    useAttrs,
+    ref,
+    Ref,
+    reactive,
+    onMounted,
+    watch,
+    toRefs,
+    onBeforeUnmount,
+  } from 'vue';
   import { debounce, get, isArray, isFunction, isString, merge, omit, toNumber } from 'lodash-es';
   import { eachTree } from '@/utils/treeHelper';
   import { message as $message } from 'ant-design-vue';
@@ -44,6 +54,7 @@
   });
   const submitOnReset = true;
   const boxEl = ref<HTMLDivElement>();
+  const pFormWrapper = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   const selectedRowKeys = ref<Array<string | number>>([]);
   const selectedCaches = ref<D[]>([]);
@@ -377,6 +388,21 @@
     },
     { deep: true },
   );
+  const resizeTable = () => {
+    const pNode = boxEl.value?.parentElement;
+    const ph = pNode ? window.getComputedStyle(pNode).height : '0px';
+    const formHeight = pFormWrapper.value
+      ? toNumber(window.getComputedStyle(pFormWrapper.value).height.replace('px', ''))
+      : 0;
+
+    renderHeight.value =
+      props.renderY ??
+      toNumber(ph.replace('px', '')) -
+        (props.fitHeight ?? 170) -
+        (!!props.toolbarConfig ? 30 : 0) -
+        formHeight;
+    enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
+  };
   defineExpose({
     commitProxy: {
       query: debounceFetchData,
@@ -394,19 +420,15 @@
       loading.table = value;
       loading.toolbar = value;
     },
+    resizeTable,
   });
   onMounted(() => {
-    /*判断本组件所在容器DOM*/
-    const pNode = boxEl.value?.parentElement;
-    const ph = pNode ? window.getComputedStyle(pNode).height : '0px';
-    renderHeight.value =
-      props.renderY ??
-      toNumber(ph.replace('px', '')) -
-        (props.fitHeight ?? 170) -
-        (!!props.toolbarConfig ? 30 : 0) -
-        Math.ceil((props.formConfig?.items?.length ?? 0) / 4) * 35;
-    enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
+    resizeTable();
+    window.addEventListener('resize', resizeTable);
     resetQueryFormData(props.manualFetch);
+  });
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', resizeTable);
   });
 </script>
 <template>
@@ -416,6 +438,7 @@
       <div
         v-if="formConfig?.items?.some((s: PFormItemProps<F>) => s.field && s.itemRender)"
         class="p-pane p-form-wrapper"
+        ref="pFormWrapper"
       >
         <a-spin :spinning="loading.form">
           <a-form

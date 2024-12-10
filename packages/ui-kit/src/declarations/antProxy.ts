@@ -260,6 +260,7 @@ export interface PGridInstance<D = Recordable, F = Recordable> {
   $form: Recordable;
   setLoadings: (value: boolean) => void;
   setBtnLoading: (code: string, status: boolean) => void;
+  resizeTable: () => void;
 }
 
 export interface PFormInstance {
