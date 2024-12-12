@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -14,7 +14,10 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "README.zh.md",
+    "tsconfig.json"
   ],
   "scripts": {
     "dev": "vue-tsc --noEmit --skipLibCheck & vite",

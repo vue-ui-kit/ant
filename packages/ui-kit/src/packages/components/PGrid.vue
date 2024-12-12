@@ -167,6 +167,7 @@
       data: { data: D[]; code: string; selectedKeys: Array<string | number>; records: D[] },
     ): void;
     (event: 'pick', data: { row: D; field: string }): void;
+    (event: 'resetQuery'): void;
   }>();
   // @ts-ignore
   const selectedRecords = computed<D[]>(() =>
@@ -216,6 +217,7 @@
         });
         queryFormData.value = obj;
       }
+      emit('resetQuery');
       refreshForm();
     }
 
