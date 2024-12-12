@@ -1,5 +1,6 @@
 {
   "name": "ui-kit",
+  "homepage": "https://github.com/vue-ui-kit/ant",
   "type": "module",
   "version": "1.6.0",
   "description": "Vue3 UI Kit based on Ant Design",
