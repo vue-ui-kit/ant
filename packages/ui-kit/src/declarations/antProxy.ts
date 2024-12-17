@@ -89,7 +89,7 @@ export type GroupMenuItemHandler<F = Recordable> = ({
 }: {
   index: number;
   code: string;
-  data: Partial<F>;
+  data: Partial<F & { __index: number }>;
 }) => void;
 
 export interface GroupMenuItem<F = Recordable> {
@@ -105,6 +105,8 @@ export interface PFormGroupProps<F = Recordable> {
   tabLabel?: string;
   editAble?: boolean;
   showAdd?: boolean;
+  /* 是否保持连续编号 */
+  keepSerial?: boolean;
   itemMenus?: Array<GroupMenuItem<F>>;
   creatItem?: ({ list }: { list?: Partial<F>[] }) => Promise<Partial<F>>;
   max?: number;
