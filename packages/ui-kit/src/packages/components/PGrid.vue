@@ -529,7 +529,7 @@
                 </template>
                 <a-button
                   :type="btn.type"
-                  :size="btn.size ?? 'small'"
+                  :size="btn.size ?? 'middle'"
                   :disabled="toolbarConfig.disabled || btn.disabled"
                   :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
                 >
@@ -541,7 +541,7 @@
               <a-button
                 v-else-if="btn.code"
                 :type="btn.type"
-                :size="btn.size ?? 'small'"
+                :size="btn.size ?? 'middle'"
                 :disabled="toolbarConfig.disabled || btn.disabled"
                 :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
                 @click="debounceToolBtnClick(btn.code)"
@@ -559,7 +559,7 @@
               v-for="(tool, idx) in toolbarConfig.tools"
               :key="idx"
               :type="tool.type"
-              size="small"
+              :size="btn.size ?? 'middle'"
               :disabled="toolbarConfig.disabled || tool.disabled"
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
