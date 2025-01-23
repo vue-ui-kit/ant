@@ -1,10 +1,12 @@
 <script lang="ts" setup name="PromisePicker" generic="D = Recordable, F = Recordable">
-  import { PropType, reactive, ref } from 'vue';
+  import { PropType, reactive, ref, computed } from 'vue';
   import { PGridInstance, PGridProps } from '#/antProxy';
   import PGrid from '@/components/PGrid.vue';
+  import { $warning } from '@/hooks/useMessage';
+  import { Button as AButton, Modal as AModal } from 'ant-design-vue';
 
   const gridEl = ref<PGridInstance<D>>();
-  defineProps({
+  const props = defineProps({
     gridSetting: {
       type: Object as PropType<PGridProps<D, F>>,
       required: true,
@@ -17,14 +19,20 @@
       type: [String, Number] as PropType<string | number>,
       default: '70%',
     },
+    multipleAllowEmpty: {
+      type: Boolean,
+      default: false,
+    },
     bodyStyle: {
       type: Object,
       default: () => ({}),
     },
   });
+  const isMultiple = computed(() => props.gridSetting.selectConfig?.multiple);
   let resolvePromise: (
     value: { row: D; field?: string } | PromiseLike<{ row: D; field?: string }>,
   ) => void;
+  let multipleResolver: (rows: D[]) => void;
   let rejectPromise: (reason?: any) => void;
   const visible = reactive({
     modal: false,
@@ -35,15 +43,29 @@
     }
   };
   const selectRow = ({ row, field }: { row: D; field?: string }) => {
-    if (resolvePromise) {
+    // 单选才关闭结束选择
+    if (resolvePromise && !isMultiple.value) {
       visible.modal = false;
       resolvePromise({ row, field });
     }
   };
+  const endMultiplePicker = () => {
+    const records = gridEl.value?.selectedRecords.value ?? [];
+    if (records.length === 0 && !props.multipleAllowEmpty) {
+      $warning('请选择数据');
+    } else {
+      visible.modal = false;
+      multipleResolver(records);
+    }
+  };
   defineExpose({
     pick: () =>
-      new Promise<{ row: D; field?: string }>((resolve, reject) => {
-        resolvePromise = resolve;
+      new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
+        if (isMultiple.value) {
+          multipleResolver = resolve;
+        } else {
+          resolvePromise = resolve;
+        }
         rejectPromise = reject;
         visible.modal = true;
       }),
@@ -55,10 +77,15 @@
     destroy-on-close
     :title="title"
     :width="width"
-    :footer="null"
+    :footer="isMultiple ? true : null"
     @cancel="handleCancel"
     :body-style="bodyStyle"
   >
     <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
+    <template v-if="isMultiple" #footer>
+      <div class="w-full flex flex-end p-2">
+        <a-button type="primary" @click="endMultiplePicker"> 确定 </a-button>
+      </div>
+    </template>
   </a-modal>
 </template>

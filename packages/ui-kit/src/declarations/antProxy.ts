@@ -4,6 +4,7 @@ import { ColProps } from 'ant-design-vue/lib/grid/Col';
 import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
 import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
+import { ComputedRef } from 'vue';
 
 export interface CellFuncArg<D = Recordable> {
   row: D;
@@ -258,6 +259,7 @@ export interface PGridInstance<D = Recordable, F = Recordable> {
     passQuery: (query: Partial<F>, lazy?: boolean) => Promise<void | D[]>;
   };
   selectedRowKeys: string[] | number[];
+  selectedRecords: ComputedRef<D[]>;
   $table: Recordable;
   $form: Recordable;
   setLoadings: (value: boolean) => void;
@@ -271,7 +273,7 @@ export interface PFormInstance {
 }
 
 export interface PromisePickerInstance<D = Recordable> {
-  pick: () => Promise<{ row: D; field?: string }>;
+  pick: () => Promise<{ row: D; field?: string } | D[]>;
 }
 
 export interface PFormBlockInstance {
