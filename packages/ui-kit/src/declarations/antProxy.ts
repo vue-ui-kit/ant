@@ -259,7 +259,7 @@ export interface PGridInstance<D = Recordable, F = Recordable> {
     passQuery: (query: Partial<F>, lazy?: boolean) => Promise<void | D[]>;
   };
   selectedRowKeys: string[] | number[];
-  selectedRecords: ComputedRef<D[]>;
+  selectedRecords: D[];
   $table: Recordable;
   $form: Recordable;
   setLoadings: (value: boolean) => void;

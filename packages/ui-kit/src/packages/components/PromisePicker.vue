@@ -50,7 +50,7 @@
     }
   };
   const endMultiplePicker = () => {
-    const records = gridEl.value?.selectedRecords.value ?? [];
+    const records = gridEl.value?.selectedRecords ?? [];
     if (records.length === 0 && !props.multipleAllowEmpty) {
       $warning('请选择数据');
     } else {
