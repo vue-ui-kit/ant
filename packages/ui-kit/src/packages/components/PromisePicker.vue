@@ -61,11 +61,13 @@
   defineExpose({
     pick: () =>
       new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
-        if (isMultiple.value) {
-          multipleResolver = resolve;
-        } else {
-          resolvePromise = resolve;
-        }
+        resolvePromise = resolve;
+        rejectPromise = reject;
+        visible.modal = true;
+      }),
+    pickMultiple: () =>
+      new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
+        multipleResolver = resolve;
         rejectPromise = reject;
         visible.modal = true;
       }),
@@ -84,7 +86,7 @@
     <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
     <template v-if="isMultiple" #footer>
       <div class="w-full flex flex-end p-2">
-        <a-button type="primary" @click="endMultiplePicker"> 确定 </a-button>
+        <a-button type="primary" @click="endMultiplePicker"> 确定</a-button>
       </div>
     </template>
   </a-modal>

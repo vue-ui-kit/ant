@@ -273,7 +273,8 @@ export interface PFormInstance {
 }
 
 export interface PromisePickerInstance<D = Recordable> {
-  pick: () => Promise<{ row: D; field?: string } | D[]>;
+  pick: () => Promise<{ row: D; field?: string }>;
+  pickMultiple: () => Promise<D[]>;
 }
 
 export interface PFormBlockInstance {
