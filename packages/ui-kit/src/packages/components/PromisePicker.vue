@@ -42,6 +42,13 @@
       rejectPromise();
     }
   };
+
+  const manualCancel = () => {
+    visible.modal = false;
+    if (rejectPromise) {
+      rejectPromise();
+    }
+  };
   const selectRow = ({ row, field }: { row: D; field?: string }) => {
     // 单选才关闭结束选择
     if (resolvePromise && !isMultiple.value) {
@@ -86,7 +93,10 @@
     <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
     <template v-if="isMultiple" #footer>
       <div class="w-full text-right p-2">
-        <a-button type="primary" @click="endMultiplePicker"> 确定</a-button>
+        <span>
+          <a-button class="mr-4" @click="manualCancel"> 取消 </a-button>
+          <a-button type="primary" @click="endMultiplePicker"> 确定 </a-button>
+        </span>
       </div>
     </template>
   </a-modal>
