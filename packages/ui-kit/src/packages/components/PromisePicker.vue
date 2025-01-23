@@ -79,13 +79,13 @@
     destroy-on-close
     :title="title"
     :width="width"
-    :footer="isMultiple ? true : null"
+    :footer="isMultiple ? undefined : null"
     @cancel="handleCancel"
     :body-style="bodyStyle"
   >
     <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
     <template v-if="isMultiple" #footer>
-      <div class="w-full flex flex-end p-2">
+      <div class="w-full text-right p-2">
         <a-button type="primary" @click="endMultiplePicker"> 确定</a-button>
       </div>
     </template>
