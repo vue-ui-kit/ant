@@ -393,7 +393,10 @@
   const resizeTable = () => {
     const pNode = boxEl.value?.parentElement;
     const ph = pNode ? window.getComputedStyle(pNode).height : '0px';
-    const formHeight = pFormWrapper.value
+    const formOriginHeight = pFormWrapper.value
+      ? window.getComputedStyle(pFormWrapper.value).height
+      : '0px';
+    const formHeight = formOriginHeight.includes('px')
       ? toNumber(window.getComputedStyle(pFormWrapper.value).height.replace('px', ''))
       : 0;
 
@@ -424,13 +427,32 @@
     },
     resizeTable,
   });
+
+  let observer: MutationObserver;
   onMounted(() => {
     resizeTable();
     window.addEventListener('resize', resizeTable);
+    // 还需要在组件根节点由不可见转为可见时重新计算高度（display:none等样式控制时）
+    observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const el = mutation.target as HTMLElement;
+          const style = window.getComputedStyle(el);
+          if (style.display !== 'none') {
+            handlePageResize();
+          }
+        }
+      });
+    });
+
+    if (boxEl.value) {
+      observer.observe(boxEl.value, { attributes: true, attributeFilter: ['style'] });
+    }
     resetQueryFormData(props.manualFetch);
   });
   onBeforeUnmount(() => {
     window.removeEventListener('resize', resizeTable);
+    observer.disconnect();
   });
 </script>
 <template>
