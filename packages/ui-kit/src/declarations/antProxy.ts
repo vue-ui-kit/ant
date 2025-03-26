@@ -22,6 +22,7 @@ export interface ItemRender {
   name: string;
   defaultValue?: any;
   props?: Recordable;
+  attrs?: Recordable;
   options?: IOption[];
   children?: Recordable[];
   events?: { [key: string]: (...args: any[]) => any };
@@ -30,6 +31,7 @@ export interface ItemRender {
 export interface CellRender {
   name: string;
   props?: Recordable;
+  attrs?: Recordable;
   children?: Recordable[];
 }
 
