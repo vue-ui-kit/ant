@@ -397,15 +397,12 @@
       ? window.getComputedStyle(pFormWrapper.value).height
       : '0px';
     const formHeight = formOriginHeight.includes('px')
-      ? toNumber(window.getComputedStyle(pFormWrapper.value).height.replace('px', ''))
+      ? toNumber(window.getComputedStyle(pFormWrapper.value!).height.replace('px', ''))
       : 0;
-
+    const showCountHeight = selectConfig.value?.showCount ? 22 : 0
     renderHeight.value =
       props.renderY ??
-      toNumber(ph.replace('px', '')) -
-        (props.fitHeight ?? 170) -
-        (!!props.toolbarConfig ? 30 : 0) -
-        formHeight;
+      toNumber(ph.replace('px', '')) -(props.fitHeight ?? 170) -(!!props.toolbarConfig ? 30 : 0) -formHeight- showCountHeight;
     enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
   };
   defineExpose({
@@ -439,7 +436,7 @@
           const el = mutation.target as HTMLElement;
           const style = window.getComputedStyle(el);
           if (style.display !== 'none') {
-            handlePageResize();
+            resizeTable();
           }
         }
       });
