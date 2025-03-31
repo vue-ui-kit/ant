@@ -591,6 +591,9 @@
           </template>
         </span>
       </div>
+      <div v-if="selectConfig?.multiple && selectConfig.showCount" class="w-100p text-slate-5 pl-8">
+        已选：{{ selectedRowKeys.length }}
+      </div>
       <div :class="`p-pane flex-1 ${enoughSpacing ? 'h-0' : ''} p-${scrollMode ?? 'inner'}-scroll`">
         <a-table
           :key="renderTableKey + '_table'"

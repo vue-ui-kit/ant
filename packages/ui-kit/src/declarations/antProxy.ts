@@ -180,6 +180,7 @@ export interface PageConfig {
 
 export interface SelectConfig<D = Recordable> {
   multiple?: boolean;
+  showCount?: boolean;
   getCheckboxProps?: (record: D) => { disabled?: boolean };
 }
 
