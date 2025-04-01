@@ -397,7 +397,7 @@
       ? window.getComputedStyle(pFormWrapper.value).height
       : '0px';
     const formHeight = formOriginHeight.includes('px')
-      ? toNumber(window.getComputedStyle(pFormWrapper.value!).height.replace('px', ''))
+      ? toNumber(formOriginHeight.replace('px', ''))
       : 0;
     const showCountHeight = selectConfig.value?.showCount ? 22 : 0
     renderHeight.value =
