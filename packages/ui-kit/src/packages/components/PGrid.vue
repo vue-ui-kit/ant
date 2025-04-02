@@ -447,6 +447,13 @@
     }
     resetQueryFormData(props.manualFetch);
   });
+  const passFields = ['align']
+  const passDefaultColumnProps = (columns: ColumnProps<D>[]) => columns.map(c => ({
+    ...passFields.reduce((prev, cur) => ({
+      [cur]: props[cur],
+    }), {} as ColumnProps<D>),
+    ...c,
+  }))
   onBeforeUnmount(() => {
     window.removeEventListener('resize', resizeTable);
     observer.disconnect();
@@ -596,7 +603,7 @@
           :key="renderTableKey + '_table'"
           :row-key="rowKey ?? 'id'"
           ref="tableEl"
-          :columns="(columns ?? []).map((c) => cleanCol(c as Recordable))"
+          :columns="passDefaultColumnProps(columns ?? []).map((c) => cleanCol(c as ColumnProps))"
           :data-source="tableData"
           :loading="loading.table"
           :pagination="pg"

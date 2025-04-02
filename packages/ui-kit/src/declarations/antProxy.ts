@@ -188,6 +188,7 @@ export type PGridProps<D = Recordable, F = Recordable> = {
   selectConfig?: SelectConfig<D>;
   rowKey?: string;
   manualFetch?: boolean;
+  align?: 'left' | 'right' | 'center'
   formConfig?: PFormProps<F>;
   columns?: ColumnProps<D>[];
   toolbarConfig?: ToolbarConfig;
