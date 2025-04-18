@@ -78,6 +78,7 @@
         rejectPromise = reject;
         visible.modal = true;
       }),
+  grid: gridEl,
   });
 </script>
 <template>

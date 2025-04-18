@@ -279,6 +279,7 @@ export interface PFormInstance {
 export interface PromisePickerInstance<D = Recordable> {
   pick: () => Promise<{ row: D; field?: string }>;
   pickMultiple: () => Promise<D[]>;
+  grid: PGridInstance<D>
 }
 
 export interface PFormBlockInstance {
@@ -289,4 +290,5 @@ export interface PFormGroupInstance<F = Recordable> {
   activeKey: number;
   setActiveKey: (activeKey: number) => void;
   validateAll: () => Promise<void>;
+  validate: (index: number) => Promise<void>;
 }
