@@ -97,9 +97,9 @@
         blockInstance.value.map((block) => block.$form?.validate() ?? Promise.resolve()),
       );
     },
-  validate: (index) => {
-    return blockInstance.value[index]?.$form?.validate()
-  },
+    validate: (index) => {
+      return blockInstance.value[index]?.$form?.validate()
+    },
   });
 </script>
 <template>
