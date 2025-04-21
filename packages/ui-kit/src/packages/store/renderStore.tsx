@@ -220,7 +220,7 @@ const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
   );
 const renders = {
   ...Object.fromEntries(Object.keys(componentsMap).map((name) => [name, renderBasic(name)])),
-  //简单按钮
+  // 简单按钮
   $button: {
     renderItemContent(
       { props = {}, events = {} }: RenderOptions,
@@ -241,6 +241,7 @@ const renders = {
           }}
         >
           {props.content}
+          {props.suffix?.({ data, field }) ?? null}
         </Button>
       );
     },
@@ -281,40 +282,87 @@ const renders = {
     ) {
       return (
         <span class="align-gap-box w-fit">
-          {children.map((m) => (
-            <Button
-              {...omit(Object.assign(props, m.props), ['content'])}
-              icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
-              onClick={() => {
-                m.events?.click?.({ data, field });
-                if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
-                  defaultHandler.reset({ data, field });
-                }
-              }}
-            >
-              {m.props.content}
-            </Button>
-          ))}
+          {children.map((m) => {
+            return (
+              <Button
+                {...omit(Object.assign({}, props, m.props), ['content'])}
+                icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
+                onClick={() => {
+                  m.events?.click?.({ data, field });
+                  if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
+                    if (props.beforeClick && isFunction(props.beforeClick)) {
+                      props.beforeClick({ data, field }).then(() => {
+                        defaultHandler.reset({ data, field });
+                      });
+                    } else {
+                      defaultHandler.reset({ data, field });
+                    }
+                  }
+                  if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
+                    if (props.beforeClick && isFunction(props.beforeClick)) {
+                      props.beforeClick({ data, field }).then(() => {
+                        defaultHandler.pick({ data, field });
+                      });
+                    } else {
+                      defaultHandler.pick({ data, field });
+                    }
+                  }
+                }}
+              >
+                {m.props.content}
+              </Button>
+            );
+          })}
         </span>
       );
     },
     renderDefault(
       { props = {}, children = [] }: RenderOptions,
       { data, row, field }: RenderTableParams,
+      defaultHandler: {
+        [key: string]: (...args: any[]) => any;
+      },
     ) {
       return (
         <span class="align-gap-box w-fit">
-          {children.map((m) => (
-            <Button
-              {...omit(Object.assign(props, m.props), ['content'])}
-              icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
-              onClick={() => {
-                m.events?.click?.({ data, row, field });
-              }}
-            >
-              {m.props.content}
-            </Button>
-          ))}
+          {children
+            .filter(
+              (f) =>
+                !f?.props?.hiddenIf?.({
+                  data,
+                  row,
+                  field,
+                }),
+            )
+            .map((m) => (
+              <Button
+                {...omit(Object.assign({}, props, m.props), ['content', 'hiddenIf'])}
+                icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
+                onClick={() => {
+                  m.events?.click?.({ data, row, field });
+                  if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
+                    if (props.beforeClick && isFunction(props.beforeClick)) {
+                      props.beforeClick({ row, field }).then(() => {
+                        defaultHandler.reset({ row, field });
+                      });
+                    } else {
+                      defaultHandler.reset({ row, field });
+                    }
+                  }
+                  if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
+                    if (props.beforeClick && isFunction(props.beforeClick)) {
+                      props.beforeClick({ row, field }).then(() => {
+                        defaultHandler.pick({ row, field });
+                      });
+                    } else {
+                      defaultHandler.pick({ row, field });
+                    }
+                  }
+                }}
+              >
+                {m.props.content}
+              </Button>
+            ))}
         </span>
       );
     },
@@ -323,18 +371,27 @@ const renders = {
     renderDefault({ children = [], props = {} as Recordable }, params: RenderTableParams) {
       return (
         <span class={props.noGap ? 'align-no-gap-box' : 'align-gap-box'}>
-          {(children as BtnOptions[]).map((item) => renderBtn(item, params)) ?? []}
+          {(children as BtnOptions[])
+            .filter((f) => !f.hiddenIf?.(params))
+            .map((item) => renderBtn(item, params)) ?? []}
         </span>
       );
     },
   },
   $radio: {
-    renderItemContent({ props = {}, options }: RenderOptions, { data, field }: RenderFormParams) {
+    renderItemContent(
+      { props = {}, events = {}, options }: RenderOptions,
+      { data, field }: RenderFormParams,
+    ) {
       return valued(field) ? (
         <RadioGroup
           v-model:value={data[field!]}
           {...props}
           options={props.options ?? options ?? []}
+          disabled={!!props.disabled}
+          onChange={(...arg) => {
+            events.change?.({ data, field }, ...arg);
+          }}
         />
       ) : null;
     },
@@ -356,7 +413,7 @@ const renders = {
       return valued(field) ? (
         <AutoComplete
           v-model:value={data[field!]}
-          {...props}
+          {...Object.assign({}, { filterOption: defaultProps.autoComplete.filterOption }, props)}
           onChange={(...arg) => {
             events.change?.({ data, field }, ...arg);
           }}
