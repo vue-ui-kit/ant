@@ -11,7 +11,7 @@
     toRefs,
     onBeforeUnmount,
   } from 'vue';
-  import { debounce, get, isArray, isFunction, isString, merge, omit, toNumber } from 'lodash-es';
+  import { debounce, get, isArray, isBoolean, isFunction, isObject, isString, merge, omit, toNumber } from 'lodash-es';
   import { eachTree } from '@/utils/treeHelper';
   import { message as $message } from 'ant-design-vue';
   import RenderAntItem from '@/components/RenderAntItem';
@@ -52,6 +52,17 @@
     toolbar: false,
     form: false,
   });
+  const setLoadings = (value: boolean|Record<string, boolean>) => {
+    if(isObject(value)) {
+      Object.keys(value).forEach(key => {
+        loading[key] = value[key];
+      });
+    } else if(isBoolean(value)) {
+      loading.form = value;
+      loading.table = value;
+      loading.toolbar = value;
+    }
+  };
   const submitOnReset = true;
   const boxEl = ref<HTMLDivElement>();
   const pFormWrapper = ref<HTMLDivElement>();
@@ -417,11 +428,7 @@
     setBtnLoading,
     selectedRecords,
     $form: computed(() => formEl.value),
-    setLoadings: (value: boolean) => {
-      loading.form = value;
-      loading.table = value;
-      loading.toolbar = value;
-    },
+    setLoadings,
     resizeTable,
   });
 
@@ -626,7 +633,7 @@
               v-if="slotDefaultColumns.some((s) => column.key && s.field === column.key)"
               :key="renderTableKey + '_cell_' + dataSeed + '_slot_' + column.key"
               :column="slotDefaultColumns.find((f) => column.key && f.field === column.key)!"
-              :default-handler="{ pick: pickRow }"
+              :default-handler="{ pick: pickRow, setLoadings }"
               :row="record"
               :row-index="index"
               :table-data="tableData as Recordable[]"

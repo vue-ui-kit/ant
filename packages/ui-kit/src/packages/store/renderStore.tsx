@@ -222,149 +222,184 @@ const renders = {
   ...Object.fromEntries(Object.keys(componentsMap).map((name) => [name, renderBasic(name)])),
   // 简单按钮
   $button: {
-    renderItemContent(
-      { props = {}, events = {} }: RenderOptions,
-      { data, field }: RenderFormParams,
-      defaultHandler: {
-        [key: string]: (...args: any[]) => any;
-      },
-    ) {
+    renderItemContent({ props = {}, events = {} }: RenderOptions, {
+      data,
+      field,
+    }: RenderFormParams, defaultHandler: {
+      [key: string]: (...args: any[]) => any
+    }) {
       return (
         <Button
           {...omit(props, ['content'])}
           icon={props.icon ? <Icon icon={props.icon} /> : null}
           onClick={() => {
-            events.click?.({ data, field });
+            events.click?.({ data, field })
             if (props.htmlType === 'reset' && defaultHandler?.reset) {
-              defaultHandler.reset({ data, field });
+              if (props.beforeClick && isFunction(props.beforeClick)) {
+                props.beforeClick({ data, field }).then(() => {
+                  defaultHandler.reset({ data, field })
+                })
+              }
+              else {
+                defaultHandler.reset({ data, field })
+              }
             }
           }}
         >
           {props.content}
-          {props.suffix?.({ data, field }) ?? null}
+          {
+            props.suffix?.({ data, field }) ?? null
+          }
         </Button>
-      );
+      )
     },
-    renderDefault(
-      { props = {}, events = {} }: RenderOptions,
-      { row, field }: RenderTableParams,
-      defaultHandler: {
-        [key: string]: (...args: any[]) => any;
-      },
-    ) {
+    renderDefault({ props = {}, events = {} }: RenderOptions, {
+      row,
+      field,
+    }: RenderTableParams, defaultHandler: {
+      [key: string]: (...args: any[]) => any
+    }) {
       return (
         <Button
           {...omit(props, ['content'])}
           icon={props.icon ? <Icon icon={props.icon} /> : null}
           onClick={() => {
-            events.click?.({ row, field });
+            events.click?.({ row, field })
             if (props.htmlType === 'reset' && defaultHandler?.reset) {
-              defaultHandler.reset({ row, field });
+              if (props.beforeClick && isFunction(props.beforeClick)) {
+                defaultHandler?.setLoadings?.(true)
+                props.beforeClick({ row, field }).then(() => {
+                  defaultHandler.reset({ row, field })
+                }).finally(() => {
+                  defaultHandler?.setLoadings?.(false)
+                })
+              }
+              else {
+                defaultHandler.reset({ row, field })
+              }
             }
             if (props.htmlType === 'pick' && defaultHandler?.pick) {
-              defaultHandler.pick({ row, field });
+              if (props.beforeClick && isFunction(props.beforeClick)) {
+                defaultHandler?.setLoadings?.(true)
+                props.beforeClick({ row, field }).then(() => {
+                  defaultHandler.pick({ row, field })
+                }).finally(() => {
+                  defaultHandler?.setLoadings?.(false)
+                })
+              }
+              else {
+                defaultHandler.pick({ row, field })
+              }
             }
           }}
         >
           {props.content}
         </Button>
-      );
+      )
     },
   },
   // 简单按钮组
   $buttons: {
-    renderItemContent(
-      { props = {}, children = [] }: RenderOptions,
-      { data, field }: RenderFormParams,
-      defaultHandler: {
-        [key: string]: (...args: any[]) => any;
-      },
-    ) {
+    renderItemContent({ props = {}, children = [] }: RenderOptions, {
+      data,
+      field,
+    }: RenderFormParams, defaultHandler: {
+      [key: string]: (...args: any[]) => any
+    }) {
       return (
         <span class="align-gap-box w-fit">
-          {children.map((m) => {
-            return (
-              <Button
-                {...omit(Object.assign({}, props, m.props), ['content'])}
-                icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
-                onClick={() => {
-                  m.events?.click?.({ data, field });
-                  if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
-                    if (props.beforeClick && isFunction(props.beforeClick)) {
-                      props.beforeClick({ data, field }).then(() => {
-                        defaultHandler.reset({ data, field });
-                      });
-                    } else {
-                      defaultHandler.reset({ data, field });
+          {
+            children.map((m) => {
+              return (
+                <Button
+                  {...omit(Object.assign({}, props, m.props), ['content'])}
+                  icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
+                  onClick={() => {
+                    m.events?.click?.({ data, field })
+                    if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
+                      if (props.beforeClick && isFunction(props.beforeClick)) {
+                        props.beforeClick({ data, field }).then(() => {
+                          defaultHandler.reset({ data, field })
+                        })
+                      }
+                      else {
+                        defaultHandler.reset({ data, field })
+                      }
                     }
-                  }
-                  if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
-                    if (props.beforeClick && isFunction(props.beforeClick)) {
-                      props.beforeClick({ data, field }).then(() => {
-                        defaultHandler.pick({ data, field });
-                      });
-                    } else {
-                      defaultHandler.pick({ data, field });
+                    if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
+                      if (props.beforeClick && isFunction(props.beforeClick)) {
+                        props.beforeClick({ data, field }).then(() => {
+                          defaultHandler.pick({ data, field })
+                        })
+                      }
+                      else {
+                        defaultHandler.pick({ data, field })
+                      }
                     }
-                  }
-                }}
-              >
-                {m.props.content}
-              </Button>
-            );
-          })}
+                  }}
+                >
+                  {m.props.content}
+                </Button>
+              )
+            })
+          }
         </span>
-      );
+      )
     },
-    renderDefault(
-      { props = {}, children = [] }: RenderOptions,
-      { data, row, field }: RenderTableParams,
-      defaultHandler: {
-        [key: string]: (...args: any[]) => any;
-      },
-    ) {
+    renderDefault({ props = {}, children = [] }: RenderOptions, {
+      data,
+      row,
+      field,
+    }: RenderTableParams, defaultHandler: {
+      [key: string]: (...args: any[]) => any
+    }) {
       return (
         <span class="align-gap-box w-fit">
-          {children
-            .filter(
-              (f) =>
-                !f?.props?.hiddenIf?.({
-                  data,
-                  row,
-                  field,
-                }),
-            )
-            .map((m) => (
+          {
+            children.filter(f => !f?.props?.hiddenIf?.({
+              data,
+              row,
+              field,
+            })).map(m => (
               <Button
                 {...omit(Object.assign({}, props, m.props), ['content', 'hiddenIf'])}
                 icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
                 onClick={() => {
-                  m.events?.click?.({ data, row, field });
+                  m.events?.click?.({ data, row, field })
                   if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
                     if (props.beforeClick && isFunction(props.beforeClick)) {
+                      defaultHandler?.setLoadings?.(true)
                       props.beforeClick({ row, field }).then(() => {
-                        defaultHandler.reset({ row, field });
-                      });
-                    } else {
-                      defaultHandler.reset({ row, field });
+                        defaultHandler.reset({ row, field })
+                      }).finally(() => {
+                        defaultHandler?.setLoadings?.(false)
+                      })
+                    }
+                    else {
+                      defaultHandler.reset({ row, field })
                     }
                   }
                   if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
                     if (props.beforeClick && isFunction(props.beforeClick)) {
+                      defaultHandler?.setLoadings?.(true)
                       props.beforeClick({ row, field }).then(() => {
-                        defaultHandler.pick({ row, field });
-                      });
-                    } else {
-                      defaultHandler.pick({ row, field });
+                        defaultHandler.pick({ row, field })
+                      }).finally(() => {
+                        defaultHandler?.setLoadings?.(false)
+                      })
+                    }
+                    else {
+                      defaultHandler.pick({ row, field })
                     }
                   }
                 }}
               >
                 {m.props.content}
               </Button>
-            ))}
+            ))
+          }
         </span>
-      );
+      )
     },
   },
   ButtonTree: {
