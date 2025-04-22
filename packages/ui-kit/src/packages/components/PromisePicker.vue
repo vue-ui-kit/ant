@@ -78,7 +78,10 @@
         rejectPromise = reject;
         visible.modal = true;
       }),
-  grid: gridEl,
+    grid: gridEl,
+    hide: () => {
+      visible.modal = false;
+    }
   });
 </script>
 <template>

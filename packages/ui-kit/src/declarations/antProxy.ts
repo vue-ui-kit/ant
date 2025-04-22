@@ -279,7 +279,8 @@ export interface PFormInstance {
 export interface PromisePickerInstance<D = Recordable> {
   pick: () => Promise<{ row: D; field?: string }>;
   pickMultiple: () => Promise<D[]>;
-  grid: PGridInstance<D>
+  grid: PGridInstance<D>;
+  hide: () => void;
 }
 
 export interface PFormBlockInstance {
