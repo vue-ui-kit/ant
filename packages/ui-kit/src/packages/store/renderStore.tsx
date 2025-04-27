@@ -236,8 +236,8 @@ const renders = {
             events.click?.({ data, field })
             if (props.htmlType === 'reset' && defaultHandler?.reset) {
               if (props.beforeClick && isFunction(props.beforeClick)) {
-                props.beforeClick({ data, field }).then(() => {
-                  defaultHandler.reset({ data, field })
+                props.beforeClick({ data, field }).then((res: void | Recordable) => {
+                  defaultHandler.reset(res ? { data: res, field } : { data, field })
                 })
               }
               else {
@@ -268,8 +268,8 @@ const renders = {
             if (props.htmlType === 'reset' && defaultHandler?.reset) {
               if (props.beforeClick && isFunction(props.beforeClick)) {
                 defaultHandler?.setLoadings?.(true)
-                props.beforeClick({ row, field }).then(() => {
-                  defaultHandler.reset({ row, field })
+                props.beforeClick({ row, field }).then((res: void | Recordable) => {
+                  defaultHandler.reset(res ? { row: res, field } : { row, field })
                 }).finally(() => {
                   defaultHandler?.setLoadings?.(false)
                 })
@@ -281,8 +281,8 @@ const renders = {
             if (props.htmlType === 'pick' && defaultHandler?.pick) {
               if (props.beforeClick && isFunction(props.beforeClick)) {
                 defaultHandler?.setLoadings?.(true)
-                props.beforeClick({ row, field }).then(() => {
-                  defaultHandler.pick({ row, field })
+                props.beforeClick({ row, field }).then((res: void | Recordable) => {
+                  defaultHandler.pick(res ? { row: res, field } : { row, field })
                 }).finally(() => {
                   defaultHandler?.setLoadings?.(false)
                 })
@@ -318,8 +318,8 @@ const renders = {
                     m.events?.click?.({ data, field })
                     if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
                       if (props.beforeClick && isFunction(props.beforeClick)) {
-                        props.beforeClick({ data, field }).then(() => {
-                          defaultHandler.reset({ data, field })
+                        props.beforeClick({ data, field }).then((res: void | Recordable) => {
+                          defaultHandler.reset(res ? { data: res, field } : { data, field })
                         })
                       }
                       else {
@@ -328,8 +328,8 @@ const renders = {
                     }
                     if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
                       if (props.beforeClick && isFunction(props.beforeClick)) {
-                        props.beforeClick({ data, field }).then(() => {
-                          defaultHandler.pick({ data, field })
+                        props.beforeClick({ data, field }).then((res: void | Recordable) => {
+                          defaultHandler.pick(res ? { data: res, field } : { data, field })
                         })
                       }
                       else {
@@ -369,8 +369,8 @@ const renders = {
                   if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
                     if (props.beforeClick && isFunction(props.beforeClick)) {
                       defaultHandler?.setLoadings?.(true)
-                      props.beforeClick({ row, field }).then(() => {
-                        defaultHandler.reset({ row, field })
+                      props.beforeClick({ row, field }).then((res: void | Recordable) => {
+                        defaultHandler.reset(res ? { row: res, field } : { row, field })
                       }).finally(() => {
                         defaultHandler?.setLoadings?.(false)
                       })
@@ -382,8 +382,8 @@ const renders = {
                   if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
                     if (props.beforeClick && isFunction(props.beforeClick)) {
                       defaultHandler?.setLoadings?.(true)
-                      props.beforeClick({ row, field }).then(() => {
-                        defaultHandler.pick({ row, field })
+                      props.beforeClick({ row, field }).then((res: void | Recordable) => {
+                        defaultHandler.pick(res ? { row: res, field } : { row, field })
                       }).finally(() => {
                         defaultHandler?.setLoadings?.(false)
                       })
