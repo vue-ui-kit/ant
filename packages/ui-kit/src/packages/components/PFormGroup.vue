@@ -15,6 +15,7 @@
   } from 'ant-design-vue';
   import { valued } from '@/utils/is';
   import { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
+  import { $warning } from '@/hooks/useMessage';
 
   const props = defineProps<PFormGroupProps<F>>();
   const model = defineModel({
@@ -70,6 +71,10 @@
           });
           break;
         case 'copy':
+          if (model.value.length >= maxLen.value) {
+            $warning('已达到最大数量')
+            return
+          }
           model.value = [
             ...model.value,
             cloneDeep({
