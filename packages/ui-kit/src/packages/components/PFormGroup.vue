@@ -102,7 +102,8 @@
         blockInstance.value.map((block) => block.$form?.validate() ?? Promise.resolve()),
       );
     },
-    validate: (index) => {
+    validate: (__index: number) => {
+      const index = model.value.findIndex(f => f.__index === __index)
       return blockInstance.value[index]?.$form?.validate()
     },
   });
