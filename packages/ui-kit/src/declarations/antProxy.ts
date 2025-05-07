@@ -108,6 +108,7 @@ export interface PFormGroupProps<F = Recordable> {
   tabLabel?: string;
   editAble?: boolean;
   showAdd?: boolean;
+  forceRender?: boolean;
   /* 是否保持连续编号 */
   keepSerial?: boolean;
   itemMenus?: Array<GroupMenuItem<F>>;

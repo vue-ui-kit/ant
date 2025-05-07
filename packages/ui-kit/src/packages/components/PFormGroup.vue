@@ -125,7 +125,7 @@
         v-for="(item, idx) in model"
         :key="idx"
         :tab="`${tabLabel} ${keepSerial ? idx + 1 : (item.__index ?? 0) + 1}`"
-        force-render
+        :force-render="forceRender || model.length <= 5"
       >
         <template #closeIcon>
           <a-dropdown v-if="editAble && itemMenus?.length">
