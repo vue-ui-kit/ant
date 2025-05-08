@@ -2,6 +2,7 @@
   import { computed, nextTick, PropType, ref, watchEffect } from 'vue';
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
+  import { Form } from 'ant-design-vue'
   import { cloneDeep, toString, isFunction, omit, maxBy, debounce } from 'lodash-es';
   import PGroupBlock from '@/components/PGroupBlock.vue';
   import {
@@ -16,7 +17,8 @@
   import { valued } from '@/utils/is';
   import { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
   import { $warning } from '@/hooks/useMessage';
-
+  
+  const useForm = Form.useForm
   const props = defineProps<PFormGroupProps<F>>();
   const model = defineModel({
     type: Array as PropType<Partial<F & { __index: number }>[]>,
@@ -45,6 +47,15 @@
     { content: '复制', code: 'copy' },
     { content: '删除', code: 'delete' },
   ];
+  // 实际是否强制渲染
+  const fr = computed(() => {
+    return props.forceRender || model.value.length <= 5
+  })
+  const handleTabChange = () => {
+    nextTick().then(() => {
+      blockInstance.value[activeKey.value]?.$form?.validate()
+    })
+  }
   watchEffect(() => {
     if (!props.keepSerial) {
       const unSortItems = model.value.filter((f) => !valued(f.__index));
@@ -98,19 +109,21 @@
     activeKey: computed(() => activeKey.value),
     setActiveKey,
     validateAll: () => {
-      return Promise.all(
-        blockInstance.value.map((block) => block.$form?.validate() ?? Promise.resolve()),
-      );
+      return Promise.all(blockInstance.value.map((block, idx) =>
+        fr.value ? (block.$form?.validate() ?? Promise.resolve()) : (useForm(model.value[idx], props.getFormSetting(model.value[idx]).rules)?.validate() ?? Promise.resolve()),
+      ))
     },
     validate: (__index: number) => {
       const index = model.value.findIndex(f => f.__index === __index)
-      return blockInstance.value[index]?.$form?.validate()
+      return fr.value
+        ? (blockInstance.value[index]?.$form?.validate() ?? Promise.resolve())
+        : (useForm(model.value[index], props.getFormSetting(model.value[index]).rules)?.validate() ?? Promise.resolve())
     },
   });
 </script>
 <template>
   <a-card :title="title" size="small">
-    <a-tabs type="editable-card" v-model:activeKey="activeKey" hide-add>
+    <a-tabs type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
       <template #rightExtra>
         <slot name="rightExtra">
           <a-button
@@ -126,7 +139,7 @@
         v-for="(item, idx) in model"
         :key="idx"
         :tab="`${tabLabel} ${keepSerial ? idx + 1 : (item.__index ?? 0) + 1}`"
-        :force-render="forceRender || model.length <= 5"
+        :force-render="fr"
       >
         <template #closeIcon>
           <a-dropdown v-if="editAble && itemMenus?.length">
