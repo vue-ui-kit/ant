@@ -146,7 +146,7 @@ export interface ToolbarButtonProps extends PButtonProps {
 
 export interface ToolbarConfig {
   buttons?: Array<ToolbarButtonProps>;
-  tools?: Array<{ code: string; icon: string; type?: ButtonType; disabled?: boolean }>;
+  tools?: Array<{ code: string; icon: string; type?: ButtonType; disabled?: boolean; size?: 'small' | 'large' | 'middle' }>;
   disabled?: boolean;
 }
 
