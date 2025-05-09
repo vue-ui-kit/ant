@@ -592,7 +592,7 @@
               v-for="(tool, idx) in toolbarConfig.tools"
               :key="idx"
               :type="tool.type"
-              :size="btn.size ?? 'middle'"
+              :size="tool.size ?? 'middle'"
               :disabled="toolbarConfig.disabled || tool.disabled"
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"

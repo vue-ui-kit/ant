@@ -34,6 +34,7 @@ interface BtnOptions extends ButtonProps {
   dynamicClassName?: (p: RenderTableParams) => string;
   dropdowns?: BtnOptions[];
   clickEvt?: (p: RenderTableParams) => any;
+  hiddenIf?: (p: RenderTableParams) => boolean;
 }
 
 const antDefaultProps = {
