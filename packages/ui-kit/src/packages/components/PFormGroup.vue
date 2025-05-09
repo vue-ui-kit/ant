@@ -123,7 +123,8 @@
 </script>
 <template>
   <a-card :title="title" size="small">
-    <a-tabs type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
+    <a-spin v-if="loading" class="w-full" />
+    <a-tabs v-else type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
       <template #rightExtra>
         <slot name="rightExtra">
           <a-button

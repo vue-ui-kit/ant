@@ -111,6 +111,7 @@ export interface PFormGroupProps<F = Recordable> {
   forceRender?: boolean;
   /* 是否保持连续编号 */
   keepSerial?: boolean;
+  loading?: boolean;
   itemMenus?: Array<GroupMenuItem<F>>;
   creatItem?: ({ list }: { list?: Partial<F>[] }) => Promise<Partial<F>>;
   max?: number;
