@@ -512,6 +512,7 @@
                     :form-data="queryFormData"
                     :item="item"
                     :pass-trigger="() => {}"
+                    :pass-delay-trigger="() => {}"
                   />
                   <render-ant-item
                     v-else-if="item.itemRender?.name"
