@@ -65,6 +65,7 @@ export interface PFormItemProps<F = Recordable> {
     default?: (
       { data, field }: ItemFuncArg<F>,
       passTrigger?: (cusFields?: string | string[]) => void,
+      passDelayTrigger?: (cusFields?: string | string[], time?: number) => void
     ) => any;
   };
 }
@@ -242,6 +243,12 @@ export interface RenderOptions {
    * @param cusFields field或者field数组
    */
   handleTrigger?: (cusFields?: string | string[]) => void;
+  /**
+   * 延迟校验触发器
+   * @param cusFields field或者field数组
+   * @param time 延迟时间
+   */
+  handleDelayTrigger?: (cusFields?: string | string[], time?: number) => void;
 }
 
 export interface RenderFormParams<F = Recordable> {

@@ -18,12 +18,16 @@ export default defineComponent(
     const passTrigger = (cusFields?: string | string[]) => {
       emit('trigger', cusFields);
     };
+    const passDelayTrigger = (cusFields?: string | string[], time?: number) => {
+      emit('delayTrigger', cusFields, time);
+    };
     return () => {
       return (
         renderStore.renders[itemRender!.name]?.renderItemContent?.(
           {
             ...itemRender!,
             handleTrigger: passTrigger,
+            handleDelayTrigger: passDelayTrigger,
           },
           renderFormParams.value,
           defaultHandler,
@@ -49,6 +53,6 @@ export default defineComponent(
         required: false,
       },
     },
-    emits: ['trigger'],
+    emits: ['trigger', 'delayTrigger'],
   },
 );

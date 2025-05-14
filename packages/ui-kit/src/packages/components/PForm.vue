@@ -63,6 +63,12 @@
   const handleTrigger = (cusFields?: string | string[]) => {
     validateField(cusFields);
   };
+  const handleDelayTrigger = (cusFields?: string | string[], time?: number) => {
+    const delayTime = time ?? 222;
+    setTimeout(() => {
+      validateField(cusFields);
+    }, delayTime);
+  };
   defineExpose({
     reset: resetForm,
     $form: computed(() => formEl.value),
@@ -112,6 +118,7 @@
               :item="item"
               :key="'_sl_' + (item.field ?? '_') + '_' + idx"
               :pass-trigger="handleTrigger"
+              :pass-delay-trigger="handleDelayTrigger"
             />
             <render-ant-item
               v-else-if="item.itemRender?.name"
@@ -119,6 +126,7 @@
               :default-handler="{ reset: resetFormData }"
               :item-render="item.itemRender"
               @trigger="handleTrigger"
+              @delay-trigger="handleDelayTrigger"
               :render-form-params="{ data: formData, field: item.field }"
             />
             <span v-else></span>
