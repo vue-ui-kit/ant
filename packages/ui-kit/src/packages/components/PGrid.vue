@@ -266,6 +266,8 @@
         };
   const enoughSpacing = ref(true);
   const reload = () => {
+    selectedCaches.value = []
+    selectedRowKeys.value = []
     return resetQueryFormData();
   };
   const resetPage = () => {
