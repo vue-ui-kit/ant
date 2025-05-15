@@ -1,5 +1,5 @@
 <script lang="ts" generic="F = Recordable" setup name="PFormGroup">
-  import { computed, nextTick, PropType, ref, watchEffect } from 'vue';
+  import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
   import { Form } from 'ant-design-vue'
@@ -56,17 +56,17 @@
       blockInstance.value[activeKey.value]?.$form?.validate()
     })
   }
-  watchEffect(() => {
-    if (!props.keepSerial) {
-      const unSortItems = model.value.filter((f) => !valued(f.__index));
-      if (unSortItems.length > 0) {
-        unSortItems.forEach((item) => {
-          // @ts-ignore
-          item.__index = (maxBy(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1;
-        });
-      }
+  watch(() => model.value, () => {
+  if (!props.keepSerial) {
+    const unSortItems = model.value.filter(f => !valued(f.__index))
+    if (unSortItems.length > 0) {
+      unSortItems.forEach((item) => {
+        // @ts-ignore
+        item.__index = (maxBy(model.value, m => m.__index ?? -1)?.__index ?? -1) + 1
+      })
     }
-  });
+  }
+}, { immediate: true })
   const handleMenu = ({ key }: MenuInfo, item: Partial<F & { __index: number }>, idx: number) => {
     if (props.menuHandler && isFunction(props.menuHandler)) {
       props.menuHandler({ code: toString(key), data: item, index: idx });
