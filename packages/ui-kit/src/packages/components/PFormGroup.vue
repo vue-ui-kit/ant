@@ -2,6 +2,7 @@
   import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
+  import type { Tabs } from 'ant-design-vue'
   import { Form } from 'ant-design-vue'
   import { cloneDeep, toString, isFunction, omit, maxBy, debounce } from 'lodash-es';
   import PGroupBlock from '@/components/PGroupBlock.vue';
@@ -19,19 +20,21 @@
   import { $warning } from '@/hooks/useMessage';
   
   const useForm = Form.useForm
+  const tabsRef = ref<InstanceType<typeof Tabs>>()
   const props = defineProps<PFormGroupProps<F>>();
   const model = defineModel({
     type: Array as PropType<Partial<F & { __index: number }>[]>,
     default: () => [],
   });
   const activeKey = ref(0);
+  const error_indexes = ref<number[]>([])
   const blockInstance = ref<PFormBlockInstance[]>([]);
   const setActiveKey = (key: number) => {
     activeKey.value = key;
   };
   const maxLen = computed(() => props.max ?? Infinity);
   const handleAddItem = (idx: number) => {
-    const creator = props.creatItem ?? (() => Promise.resolve({} as Partial<F>));
+    const creator = props.createItem ?? (() => Promise.resolve({} as Partial<F>));
     creator({ list: model.value }).then((item) => {
       model.value = [
         ...model.value,
@@ -105,26 +108,80 @@
       activeKey.value = model.value.length - 1;
     }
   });
+  const handleBlockFocus = (idx: number) => {
+    const target_index = model.value.find((f, index) => index === idx)?.__index
+    if (valued(target_index)) {
+      error_indexes.value = error_indexes.value.filter(f => f !== target_index)
+    }
+  }
+  const debounceHandleBlockFocus = debounce(handleBlockFocus, 50)
+  watchEffect(() => {
+  const errorKeys = model.value.map((m, idx) => error_indexes.value.includes(m.__index!) ? idx : undefined).filter(valued)
+  const rootDom = tabsRef.value?.$el
+  if (rootDom) {
+    const tabPanel = rootDom.querySelectorAll(':scope >.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-tab>.ant-tabs-tab-btn')
+    tabPanel.forEach((tab, idx) => {
+      if (errorKeys.includes(idx)) {
+        tab.classList.add('p-error-group-tab')
+      }
+      else {
+        tab.classList.remove('p-error-group-tab')
+      }
+    })
+  }
+})
   defineExpose({
     activeKey: computed(() => activeKey.value),
     setActiveKey,
     validateAll: () => {
-      return Promise.all(blockInstance.value.map((block, idx) =>
-        fr.value ? (block.$form?.validate() ?? Promise.resolve()) : (useForm(model.value[idx], props.getFormSetting(model.value[idx]).rules)?.validate() ?? Promise.resolve()),
-      ))
-    },
-    validate: (__index: number) => {
-      const index = model.value.findIndex(f => f.__index === __index)
-      return fr.value
+    return Promise.allSettled(blockInstance.value.map((block, idx) =>
+      fr.value
+        ? (block.$form?.validate() ?? Promise.resolve())
+        : (useForm(model.value[idx], props.getFormSetting(model.value[idx]).rules)?.validate() ?? Promise.resolve()),
+    )).then((results) => {
+      // 更新 error_indexes
+      error_indexes.value = results
+        .map((res, idx) => (res.status === 'rejected' && typeof model.value[idx]?.__index === 'number' ? model.value[idx].__index as number : undefined))
+        .filter((v): v is number => typeof v === 'number')
+      if (!props.lazyErrorMark && error_indexes.value.length) {
+        // 跳到第一个出错的tab
+        const firstErrorIndex = error_indexes.value[0]
+        const firstErrorTab = model.value.findIndex(f => f.__index === firstErrorIndex)
+        if (firstErrorTab !== -1) {
+          activeKey.value = firstErrorTab
+        }
+      }
+      // 判断是否有错误
+      if (error_indexes.value.length) {
+        return Promise.reject({ error_indexes: error_indexes.value, results })
+      }
+      return Promise.resolve(results)
+    })
+  },
+  validate: async (__index: number) => {
+    const index = model.value.findIndex(f => f.__index === __index)
+    try {
+      await (fr.value
         ? (blockInstance.value[index]?.$form?.validate() ?? Promise.resolve())
-        : (useForm(model.value[index], props.getFormSetting(model.value[index]).rules)?.validate() ?? Promise.resolve())
-    },
+        : (useForm(model.value[index], props.getFormSetting(model.value[index]).rules)?.validate() ?? Promise.resolve()))
+      // 校验通过，移除error_indexes中的__index
+      error_indexes.value = error_indexes.value.filter(f => f !== __index)
+      return Promise.resolve()
+    }
+    catch (e) {
+      // 校验失败，加入error_indexes
+      if (!error_indexes.value.includes(__index)) {
+        error_indexes.value = [...error_indexes.value, __index]
+      }
+      return Promise.reject(e)
+    }
+  },
   });
 </script>
 <template>
   <a-card :title="title" size="small">
     <a-spin v-if="loading" class="w-full" />
-    <a-tabs v-else type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
+    <a-tabs v-else ref="tabsRef" type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
       <template #rightExtra>
         <slot name="rightExtra">
           <a-button
@@ -173,6 +230,8 @@
           :key="idx"
           :source="item"
           :get-form-setting="getFormSetting"
+          @focus.capture="debounceHandleBlockFocus(idx)"
+          @click.capture="debounceHandleBlockFocus(idx)"
         />
       </a-tab-pane>
     </a-tabs>

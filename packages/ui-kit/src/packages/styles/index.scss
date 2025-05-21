@@ -204,7 +204,20 @@
     }
   }
 }
-
+.p-error-group-tab{
+  position:relative;
+  overflow: visible;
+  &:after{
+    content:'🏷️';
+    position:absolute;
+    top:-1em;
+    right:0;
+    width:1em;
+    height:1em;
+    font-size:0.8em;
+    animation: heartbeat 2s infinite;
+  }
+}
 //endregion
 
 @each $align in right center {
@@ -219,4 +232,18 @@
     align-items: center;
     text-align: #{$align};
   }
+}
+
+@keyframes heartbeat {
+  0%   { transform: scale(1); }
+  6%   { transform: scale(1.22); }
+  12%  { transform: scale(1); }
+  18%  { transform: scale(1.18); }
+  24%  { transform: scale(1); }
+  48%  { transform: scale(1); }   // 长停顿
+  54%  { transform: scale(1.22); }
+  60%  { transform: scale(1); }
+  66%  { transform: scale(1.18); }
+  72%  { transform: scale(1); }
+  100% { transform: scale(1); }   // 长停顿
 }
