@@ -54,8 +54,15 @@
   const fr = computed(() => {
     return props.forceRender || model.value.length <= 5
   })
+  const handleBlockFocus = (idx: number) => {
+    const target_index = model.value.find((f, index) => index === idx)?.__index
+    if (valued(target_index)) {
+      error_indexes.value = error_indexes.value.filter(f => f !== target_index)
+    }
+  }
   const handleTabChange = () => {
     nextTick().then(() => {
+      handleBlockFocus(activeKey.value)
       blockInstance.value[activeKey.value]?.$form?.validate()
     })
   }
@@ -108,12 +115,7 @@
       activeKey.value = model.value.length - 1;
     }
   });
-  const handleBlockFocus = (idx: number) => {
-    const target_index = model.value.find((f, index) => index === idx)?.__index
-    if (valued(target_index)) {
-      error_indexes.value = error_indexes.value.filter(f => f !== target_index)
-    }
-  }
+
   const debounceHandleBlockFocus = debounce(handleBlockFocus, 50)
   watchEffect(() => {
   const errorKeys = model.value.map((m, idx) => error_indexes.value.includes(m.__index!) ? idx : undefined).filter(valued)
