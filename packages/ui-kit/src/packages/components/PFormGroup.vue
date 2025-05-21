@@ -136,11 +136,11 @@
     activeKey: computed(() => activeKey.value),
     setActiveKey,
     validateAll: () => {
-    return Promise.allSettled(blockInstance.value.map((block, idx) =>
-      fr.value
-        ? (block.$form?.validate() ?? Promise.resolve())
-        : (useForm(model.value[idx], props.getFormSetting(model.value[idx]).rules)?.validate() ?? Promise.resolve()),
-    )).then((results) => {
+    const promiseList = fr.value
+      ? blockInstance.value.map(block => block.$form?.validate())
+      : model.value.map(m => useForm(m, props.getFormSetting(m).rules)?.validate() ?? Promise.resolve())
+    return Promise.allSettled(promiseList).then((results) => {
+      console.log('results', results)
       // 更新 error_indexes
       error_indexes.value = results
         .map((res, idx) => (res.status === 'rejected' && typeof model.value[idx]?.__index === 'number' ? model.value[idx].__index as number : undefined))
