@@ -276,6 +276,7 @@ export interface PGridInstance<D = Recordable, F = Recordable> {
   selectedRecords: D[];
   $table: Recordable;
   $form: Recordable;
+  getFormData: () => Partial<F>;
   setLoadings: (value: boolean) => void;
   setBtnLoading: (code: string, status: boolean) => void;
   resizeTable: () => void;

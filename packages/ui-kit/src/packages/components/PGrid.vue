@@ -430,6 +430,7 @@
     setBtnLoading,
     selectedRecords,
     $form: computed(() => formEl.value),
+    getFormData: () => queryFormData.value,
     setLoadings,
     resizeTable,
   });
