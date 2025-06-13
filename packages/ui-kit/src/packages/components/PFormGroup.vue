@@ -22,6 +22,7 @@
   const useForm = Form.useForm
   const tabsRef = ref<InstanceType<typeof Tabs>>()
   const props = defineProps<PFormGroupProps<F>>();
+  const rootRef = ref<InstanceType<typeof ACard>>()
   const model = defineModel({
     type: Array as PropType<Partial<F & { __index: number }>[]>,
     default: () => [],
@@ -50,6 +51,7 @@
     { content: '复制', code: 'copy' },
     { content: '删除', code: 'delete' },
   ];
+  const getPopupContainer = () => rootRef.value?.$el ?? document.body
   // 实际是否强制渲染
   const fr = computed(() => {
     return props.forceRender || model.value.length <= 5
@@ -180,7 +182,7 @@
   });
 </script>
 <template>
-  <a-card :title="title" size="small">
+  <a-card ref="rootRef" :title="title" size="small">
     <a-spin v-if="loading" class="w-full" />
     <a-tabs v-else ref="tabsRef" type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
       <template #rightExtra>
@@ -201,7 +203,7 @@
         :force-render="fr"
       >
         <template #closeIcon>
-          <a-dropdown v-if="editAble && itemMenus?.length">
+          <a-dropdown v-if="editAble && itemMenus?.length" :get-popup-container="getPopupContainer">
             <MoreOutlined />
             <template #overlay>
               <a-menu @click="(e) => debounceHandleMenu(e, item, idx)">
