@@ -67,6 +67,7 @@ export interface PFormItemProps<F = Recordable> {
       passTrigger?: (cusFields?: string | string[]) => void,
       passDelayTrigger?: (cusFields?: string | string[], time?: number) => void
     ) => any;
+    defaultValue?: any
   };
 }
 

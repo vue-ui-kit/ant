@@ -225,6 +225,14 @@
               obj[item.field] = undefined;
             }
           }
+          else if (item.field && item.slots) {
+            if (isGoodValue(item.slots.defaultValue)) {
+              obj[item.field] = item.slots.defaultValue
+            }
+            else {
+              obj[item.field] = undefined
+            }
+          }
         });
         queryFormData.value = obj;
       }
