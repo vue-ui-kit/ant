@@ -56,6 +56,7 @@
       });
       Object.assign(formData.value, obj);
     }
+    emit('reset');
   };
   // omit({labelCol:defaultLabelCol,...props},['items','data','model'])
   const fc = computed(() => ({
