@@ -1,8 +1,18 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, ref } from 'vue';
   import { Student } from './Mock/apis/type';
   import { queryStudents } from './Mock/apis/school';
-  import { PGridProps, labelColDict } from '@vue-ui-kit/ant';
+  import { PGridProps, PFormProps, PFormGroupProps, labelColDict } from '@vue-ui-kit/ant';
+  import { 
+    Card as ACard, 
+    Button as AButton, 
+    Divider as ADivider, 
+    Space as ASpace, 
+    Typography,
+    Switch as ASwitch
+  } from 'ant-design-vue';
+
+  const { Title } = Typography;
 
   interface IPage {
     /**
@@ -15,6 +25,33 @@
     size: number;
   }
 
+  // 表单数据
+  const formData = ref({
+    name: '',
+    email: '',
+    age: undefined as number | undefined,
+    gender: '',
+    birthday: '',
+    description: '',
+    skills: [] as string[],
+    isActive: false,
+  });
+
+  // 动态表单组数据
+  const groupFormData = ref([
+    {
+      __index: 0,
+      projectName: '项目A',
+      startDate: '',
+      endDate: '',
+      budget: undefined as number | undefined,
+      members: [] as string[],
+    }
+  ]);
+
+  // 当前展示模式
+  const currentView = ref<'grid' | 'form' | 'group'>('grid');
+
   const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
     columns: [
       {
@@ -25,7 +62,7 @@
       {
         field: 'enName',
         width: 200,
-        title: '姓名',
+        title: '英文名',
         formatter: 'capitalize',
       },
       {
@@ -83,17 +120,313 @@
       },
     },
   }));
-  const handleToolbarBtn = ({ code, records }) => {
+
+  // PForm 配置
+  const formSetting = computed<PFormProps<typeof formData.value>>(() => ({
+    labelCol: { span: 6 },
+    wrapperCol: { span: 16 },
+    items: [
+      {
+        field: 'name',
+        title: '姓名',
+        span: 12,
+        rule: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        itemRender: {
+          name: '$input',
+          props: {
+            placeholder: '请输入姓名',
+          },
+        },
+      },
+      {
+        field: 'email',
+        title: '邮箱',
+        span: 12,
+        rule: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
+        ],
+        itemRender: {
+          name: '$input',
+          props: {
+            placeholder: '请输入邮箱',
+          },
+        },
+      },
+      {
+        field: 'age',
+        title: '年龄',
+        span: 12,
+        rule: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
+        itemRender: {
+          name: '$number',
+          props: {
+            placeholder: '请输入年龄',
+            min: 1,
+            max: 120,
+          },
+        },
+      },
+      {
+        field: 'gender',
+        title: '性别',
+        span: 12,
+        rule: [{ required: true, message: '请选择性别', trigger: 'change' }],
+        itemRender: {
+          name: '$select',
+          props: {
+            placeholder: '请选择性别',
+            options: [
+              { label: '男', value: 'male' },
+              { label: '女', value: 'female' },
+            ],
+          },
+        },
+      },
+      {
+        field: 'birthday',
+        title: '生日',
+        span: 12,
+        itemRender: {
+          name: '$date',
+          props: {
+            placeholder: '请选择生日',
+            format: 'YYYY-MM-DD',
+          },
+          attrs:{
+            style:{
+              width: '100%',
+            }
+          }
+        },
+      },
+      {
+        field: 'skills',
+        title: '技能',
+        span: 12,
+        itemRender: {
+          name: '$select',
+          props: {
+            mode: 'multiple',
+            placeholder: '请选择技能',
+            options: [
+              { label: 'Vue.js', value: 'vue' },
+              { label: 'React', value: 'react' },
+              { label: 'Angular', value: 'angular' },
+              { label: 'Node.js', value: 'nodejs' },
+              { label: 'Python', value: 'python' },
+            ],
+          },
+        },
+      },
+      {
+        field: 'description',
+        title: '描述',
+        span: 24,
+        itemRender: {
+          name: '$textarea',
+          props: {
+            placeholder: '请输入描述',
+            rows: 4,
+          },
+        },
+      },
+              {
+          field: 'isActive',
+          title: '状态',
+          span: 24,
+          itemRender: {
+            name: 'ASwitch',
+            props: {
+              checkedChildren: '启用',
+              unCheckedChildren: '禁用',
+            },
+          },
+        },
+    ],
+  }));
+
+  // PFormGroup 配置
+  const groupFormSetting = computed<PFormGroupProps<typeof groupFormData.value[0]>>(() => ({
+    title: '项目管理',
+    showAdd: true,
+    tabLabel:'项目',
+    max: 5,
+    getFormSetting: (data) => ({
+      labelCol: { span: 6 },
+      wrapperCol: { span: 16 },
+      items: [
+        {
+          field: 'projectName',
+          title: '项目名称',
+          span: 24,
+          rule: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
+          itemRender: {
+            name: '$input',
+            props: {
+              placeholder: '请输入项目名称',
+            },
+          },
+        },
+        {
+          field: 'startDate',
+          title: '开始日期',
+          span: 12,
+          rule: [{ required: true, message: '请选择开始日期', trigger: 'change' }],
+          itemRender: {
+            name: '$date',
+            props: {
+              placeholder: '请选择开始日期',
+              format: 'YYYY-MM-DD',
+            },
+          },
+        },
+        {
+          field: 'endDate',
+          title: '结束日期',
+          span: 12,
+          rule: [{ required: true, message: '请选择结束日期', trigger: 'change' }],
+          itemRender: {
+            name: '$date',
+            props: {
+              placeholder: '请选择结束日期',
+              format: 'YYYY-MM-DD',
+            },
+          },
+        },
+        {
+          field: 'budget',
+          title: '预算',
+          span: 12,
+          itemRender: {
+            name: '$number',
+            props: {
+              placeholder: '请输入预算',
+              min: 0,
+              formatter: (value: string) => `￥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','),
+              parser: (value: string) => value.replace(/￥\s?|(,*)/g, ''),
+            },
+          },
+        },
+        {
+          field: 'members',
+          title: '项目成员',
+          span: 12,
+          itemRender: {
+            name: '$select',
+            props: {
+              mode: 'multiple',
+              placeholder: '请选择项目成员',
+              options: [
+                { label: '张三', value: 'zhangsan' },
+                { label: '李四', value: 'lisi' },
+                { label: '王五', value: 'wangwu' },
+                { label: '赵六', value: 'zhaoliu' },
+              ],
+            },
+          },
+        },
+      ],
+    }),
+  }));
+
+  const handleToolbarBtn = ({ code, records }: { code: string; records: Student[] }) => {
     switch (code) {
       case 'test':
         console.log('test', records);
         break;
     }
   };
+
+  const handleFormSubmit = () => {
+    console.log('表单数据:', formData.value);
+  };
+
+  const handleFormReset = () => {
+    console.log('表单重置');
+  };
+
+  const handleGroupFormSubmit = () => {
+    console.log('表单组数据:', groupFormData.value);
+  };
 </script>
 
 <template>
-  <div style="height: 100vh; width: 100%">
-    <p-grid v-bind="gridSetting" @toolbar-button-click="handleToolbarBtn" />
+  <div style="height: 100vh; width: 100%; padding: 20px; overflow-y: auto">
+        <div style="margin-bottom: 20px">
+       <a-typography-title :level="2">Vue UI Kit 示例</a-typography-title>
+       <a-space>
+         <a-button 
+           :type="currentView === 'grid' ? 'primary' : 'default'"
+           @click="currentView = 'grid'"
+         >
+           PGrid 示例
+         </a-button>
+         <a-button 
+           :type="currentView === 'form' ? 'primary' : 'default'"
+           @click="currentView = 'form'"
+         >
+           PForm 示例
+         </a-button>
+         <a-button 
+           :type="currentView === 'group' ? 'primary' : 'default'"
+           @click="currentView = 'group'"
+         >
+           PFormGroup 示例
+                  </a-button>
+       </a-space>
+     </div>
+
+     <a-divider />
+
+         <!-- PGrid 示例 -->
+     <div v-if="currentView === 'grid'">
+       <a-typography-title :level="3">PGrid - 增强数据表格</a-typography-title>
+      <p>集成了查询表单、分页、工具栏等功能的数据表格组件</p>
+      <div style="height: 600px">
+        <p-grid v-bind="gridSetting" @toolbar-button-click="handleToolbarBtn" />
+      </div>
+    </div>
+
+         <!-- PForm 示例 -->
+     <div v-if="currentView === 'form'">
+       <a-typography-title :level="3">PForm - 增强表单</a-typography-title>
+       <p>基于配置的动态表单组件，支持多种字段类型和验证规则</p>
+       <a-card title="用户信息表单" style="margin-top: 16px">
+        <p-form 
+          v-bind="formSetting" 
+          :data="formData"
+          @apply="handleFormSubmit"
+          @reset="handleFormReset"
+        />
+                          <template #actions>
+           <a-space style="margin-top: 16px">
+             <a-button type="primary" @click="handleFormSubmit">提交</a-button>
+             <a-button @click="handleFormReset">重置</a-button>
+           </a-space>
+         </template>
+       </a-card>
+    </div>
+
+         <!-- PFormGroup 示例 -->
+     <div v-if="currentView === 'group'">
+       <a-typography-title :level="3">PFormGroup - 动态表单组</a-typography-title>
+       <p>支持动态添加、删除和管理多个表单实例的组件</p>
+       <div style="margin-top: 16px">
+         <p-form-group 
+           v-model="groupFormData"
+           v-bind="groupFormSetting"
+         />
+         <a-space style="margin-top: 16px">
+           <a-button type="primary" @click="handleGroupFormSubmit">保存所有项目</a-button>
+         </a-space>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.demo-container {
+  margin: 20px 0;
+}
+</style>

@@ -54,6 +54,8 @@ export interface PFormItemProps<F = Recordable> {
   title?: string;
   span?: number;
   colon?: boolean;
+  labelCol?: ColProps
+  wrapperCol?: ColProps
   forceRequired?: boolean; // 在页面需要必填标示，但field不需要必填校验时使用
   align?: 'left' | 'right' | 'center';
   col?: ColProps;

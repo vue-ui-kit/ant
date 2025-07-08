@@ -1318,22 +1318,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash-es@npm:^4.17.12":
-  version: 4.17.12
-  resolution: "@types/lodash-es@npm:4.17.12"
-  dependencies:
-    "@types/lodash": "npm:*"
-  checksum: 10/56b9a433348b11c31051c6fa9028540a033a08fb80b400c589d740446c19444d73b217cf1471d4036448ef686a83e8cf2a35d1fadcb3f2105f26701f94aebb07
-  languageName: node
-  linkType: hard
-
-"@types/lodash@npm:*":
-  version: 4.17.7
-  resolution: "@types/lodash@npm:4.17.7"
-  checksum: 10/b8177f19cf962414a66989837481b13f546afc2e98e8d465bec59e6ac03a59c584eb7053ce511cde3a09c5f3096d22a5ae22cfb56b23f3b0da75b0743b6b1a44
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:*":
   version: 22.5.4
   resolution: "@types/node@npm:22.5.4"
@@ -1408,7 +1392,6 @@ __metadata:
     "@ant-design/icons-vue": "npm:>=7.0.0"
     "@commitlint/cli": "npm:^19.4.1"
     "@commitlint/config-conventional": "npm:^19.4.1"
-    "@types/lodash-es": "npm:^4.17.12"
     "@types/uuid": "npm:^10.0.0"
     "@vitejs/plugin-vue": "npm:^5.1.2"
     "@vitejs/plugin-vue-jsx": "npm:^4.0.1"
@@ -1416,7 +1399,6 @@ __metadata:
     esbuild: "npm:^0.23.1"
     husky: "npm:^9.1.5"
     lint-staged: "npm:^15.2.9"
-    lodash-es: "npm:^4.17.21"
     prettier: "npm:^3.3.3"
     rimraf: "npm:^6.0.1"
     sass: "npm:^1.77.8"
@@ -1426,6 +1408,7 @@ __metadata:
     vite: "npm:^5.4.2"
     vite-plugin-dts: "npm:^4.1.0"
     vue: "npm:^3.4.38"
+    xe-utils: "npm:^3.7.6"
   peerDependencies:
     "@ant-design/icons-vue": ">=7.0.0"
     ant-design-vue: ">=4.0.0"
@@ -3295,7 +3278,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash-es@npm:^4.17.15, lodash-es@npm:^4.17.21":
+"lodash-es@npm:^4.17.15":
   version: 4.17.21
   resolution: "lodash-es@npm:4.17.21"
   checksum: 10/03f39878ea1e42b3199bd3f478150ab723f93cc8730ad86fec1f2804f4a07c6e30deaac73cad53a88e9c3db33348bb8ceeb274552390e7a75d7849021c02df43
@@ -4910,6 +4893,13 @@ __metadata:
     string-width: "npm:^7.0.0"
     strip-ansi: "npm:^7.1.0"
   checksum: 10/b9d91564c091cf3978a7c18ca0f3e4d4606e83549dbe59cf76f5e77feefdd5ec91443155e8102630524d10a8c275efac8a7082c0f26fa43e6b989dc150d176ce
+  languageName: node
+  linkType: hard
+
+"xe-utils@npm:^3.7.6":
+  version: 3.7.6
+  resolution: "xe-utils@npm:3.7.6"
+  checksum: 10/d7c303f8ffbd8d20083f5d2767b1174bd1a76499251ce551784e530ee643f551c69b6d63574da54f3ca9bb819fee6f20b58034f0a47727116ef2f5e67ef44f85
   languageName: node
   linkType: hard
 

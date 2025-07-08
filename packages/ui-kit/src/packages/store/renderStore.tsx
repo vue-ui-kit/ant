@@ -21,7 +21,7 @@ import {
   TimePicker,
   TreeSelect,
 } from 'ant-design-vue';
-import { set, isFunction, merge, omit } from 'lodash-es';
+import { set, isFunction, merge, omit } from 'xe-utils';
 import { ButtonProps } from 'ant-design-vue/lib/button';
 import { isBadValue, isGoodValue, noValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';

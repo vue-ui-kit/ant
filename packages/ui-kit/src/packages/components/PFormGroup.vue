@@ -4,7 +4,7 @@
   import { MoreOutlined } from '@ant-design/icons-vue';
   import type { Tabs } from 'ant-design-vue'
   import { Form } from 'ant-design-vue'
-  import { cloneDeep, toString, isFunction, omit, maxBy, debounce } from 'lodash-es';
+  import { clone, toString, isFunction, omit, max, debounce } from 'xe-utils';
   import PGroupBlock from '@/components/PGroupBlock.vue';
   import {
     Card as ACard,
@@ -41,7 +41,7 @@
         ...model.value,
         {
           ...item,
-          __index: (maxBy(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1,
+          __index: (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1,
         } as Partial<F & { __index: number }>,
       ];
       activeKey.value = idx;
@@ -74,7 +74,7 @@
     if (unSortItems.length > 0) {
       unSortItems.forEach((item) => {
         // @ts-ignore
-        item.__index = (maxBy(model.value, m => m.__index ?? -1)?.__index ?? -1) + 1
+        item.__index = (max(model.value, m => m.__index ?? -1)?.__index ?? -1) + 1
       })
     }
   }
@@ -100,9 +100,9 @@
           }
           model.value = [
             ...model.value,
-            cloneDeep({
+            clone({
               ...omit(item, ['id', '__index']),
-              __index: (maxBy(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1,
+              __index: (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1,
             }),
           ] as Partial<F & { __index: number }>[];
           break;

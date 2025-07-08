@@ -1,4 +1,4 @@
-import { isArray, isFunction, isString, toNumber } from 'lodash-es';
+import { isArray, isFunction, isString, toNumber } from 'xe-utils';
 import { valued } from '@/utils/is';
 import { CellFuncArg, ColumnProps } from '#/antProxy';
 

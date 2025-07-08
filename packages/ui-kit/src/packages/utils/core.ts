@@ -1,6 +1,6 @@
 import { ColumnProps, Responsive } from '#/antProxy';
 import { TableColumnGroupType, TableColumnType } from 'ant-design-vue';
-import { isArray, isNumber, omit, zipObject } from 'lodash-es';
+import { isArray, isNumber, omit, zipObject } from 'xe-utils';
 import { valued } from '@/utils/is';
 
 export const cleanCol = (col: ColumnProps): TableColumnType | TableColumnGroupType<Recordable> => {

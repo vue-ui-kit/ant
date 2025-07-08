@@ -11,7 +11,7 @@
     toRefs,
     onBeforeUnmount,
   } from 'vue';
-  import { debounce, get, isArray, isBoolean, isFunction, isObject, isString, merge, omit, toNumber } from 'lodash-es';
+  import { debounce, get, isArray, isBoolean, isFunction, isObject, isString, merge, omit, toNumber } from 'xe-utils';
   import { eachTree } from '@/utils/treeHelper';
   import { message as $message } from 'ant-design-vue';
   import RenderAntItem from '@/components/RenderAntItem';

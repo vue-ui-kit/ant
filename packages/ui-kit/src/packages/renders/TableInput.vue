@@ -4,7 +4,7 @@
   import { ColumnProps } from '#/antProxy';
   import { cleanCol } from '@/utils/core';
   import RenderDefaultSlots from '@/components/RenderDefaultSlots';
-  import { merge } from 'lodash-es';
+  import { merge } from 'xe-utils';
 
   const props = defineProps({
     modelValue: {

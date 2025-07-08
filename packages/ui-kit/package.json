@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -39,8 +39,8 @@
     "email": "adoin@qq.com"
   },
   "dependencies": {
-    "lodash-es": "^4.17.21",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "xe-utils": "^3.7.6"
   },
   "peerDependencies": {
     "@ant-design/icons-vue": ">=7.0.0",
@@ -55,7 +55,6 @@
     "@ant-design/icons-vue": ">=7.0.0",
     "@commitlint/cli": "^19.4.1",
     "@commitlint/config-conventional": "^19.4.1",
-    "@types/lodash-es": "^4.17.12",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.1.2",
     "@vitejs/plugin-vue-jsx": "^4.0.1",
