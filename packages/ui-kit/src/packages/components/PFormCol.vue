@@ -13,13 +13,18 @@ const props = defineProps<{
   formData: T
 }>()
 const emit = defineEmits<{
-  (e: 'delayTrigger', cusFields?: string | string[], time?: number): void
   (e: 'trigger', cusFields?: string | string[]): void
   (e: 'reset'): void
 }>()
+const hangOut = ref(false)
 const renderFormKey = ref(uuid_v4())
 const handleDelayTrigger = (cusFields?: string | string[], time?: number) => {
-  emit('delayTrigger', cusFields, time)
+  const delayTime = time ?? 222
+  hangOut.value = true
+  setTimeout(() => {
+    hangOut.value = false
+    emit('trigger', cusFields)
+  }, delayTime)
 }
 const handleTrigger = (cusFields?: string | string[]) => {
   emit('trigger', cusFields)
@@ -45,7 +50,10 @@ watch(() => props.item, (cur, old) => {
   >
     <a-form-item
       :key="`_item_${renderFormKey}`"
-      :class="`p-content-align-${item.align ?? 'left'} ${item.forceRequired ? 'p-required' : ''}`"
+      :class="[
+        `p-content-align-${item.align ?? 'left'} ${item.forceRequired ? 'p-required' : ''}`,
+        { 'p-error-hang-out': hangOut },
+      ]"
       colon
       :label="item.title"
       :name="item.field"

@@ -64,12 +64,7 @@
   const handleTrigger = (cusFields?: string | string[]) => {
     validateField(cusFields);
   };
-  const handleDelayTrigger = (cusFields?: string | string[], time?: number) => {
-    const delayTime = time ?? 222;
-    setTimeout(() => {
-      validateField(cusFields);
-    }, delayTime);
-  };
+
   defineExpose({
     reset: resetForm,
     $form: computed(() => formEl.value),
@@ -87,7 +82,6 @@
           :key="`_col_${idx}`"
           :form-data="formData"
           :item="item"
-          @delay-trigger="handleDelayTrigger"
           @reset="resetFormData"
           @trigger="handleTrigger"
         />
