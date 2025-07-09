@@ -203,6 +203,8 @@ export type PGridProps<D = Recordable, F = Recordable> = {
   proxyConfig?: ProxyConfig<D, F>;
   tableConfig?: TableProps<D>;
   scrollMode?: 'outer' | 'inner';
+  // 重置后不自动提交
+  lazyReset?: boolean;
   /**
    * 适应展示区到页面顶部的高度，通常和容器最上的y值有关（正比）
    */

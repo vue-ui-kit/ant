@@ -14,27 +14,23 @@
   import { debounce, get, isArray, isBoolean, isFunction, isObject, isString, merge, omit, toNumber } from 'xe-utils';
   import { eachTree } from '@/utils/treeHelper';
   import { message as $message } from 'ant-design-vue';
-  import RenderAntItem from '@/components/RenderAntItem';
   import RenderTitleSlots from '@/components/RenderTitleSlots';
   import RenderDefaultSlots from '@/components/RenderDefaultSlots';
   import { v4 as uuid_v4 } from 'uuid';
-  import { isGoodValue, valued } from '@/utils/is';
-  import RenderItemSlots from '@/components/RenderItemSlots';
-  import { cleanCol, defaultItemResponsive, defaultLabelCol } from '@/utils/core';
+  import { isGoodValue } from '@/utils/is';
+  import PFormCol from '@/components/PFormCol.vue';
+  import { cleanCol, defaultLabelCol } from '@/utils/core';
   import Icon from '@/renders/Icon';
   import { $confirm } from '@/hooks/useMessage';
   import {
     Table as ATable,
     Button as AButton,
     Form as AForm,
-    FormItem as AFormItem,
     Row as ARow,
-    Col as ACol,
     Spin as ASpin,
-    Tooltip as ATooltip,
   } from 'ant-design-vue';
   import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
-  import { InfoCircleOutlined, DownOutlined } from '@ant-design/icons-vue';
+  import { DownOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps<PGridProps<D, F>>();
   const {
@@ -63,7 +59,6 @@
       loading.toolbar = value;
     }
   };
-  const submitOnReset = true;
   const boxEl = ref<HTMLDivElement>();
   const pFormWrapper = ref<HTMLDivElement>();
   const renderHeight = ref(500);
@@ -118,9 +113,7 @@
   const tableEl = ref();
   const renderFormKey = ref(uuid_v4());
   const renderTableKey = ref(uuid_v4());
-  const refreshForm = () => {
-    renderFormKey.value = uuid_v4();
-  };
+ 
   const codeLoadings = reactive<Record<string, boolean>>(
     [
       ...(props.toolbarConfig?.buttons?.map((m) => m.code) ?? []).filter((f) => f),
@@ -139,7 +132,6 @@
   const refreshTable = () => {
     renderTableKey.value = uuid_v4();
   };
-  const debounceRefreshForm = debounce(refreshForm, 100);
   const debounceRefreshTable = debounce(refreshTable, 100);
   const slotDefaultColumns = computed(() => {
     const cols: ColumnProps<D>[] = [];
@@ -237,7 +229,6 @@
         queryFormData.value = obj;
       }
       emit('resetQuery');
-      refreshForm();
     }
 
     pagination.page = 1;
@@ -398,13 +389,6 @@
   };
 
   watch(
-    () => formConfig.value,
-    () => {
-      debounceRefreshForm();
-    },
-    { deep: true },
-  );
-  watch(
     () => [columns.value, proxyConfig.value, toolbarConfig.value],
     () => {
       debounceRefreshTable();
@@ -423,7 +407,7 @@
     const showCountHeight = selectConfig.value?.showCount ? 22 : 0
     renderHeight.value =
       props.renderY ??
-      toNumber(ph.replace('px', '')) -(props.fitHeight ?? 170) -(!!props.toolbarConfig ? 30 : 0) -formHeight- showCountHeight;
+      toNumber(ph.replace('px', '')) -(props.fitHeight ?? 170) -(props.toolbarConfig ? 30 : 0) -formHeight- showCountHeight;
     enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
   };
   defineExpose({
@@ -495,64 +479,13 @@
             @submit="handleFormSubmit"
           >
             <a-row :gutter="[6, 12]">
-              <a-col
+              <p-form-col
                 v-for="(item, idx) in formConfig!.items"
-                :key="'_col_' + idx"
-                v-bind="item.col ?? (item.span ? { span: item.span } : defaultItemResponsive)"
-              >
-                <a-form-item
-                  :key="'_item_' + idx"
-                  :class="`p-content-align-${item.align ?? 'left'} ${item.forceRequired ? 'p-required' : ''}`"
-                  :label="item.title"
-                  :name="item.field"
-                  v-bind="
-                    omit(item, [
-                      'field',
-                      'title',
-                      'span',
-                      'col',
-                      'itemRender',
-                      'forceRequired',
-                      'tooltip',
-                    ])
-                  "
-                >
-                  <render-item-slots
-                    v-if="item.slots?.default"
-                    :key="'_sl_' + (item.field ?? '_') + '_' + idx"
-                    :form-data="queryFormData"
-                    :item="item"
-                    :pass-trigger="() => {}"
-                    :pass-delay-trigger="() => {}"
-                  />
-                  <render-ant-item
-                    v-else-if="item.itemRender?.name"
-                    :key="'_re_' + (item.field ?? '_') + '_' + idx"
-                    :default-handler="{
-                      reset: () => {
-                        resetQueryFormData(!submitOnReset);
-                      },
-                    }"
-                    :item-render="item.itemRender"
-                    :render-form-params="{ data: queryFormData, field: item.field }"
-                  />
-                  <span v-else></span>
-                  <template #tooltip v-if="item.tooltipConfig">
-                    <a-tooltip
-                      v-if="isFunction(item.tooltipConfig.title)"
-                      v-bind="omit(item.tooltipConfig, ['title'])"
-                    >
-                      <InfoCircleOutlined class="cursor-pointer py-4x px-2x" />
-                      <template #title>
-                        <div v-html="item.tooltipConfig.title()"></div>
-                      </template>
-                    </a-tooltip>
-                    <a-tooltip v-else v-bind="item.tooltipConfig">
-                      <InfoCircleOutlined class="cursor-pointer py-4x px-2x" />
-                    </a-tooltip>
-                  </template>
-                </a-form-item>
-              </a-col>
+                :key="`_col_${idx}`"
+                :form-data="queryFormData"
+                :item="item as PFormItemProps<Partial<F>>"
+                @reset="resetQueryFormData(lazyReset)"
+              />
             </a-row>
           </a-form>
         </a-spin>
