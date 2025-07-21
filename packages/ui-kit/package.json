@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -10,7 +10,8 @@
       "import": "./dist/es/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./scss": "./src/packages/styles/index.scss"
+    "./style.css": "./dist/style.css",
+    "./style.scss": "./dist/style.scss"
   },
   "files": [
     "dist",
