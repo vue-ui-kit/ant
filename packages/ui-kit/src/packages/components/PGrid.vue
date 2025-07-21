@@ -20,6 +20,7 @@
   import { isGoodValue } from '@/utils/is';
   import PFormCol from '@/components/PFormCol.vue';
   import { cleanCol, defaultLabelCol } from '@/utils/core';
+  import { getGridDefaults } from '@/utils/config';
   import Icon from '@/renders/Icon';
   import { $confirm } from '@/hooks/useMessage';
   import {
@@ -33,6 +34,18 @@
   import { DownOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps<PGridProps<D, F>>();
+  
+  // 应用默认值
+  const gridDefaults = getGridDefaults();
+  const propsWithDefaults = computed(() => ({
+    ...props,
+    rowKey: props.rowKey ?? 'id',
+    scrollMode: props.scrollMode ?? 'inner',
+    align: props.align ?? gridDefaults.align ?? 'left',
+    lazyReset: props.lazyReset ?? gridDefaults.lazyReset ?? false,
+    fitHeight: props.fitHeight ?? gridDefaults.fitHeight ?? 170,
+  }));
+  
   const {
     formConfig,
     pageConfig,
@@ -407,7 +420,7 @@
     const showCountHeight = selectConfig.value?.showCount ? 22 : 0
     renderHeight.value =
       props.renderY ??
-      toNumber(ph.replace('px', '')) -(props.fitHeight ?? 170) -(props.toolbarConfig ? 30 : 0) -formHeight- showCountHeight;
+      toNumber(ph.replace('px', '')) -propsWithDefaults.value.fitHeight -(props.toolbarConfig ? 30 : 0) -formHeight- showCountHeight;
     enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
   };
   defineExpose({
@@ -452,7 +465,7 @@
   const passFields = ['align']
   const passDefaultColumnProps = (columns: ColumnProps<D>[]) => columns.map(c => ({
     ...passFields.reduce((prev, cur) => ({
-      [cur]: props[cur],
+      [cur]: propsWithDefaults.value[cur],
     }), {} as ColumnProps<D>),
     ...c,
   }))
@@ -484,7 +497,7 @@
                 :key="`_col_${idx}`"
                 :form-data="queryFormData"
                 :item="item as PFormItemProps<Partial<F>>"
-                @reset="resetQueryFormData(lazyReset)"
+                @reset="resetQueryFormData(propsWithDefaults.lazyReset)"
               />
             </a-row>
           </a-form>

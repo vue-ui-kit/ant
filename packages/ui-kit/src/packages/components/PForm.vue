@@ -5,6 +5,7 @@
   import { v4 as uuid_v4 } from 'uuid';
   import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
+  import { getFormDefaults } from '@/utils/config';
   import PFormCol from '@/components/PFormCol.vue';
   import {
     Form as AForm,
@@ -13,6 +14,15 @@
 
   const props = defineProps<PFormProps<F> & { data: F }>();
   const emit = defineEmits(['apply', 'reset']);
+  
+  // 应用默认值
+  const formDefaults = getFormDefaults();
+  const propsWithDefaults = computed(() => ({
+    ...props,
+    labelCol: props.labelCol ?? formDefaults.labelCol ?? { span: 6 },
+    wrapperCol: props.wrapperCol ?? formDefaults.wrapperCol ?? { span: 16 },
+  }));
+  
   const { items, data: formData } = toRefs(props);
 
   function handleSubmit() {
@@ -52,9 +62,9 @@
   };
   // omit({labelCol:defaultLabelCol,...props},['items','data','model'])
   const fc = computed(() => ({
-    ...omit(props, ['items', 'data', 'model', 'labelCol', 'wrapperCol']),
-    labelCol: props.labelCol ?? { span: 6 },
-    wrapperCol: props.wrapperCol ?? { span: 16 },
+    ...omit(propsWithDefaults.value, ['items', 'data', 'model', 'labelCol', 'wrapperCol']),
+    labelCol: propsWithDefaults.value.labelCol,
+    wrapperCol: propsWithDefaults.value.wrapperCol,
   }));
   const validateField = (fields?: string | string[]) => {
     if (fields) {
