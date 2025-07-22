@@ -4,7 +4,6 @@ import { ColProps } from 'ant-design-vue/lib/grid/Col';
 import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
 import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
-import { ComputedRef } from 'vue';
 
 export interface CellFuncArg<D = Recordable> {
   row: D;
@@ -54,8 +53,8 @@ export interface PFormItemProps<F = Recordable> {
   title?: string;
   span?: number;
   colon?: boolean;
-  labelCol?: ColProps
-  wrapperCol?: ColProps
+  labelCol?: ColProps;
+  wrapperCol?: ColProps;
   forceRequired?: boolean; // 在页面需要必填标示，但field不需要必填校验时使用
   align?: 'left' | 'right' | 'center';
   col?: ColProps;
@@ -67,9 +66,9 @@ export interface PFormItemProps<F = Recordable> {
     default?: (
       { data, field }: ItemFuncArg<F>,
       passTrigger?: (cusFields?: string | string[]) => void,
-      passDelayTrigger?: (cusFields?: string | string[], time?: number) => void
+      passDelayTrigger?: (cusFields?: string | string[], time?: number) => void,
     ) => any;
-    defaultValue?: any
+    defaultValue?: any;
   };
 }
 
@@ -151,7 +150,13 @@ export interface ToolbarButtonProps extends PButtonProps {
 
 export interface ToolbarConfig {
   buttons?: Array<ToolbarButtonProps>;
-  tools?: Array<{ code: string; icon: string; type?: ButtonType; disabled?: boolean; size?: 'small' | 'large' | 'middle' }>;
+  tools?: Array<{
+    code: string;
+    icon: string;
+    type?: ButtonType;
+    disabled?: boolean;
+    size?: 'small' | 'large' | 'middle';
+  }>;
   disabled?: boolean;
 }
 
@@ -167,11 +172,11 @@ export interface ResponsePathConfig<D = Recordable> {
     | ((res: Recordable) => string | { status: string; content: string; icon?: string });
 }
 
-declare type HandlerMulti = (ids: Array<string | number>) => any;
+export type HandlerMultiDel = (ids: Array<string | number>) => any;
 
 export interface AjaxConfig<F = Recordable> {
   query: (Q: { page?: IPage; form: Partial<F> }) => Promise<Recordable>;
-  multiDelete?: HandlerMulti;
+  multiDelete?: HandlerMultiDel;
 }
 
 export interface ProxyConfig<D = Recordable, F = Recordable> {
@@ -195,7 +200,7 @@ export type PGridProps<D = Recordable, F = Recordable> = {
   selectConfig?: SelectConfig<D>;
   rowKey?: string;
   manualFetch?: boolean;
-  align?: 'left' | 'right' | 'center'
+  align?: 'left' | 'right' | 'center';
   formConfig?: PFormProps<F>;
   columns?: ColumnProps<D>[];
   toolbarConfig?: ToolbarConfig;
@@ -303,7 +308,7 @@ export interface PFormBlockInstance {
   $form: Recordable;
 }
 
-export interface PFormGroupInstance<F = Recordable> {
+export interface PFormGroupInstance {
   activeKey: number;
   setActiveKey: (activeKey: number) => void;
   validateAll: () => Promise<void>;

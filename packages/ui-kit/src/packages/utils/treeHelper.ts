@@ -47,7 +47,6 @@ const eachTreeItem = <T extends Recordable>(
   path: string[],
   node: Array<T | ITreeAble<T>>,
   parseChildren: string,
-  opts: TreeConfig,
 ) => {
   let paths: string[], nodes: Array<T | ITreeAble<T>>;
   treeData.forEach((item, index) => {
@@ -56,16 +55,7 @@ const eachTreeItem = <T extends Recordable>(
     iterate.call(context, item, index, treeData, paths, parent, nodes);
     if (item && parseChildren) {
       paths.push(parseChildren);
-      eachTreeItem(
-        item,
-        item[parseChildren] || [],
-        iterate,
-        context,
-        paths,
-        nodes,
-        parseChildren,
-        opts,
-      );
+      eachTreeItem(item, item[parseChildren] || [], iterate, context, paths, nodes, parseChildren);
     }
   });
 };

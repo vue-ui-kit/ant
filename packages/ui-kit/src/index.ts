@@ -7,7 +7,6 @@ import PromisePicker from '@/components/PromisePicker.vue';
 import { addFormatter } from '@/utils/AFormatters';
 import { addRender } from '@/store/renderStore';
 import { setUIKitConfig, getUIKitConfig, resetUIKitConfig, UIKitConfig } from '@/utils/config';
-import * as utils from '@/utils/core';
 
 // 创建setup方法
 function setup(config?: Partial<UIKitConfig>) {
@@ -30,12 +29,12 @@ export default {
   setup,
 };
 
+// 导出所有类型
 export * from '#/antProxy';
 export * from '@/utils/core';
-export { 
-  setup, 
-  setUIKitConfig, 
-  getUIKitConfig, 
-  resetUIKitConfig,
-  type UIKitConfig 
-};
+
+// 导出配置方法
+export { setup, setUIKitConfig, getUIKitConfig, resetUIKitConfig, type UIKitConfig };
+
+// 直接导出组件，使用户可以直接导入使用
+export { PForm, PGrid, PFormGroup, PGroupBlock, PromisePicker, addFormatter, addRender };

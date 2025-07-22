@@ -23,7 +23,7 @@ import {
 } from 'ant-design-vue';
 import { set, isFunction, merge, omit } from 'xe-utils';
 import { ButtonProps } from 'ant-design-vue/lib/button';
-import { isBadValue, isGoodValue, noValue, valued } from '@/utils/is';
+import { isBadValue, isGoodValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
 import { computed } from 'vue';
@@ -223,184 +223,191 @@ const renders = {
   ...Object.fromEntries(Object.keys(componentsMap).map((name) => [name, renderBasic(name)])),
   // 简单按钮
   $button: {
-    renderItemContent({ props = {}, events = {} }: RenderOptions, {
-      data,
-      field,
-    }: RenderFormParams, defaultHandler: {
-      [key: string]: (...args: any[]) => any
-    }) {
+    renderItemContent(
+      { props = {}, events = {} }: RenderOptions,
+      { data, field }: RenderFormParams,
+      defaultHandler: {
+        [key: string]: (...args: any[]) => any;
+      },
+    ) {
       return (
         <Button
           {...omit(props, ['content'])}
           icon={props.icon ? <Icon icon={props.icon} /> : null}
           onClick={() => {
-            events.click?.({ data, field })
+            events.click?.({ data, field });
             if (props.htmlType === 'reset' && defaultHandler?.reset) {
               if (props.beforeClick && isFunction(props.beforeClick)) {
                 props.beforeClick({ data, field }).then((res: void | Recordable) => {
-                  defaultHandler.reset(res ? { data: res, field } : { data, field })
-                })
-              }
-              else {
-                defaultHandler.reset({ data, field })
+                  defaultHandler.reset(res ? { data: res, field } : { data, field });
+                });
+              } else {
+                defaultHandler.reset({ data, field });
               }
             }
           }}
         >
           {props.content}
-          {
-            props.suffix?.({ data, field }) ?? null
-          }
+          {props.suffix?.({ data, field }) ?? null}
         </Button>
-      )
+      );
     },
-    renderDefault({ props = {}, events = {} }: RenderOptions, {
-      row,
-      field,
-    }: RenderTableParams, defaultHandler: {
-      [key: string]: (...args: any[]) => any
-    }) {
+    renderDefault(
+      { props = {}, events = {} }: RenderOptions,
+      { row, field }: RenderTableParams,
+      defaultHandler: {
+        [key: string]: (...args: any[]) => any;
+      },
+    ) {
       return (
         <Button
           {...omit(props, ['content'])}
           icon={props.icon ? <Icon icon={props.icon} /> : null}
           onClick={() => {
-            events.click?.({ row, field })
+            events.click?.({ row, field });
             if (props.htmlType === 'reset' && defaultHandler?.reset) {
               if (props.beforeClick && isFunction(props.beforeClick)) {
-                defaultHandler?.setLoadings?.(true)
-                props.beforeClick({ row, field }).then((res: void | Recordable) => {
-                  defaultHandler.reset(res ? { row: res, field } : { row, field })
-                }).finally(() => {
-                  defaultHandler?.setLoadings?.(false)
-                })
-              }
-              else {
-                defaultHandler.reset({ row, field })
+                defaultHandler?.setLoadings?.(true);
+                props
+                  .beforeClick({ row, field })
+                  .then((res: void | Recordable) => {
+                    defaultHandler.reset(res ? { row: res, field } : { row, field });
+                  })
+                  .finally(() => {
+                    defaultHandler?.setLoadings?.(false);
+                  });
+              } else {
+                defaultHandler.reset({ row, field });
               }
             }
             if (props.htmlType === 'pick' && defaultHandler?.pick) {
               if (props.beforeClick && isFunction(props.beforeClick)) {
-                defaultHandler?.setLoadings?.(true)
-                props.beforeClick({ row, field }).then((res: void | Recordable) => {
-                  defaultHandler.pick(res ? { row: res, field } : { row, field })
-                }).finally(() => {
-                  defaultHandler?.setLoadings?.(false)
-                })
-              }
-              else {
-                defaultHandler.pick({ row, field })
+                defaultHandler?.setLoadings?.(true);
+                props
+                  .beforeClick({ row, field })
+                  .then((res: void | Recordable) => {
+                    defaultHandler.pick(res ? { row: res, field } : { row, field });
+                  })
+                  .finally(() => {
+                    defaultHandler?.setLoadings?.(false);
+                  });
+              } else {
+                defaultHandler.pick({ row, field });
               }
             }
           }}
         >
           {props.content}
         </Button>
-      )
+      );
     },
   },
   // 简单按钮组
   $buttons: {
-    renderItemContent({ props = {}, children = [] }: RenderOptions, {
-      data,
-      field,
-    }: RenderFormParams, defaultHandler: {
-      [key: string]: (...args: any[]) => any
-    }) {
+    renderItemContent(
+      { props = {}, children = [] }: RenderOptions,
+      { data, field }: RenderFormParams,
+      defaultHandler: {
+        [key: string]: (...args: any[]) => any;
+      },
+    ) {
       return (
         <span class="align-gap-box w-fit">
-          {
-            children.map((m) => {
-              return (
-                <Button
-                  {...omit(Object.assign({}, props, m.props), ['content'])}
-                  icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
-                  onClick={() => {
-                    m.events?.click?.({ data, field })
-                    if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
-                      if (props.beforeClick && isFunction(props.beforeClick)) {
-                        props.beforeClick({ data, field }).then((res: void | Recordable) => {
-                          defaultHandler.reset(res ? { data: res, field } : { data, field })
-                        })
-                      }
-                      else {
-                        defaultHandler.reset({ data, field })
-                      }
-                    }
-                    if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
-                      if (props.beforeClick && isFunction(props.beforeClick)) {
-                        props.beforeClick({ data, field }).then((res: void | Recordable) => {
-                          defaultHandler.pick(res ? { data: res, field } : { data, field })
-                        })
-                      }
-                      else {
-                        defaultHandler.pick({ data, field })
-                      }
-                    }
-                  }}
-                >
-                  {m.props.content}
-                </Button>
-              )
-            })
-          }
-        </span>
-      )
-    },
-    renderDefault({ props = {}, children = [] }: RenderOptions, {
-      data,
-      row,
-      field,
-    }: RenderTableParams, defaultHandler: {
-      [key: string]: (...args: any[]) => any
-    }) {
-      return (
-        <span class="align-gap-box w-fit">
-          {
-            children.filter(f => !f?.props?.hiddenIf?.({
-              data,
-              row,
-              field,
-            })).map(m => (
+          {children.map((m) => {
+            return (
               <Button
-                {...omit(Object.assign({}, props, m.props), ['content', 'hiddenIf'])}
+                {...omit(Object.assign({}, props, m.props), ['content'])}
                 icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
                 onClick={() => {
-                  m.events?.click?.({ data, row, field })
+                  m.events?.click?.({ data, field });
                   if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
                     if (props.beforeClick && isFunction(props.beforeClick)) {
-                      defaultHandler?.setLoadings?.(true)
-                      props.beforeClick({ row, field }).then((res: void | Recordable) => {
-                        defaultHandler.reset(res ? { row: res, field } : { row, field })
-                      }).finally(() => {
-                        defaultHandler?.setLoadings?.(false)
-                      })
-                    }
-                    else {
-                      defaultHandler.reset({ row, field })
+                      props.beforeClick({ data, field }).then((res: void | Recordable) => {
+                        defaultHandler.reset(res ? { data: res, field } : { data, field });
+                      });
+                    } else {
+                      defaultHandler.reset({ data, field });
                     }
                   }
                   if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
                     if (props.beforeClick && isFunction(props.beforeClick)) {
-                      defaultHandler?.setLoadings?.(true)
-                      props.beforeClick({ row, field }).then((res: void | Recordable) => {
-                        defaultHandler.pick(res ? { row: res, field } : { row, field })
-                      }).finally(() => {
-                        defaultHandler?.setLoadings?.(false)
-                      })
-                    }
-                    else {
-                      defaultHandler.pick({ row, field })
+                      props.beforeClick({ data, field }).then((res: void | Recordable) => {
+                        defaultHandler.pick(res ? { data: res, field } : { data, field });
+                      });
+                    } else {
+                      defaultHandler.pick({ data, field });
                     }
                   }
                 }}
               >
                 {m.props.content}
               </Button>
-            ))
-          }
+            );
+          })}
         </span>
-      )
+      );
+    },
+    renderDefault(
+      { props = {}, children = [] }: RenderOptions,
+      { data, row, field }: RenderTableParams,
+      defaultHandler: {
+        [key: string]: (...args: any[]) => any;
+      },
+    ) {
+      return (
+        <span class="align-gap-box w-fit">
+          {children
+            .filter(
+              (f) =>
+                !f?.props?.hiddenIf?.({
+                  data,
+                  row,
+                  field,
+                }),
+            )
+            .map((m) => (
+              <Button
+                {...omit(Object.assign({}, props, m.props), ['content', 'hiddenIf'])}
+                icon={m.props.icon ? <Icon icon={m.props.icon} /> : null}
+                onClick={() => {
+                  m.events?.click?.({ data, row, field });
+                  if (m.props.htmlType === 'reset' && defaultHandler?.reset) {
+                    if (props.beforeClick && isFunction(props.beforeClick)) {
+                      defaultHandler?.setLoadings?.(true);
+                      props
+                        .beforeClick({ row, field })
+                        .then((res: void | Recordable) => {
+                          defaultHandler.reset(res ? { row: res, field } : { row, field });
+                        })
+                        .finally(() => {
+                          defaultHandler?.setLoadings?.(false);
+                        });
+                    } else {
+                      defaultHandler.reset({ row, field });
+                    }
+                  }
+                  if (m.props.htmlType === 'pick' && defaultHandler?.pick) {
+                    if (props.beforeClick && isFunction(props.beforeClick)) {
+                      defaultHandler?.setLoadings?.(true);
+                      props
+                        .beforeClick({ row, field })
+                        .then((res: void | Recordable) => {
+                          defaultHandler.pick(res ? { row: res, field } : { row, field });
+                        })
+                        .finally(() => {
+                          defaultHandler?.setLoadings?.(false);
+                        });
+                    } else {
+                      defaultHandler.pick({ row, field });
+                    }
+                  }
+                }}
+              >
+                {m.props.content}
+              </Button>
+            ))}
+        </span>
+      );
     },
   },
   ButtonTree: {
