@@ -241,17 +241,8 @@
             </template>
           </a-dropdown>
         </template>
-        <!-- @vue-ignore -->
         <p-group-block
-          :ref="
-            (i: PFormBlockInstance) => {
-              if (i) {
-                blockInstance[idx] = i;
-              } else if (blockInstance) {
-                blockInstance = blockInstance.filter((_, i) => i !== idx);
-              }
-            }
-          "
+          ref="blockInstance"
           :key="idx"
           :source="item"
           :get-form-setting="getFormSetting"
