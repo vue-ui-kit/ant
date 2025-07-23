@@ -2,8 +2,8 @@
   import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
-  import type { Tabs } from 'ant-design-vue'
-  import { Form } from 'ant-design-vue'
+  import type { Tabs } from 'ant-design-vue';
+  import { Form } from 'ant-design-vue';
   import { clone, toString, isFunction, omit, max, debounce } from 'xe-utils';
   import PGroupBlock from '@/components/PGroupBlock.vue';
   import {
@@ -18,17 +18,17 @@
   import { valued } from '@/utils/is';
   import { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
   import { $warning } from '@/hooks/useMessage';
-  
-  const useForm = Form.useForm
-  const tabsRef = ref<InstanceType<typeof Tabs>>()
+
+  const useForm = Form.useForm;
+  const tabsRef = ref<InstanceType<typeof Tabs>>();
   const props = defineProps<PFormGroupProps<F>>();
-  const rootRef = ref<InstanceType<typeof ACard>>()
+  const rootRef = ref<InstanceType<typeof ACard>>();
   const model = defineModel({
     type: Array as PropType<Partial<F & { __index: number }>[]>,
     default: () => [],
   });
   const activeKey = ref(0);
-  const error_indexes = ref<number[]>([])
+  const error_indexes = ref<number[]>([]);
   const blockInstance = ref<PFormBlockInstance[]>([]);
   const setActiveKey = (key: number) => {
     activeKey.value = key;
@@ -51,34 +51,38 @@
     { content: '复制', code: 'copy' },
     { content: '删除', code: 'delete' },
   ];
-  const getPopupContainer = () => rootRef.value?.$el ?? document.body
+  const getPopupContainer = () => rootRef.value?.$el ?? document.body;
   // 实际是否强制渲染
   const fr = computed(() => {
-    return props.forceRender || model.value.length <= 5
-  })
+    return props.forceRender || model.value.length <= 5;
+  });
   const handleBlockFocus = (idx: number) => {
-    const target_index = model.value.find((f, index) => index === idx)?.__index
+    const target_index = model.value.find((f, index) => index === idx)?.__index;
     if (valued(target_index)) {
-      error_indexes.value = error_indexes.value.filter(f => f !== target_index)
+      error_indexes.value = error_indexes.value.filter((f) => f !== target_index);
     }
-  }
+  };
   const handleTabChange = () => {
     nextTick().then(() => {
-      handleBlockFocus(activeKey.value)
-      blockInstance.value[activeKey.value]?.$form?.validate()
-    })
-  }
-  watch(() => model.value, () => {
-  if (!props.keepSerial) {
-    const unSortItems = model.value.filter(f => !valued(f.__index))
-    if (unSortItems.length > 0) {
-      unSortItems.forEach((item) => {
-        // @ts-ignore
-        item.__index = (max(model.value, m => m.__index ?? -1)?.__index ?? -1) + 1
-      })
-    }
-  }
-}, { immediate: true })
+      handleBlockFocus(activeKey.value);
+      blockInstance.value[activeKey.value]?.$form?.validate();
+    });
+  };
+  watch(
+    () => model.value,
+    () => {
+      if (!props.keepSerial) {
+        const unSortItems = model.value.filter((f) => !valued(f.__index));
+        if (unSortItems.length > 0) {
+          unSortItems.forEach((item) => {
+            // @ts-ignore
+            item.__index = (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1;
+          });
+        }
+      }
+    },
+    { immediate: true },
+  );
   const handleMenu = ({ key }: MenuInfo, item: Partial<F & { __index: number }>, idx: number) => {
     if (props.menuHandler && isFunction(props.menuHandler)) {
       props.menuHandler({ code: toString(key), data: item, index: idx });
@@ -95,8 +99,8 @@
           break;
         case 'copy':
           if (model.value.length >= maxLen.value) {
-            $warning('已达到最大数量')
-            return
+            $warning('已达到最大数量');
+            return;
           }
           model.value = [
             ...model.value,
@@ -118,73 +122,91 @@
     }
   });
 
-  const debounceHandleBlockFocus = debounce(handleBlockFocus, 50)
+  const debounceHandleBlockFocus = debounce(handleBlockFocus, 50);
   watchEffect(() => {
-  const errorKeys = model.value.map((m, idx) => error_indexes.value.includes(m.__index!) ? idx : undefined).filter(valued)
-  const rootDom = tabsRef.value?.$el
-  if (rootDom) {
-    const tabPanel = rootDom.querySelectorAll(':scope >.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-tab>.ant-tabs-tab-btn')
-    tabPanel.forEach((tab, idx) => {
-      if (errorKeys.includes(idx)) {
-        tab.classList.add('p-error-group-tab')
-      }
-      else {
-        tab.classList.remove('p-error-group-tab')
-      }
-    })
-  }
-})
+    const errorKeys = model.value
+      .map((m, idx) => (error_indexes.value.includes(m.__index!) ? idx : undefined))
+      .filter(valued);
+    const rootDom = tabsRef.value?.$el;
+    if (rootDom) {
+      const tabPanel = rootDom.querySelectorAll(
+        ':scope >.ant-tabs-nav>.ant-tabs-nav-wrap>.ant-tabs-nav-list>.ant-tabs-tab>.ant-tabs-tab-btn',
+      );
+      tabPanel.forEach((tab, idx) => {
+        if (errorKeys.includes(idx)) {
+          tab.classList.add('p-error-group-tab');
+        } else {
+          tab.classList.remove('p-error-group-tab');
+        }
+      });
+    }
+  });
   defineExpose({
     activeKey: computed(() => activeKey.value),
     setActiveKey,
     validateAll: () => {
-    const promiseList = fr.value
-      ? blockInstance.value.map(block => block.$form?.validate())
-      : model.value.map(m => useForm(m, props.getFormSetting(m).rules)?.validate() ?? Promise.resolve())
-    return Promise.allSettled(promiseList).then((results) => {
-      // 更新 error_indexes
-      error_indexes.value = results
-        .map((res, idx) => (res.status === 'rejected' && typeof model.value[idx]?.__index === 'number' ? model.value[idx].__index as number : undefined))
-        .filter((v): v is number => typeof v === 'number')
-      if (!props.lazyErrorMark && error_indexes.value.length) {
-        // 跳到第一个出错的tab
-        const firstErrorIndex = error_indexes.value[0]
-        const firstErrorTab = model.value.findIndex(f => f.__index === firstErrorIndex)
-        if (firstErrorTab !== -1) {
-          activeKey.value = firstErrorTab
+      const promiseList = fr.value
+        ? blockInstance.value.map((block) => block.$form?.validate())
+        : model.value.map(
+            (m) => useForm(m, props.getFormSetting(m).rules)?.validate() ?? Promise.resolve(),
+          );
+      return Promise.allSettled(promiseList).then((results) => {
+        // 更新 error_indexes
+        error_indexes.value = results
+          .map((res, idx) =>
+            res.status === 'rejected' && typeof model.value[idx]?.__index === 'number'
+              ? (model.value[idx].__index as number)
+              : undefined,
+          )
+          .filter((v): v is number => typeof v === 'number');
+        if (!props.lazyErrorMark && error_indexes.value.length) {
+          // 跳到第一个出错的tab
+          const firstErrorIndex = error_indexes.value[0];
+          const firstErrorTab = model.value.findIndex((f) => f.__index === firstErrorIndex);
+          if (firstErrorTab !== -1) {
+            activeKey.value = firstErrorTab;
+          }
         }
+        // 判断是否有错误
+        if (error_indexes.value.length) {
+          return Promise.reject({ error_indexes: error_indexes.value, results });
+        }
+        return Promise.resolve(results);
+      });
+    },
+    validate: async (__index: number, ignoreTabError?: boolean) => {
+      const index = model.value.findIndex((f) => f.__index === __index);
+      try {
+        await (fr.value
+          ? (blockInstance.value[index]?.$form?.validate() ?? Promise.resolve())
+          : (useForm(
+              model.value[index],
+              props.getFormSetting(model.value[index]).rules,
+            )?.validate() ?? Promise.resolve()));
+        // 校验通过，移除error_indexes中的__index
+        error_indexes.value = error_indexes.value.filter((f) => f !== __index);
+        return Promise.resolve();
+      } catch (e) {
+        // 校验失败，加入error_indexes
+        if (!error_indexes.value.includes(__index) && !ignoreTabError) {
+          error_indexes.value = [...error_indexes.value, __index];
+        }
+        return Promise.reject(e);
       }
-      // 判断是否有错误
-      if (error_indexes.value.length) {
-        return Promise.reject({ error_indexes: error_indexes.value, results })
-      }
-      return Promise.resolve(results)
-    })
-  },
-  validate: async (__index: number) => {
-    const index = model.value.findIndex(f => f.__index === __index)
-    try {
-      await (fr.value
-        ? (blockInstance.value[index]?.$form?.validate() ?? Promise.resolve())
-        : (useForm(model.value[index], props.getFormSetting(model.value[index]).rules)?.validate() ?? Promise.resolve()))
-      // 校验通过，移除error_indexes中的__index
-      error_indexes.value = error_indexes.value.filter(f => f !== __index)
-      return Promise.resolve()
-    }
-    catch (e) {
-      // 校验失败，加入error_indexes
-      if (!error_indexes.value.includes(__index)) {
-        error_indexes.value = [...error_indexes.value, __index]
-      }
-      return Promise.reject(e)
-    }
-  },
+    },
   });
 </script>
 <template>
   <a-card ref="rootRef" :title="title" size="small">
     <a-spin v-if="loading" class="w-full" />
-    <a-tabs v-else ref="tabsRef" type="editable-card" v-model:activeKey="activeKey" hide-add @change="handleTabChange">
+    <a-tabs
+      v-else
+      ref="tabsRef"
+      type="editable-card"
+      v-model:activeKey="activeKey"
+      hide-add
+      @change="handleTabChange"
+    >
       <template #rightExtra>
         <slot name="rightExtra">
           <a-button

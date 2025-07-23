@@ -629,7 +629,7 @@ export const addRender = (
   },
 ) => {
   if (renders.hasOwnProperty(name)) {
-    console.warn(`render ${name} already exists`);
+    console.warn(`render ${name} already exists, you are trying to override it`);
   }
   renders[name] = {
     renderItemContent,
