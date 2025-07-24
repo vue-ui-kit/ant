@@ -2,15 +2,22 @@
   import { computed, ref } from 'vue';
   import { Student } from './Mock/apis/type';
   import { queryStudents } from './Mock/apis/school';
-  import { PGridProps, PFormProps, PFormGroupProps, labelColDict } from '@vue-ui-kit/ant';
-  import { 
-    Card as ACard, 
-    Button as AButton, 
-    Divider as ADivider, 
-    Space as ASpace, 
+  import {
+    PGridProps,
+    PFormProps,
+    PFormGroupProps,
+    labelColDict,
+    PFormGroupInstance,
+  } from '@vue-ui-kit/ant';
+  import {
+    Card as ACard,
+    Button as AButton,
+    Divider as ADivider,
+    Space as ASpace,
     Typography,
-    Switch as ASwitch
+    Switch as ASwitch,
   } from 'ant-design-vue';
+  import { sample } from 'xe-utils';
 
   const { Title } = Typography;
 
@@ -46,9 +53,9 @@
       endDate: '',
       budget: undefined as number | undefined,
       members: [] as string[],
-    }
+    },
   ]);
-
+  const groupEl = ref<PFormGroupInstance>();
   // 当前展示模式
   const currentView = ref<'grid' | 'form' | 'group'>('grid');
 
@@ -193,11 +200,11 @@
             placeholder: '请选择生日',
             format: 'YYYY-MM-DD',
           },
-          attrs:{
-            style:{
+          attrs: {
+            style: {
               width: '100%',
-            }
-          }
+            },
+          },
         },
       },
       {
@@ -231,30 +238,57 @@
           },
         },
       },
-              {
-          field: 'isActive',
-          title: '状态',
-          span: 24,
-          itemRender: {
-            name: 'ASwitch',
-            props: {
-              checkedChildren: '启用',
-              unCheckedChildren: '禁用',
-            },
+      {
+        field: 'isActive',
+        title: '状态',
+        span: 24,
+        itemRender: {
+          name: 'ASwitch',
+          props: {
+            checkedChildren: '启用',
+            unCheckedChildren: '禁用',
           },
         },
+      },
     ],
   }));
 
   // PFormGroup 配置
-  const groupFormSetting = computed<PFormGroupProps<typeof groupFormData.value[0]>>(() => ({
+  const groupFormSetting = computed<PFormGroupProps<(typeof groupFormData.value)[0]>>(() => ({
     title: '项目管理',
     showAdd: true,
-    tabLabel:'项目',
+    tabLabel: '项目',
     max: 5,
     getFormSetting: (data) => ({
       labelCol: { span: 6 },
       wrapperCol: { span: 16 },
+      rules: {
+        projectName: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
+        startDate: [
+          { required: true, message: '请选择开始日期', trigger: 'change' },
+          {
+            validator: () => {
+              if (data.startDate && data.endDate && data.startDate > data.endDate) {
+                return Promise.reject('开始日期不能晚于结束日期');
+              } else {
+                return Promise.resolve();
+              }
+            },
+          },
+        ],
+        endDate: [
+          { required: true, message: '请选择结束日期', trigger: 'change' },
+          {
+            validator: () => {
+              if (data.startDate && data.endDate && data.startDate > data.endDate) {
+                return Promise.reject('结束日期不能早于开始日期');
+              } else {
+                return Promise.resolve();
+              }
+            },
+          },
+        ],
+      },
       items: [
         {
           field: 'projectName',
@@ -349,84 +383,88 @@
   const handleGroupFormSubmit = () => {
     console.log('表单组数据:', groupFormData.value);
   };
+  const handleValidateTabFields = () => {
+    // const targetIndex = sample(groupFormData.value,1)[0]?.__index
+    const targetIndex = 0;
+    const fields = ['startDate', 'endDate'];
+    groupEl.value?.validateFields(targetIndex, fields);
+  };
 </script>
 
 <template>
   <div style="height: 100vh; width: 100%; padding: 20px; overflow-y: auto">
-        <div style="margin-bottom: 20px">
-       <a-typography-title :level="2">Vue UI Kit 示例</a-typography-title>
-       <a-space>
-         <a-button 
-           :type="currentView === 'grid' ? 'primary' : 'default'"
-           @click="currentView = 'grid'"
-         >
-           PGrid 示例
-         </a-button>
-         <a-button 
-           :type="currentView === 'form' ? 'primary' : 'default'"
-           @click="currentView = 'form'"
-         >
-           PForm 示例
-         </a-button>
-         <a-button 
-           :type="currentView === 'group' ? 'primary' : 'default'"
-           @click="currentView = 'group'"
-         >
-           PFormGroup 示例
-                  </a-button>
-       </a-space>
-     </div>
+    <div style="margin-bottom: 20px">
+      <a-typography-title :level="2">Vue UI Kit 示例</a-typography-title>
+      <a-space>
+        <a-button
+          :type="currentView === 'grid' ? 'primary' : 'default'"
+          @click="currentView = 'grid'"
+        >
+          PGrid 示例
+        </a-button>
+        <a-button
+          :type="currentView === 'form' ? 'primary' : 'default'"
+          @click="currentView = 'form'"
+        >
+          PForm 示例
+        </a-button>
+        <a-button
+          :type="currentView === 'group' ? 'primary' : 'default'"
+          @click="currentView = 'group'"
+        >
+          PFormGroup 示例
+        </a-button>
+      </a-space>
+    </div>
 
-     <a-divider />
+    <a-divider />
 
-         <!-- PGrid 示例 -->
-     <div v-if="currentView === 'grid'">
-       <a-typography-title :level="3">PGrid - 增强数据表格</a-typography-title>
+    <!-- PGrid 示例 -->
+    <div v-if="currentView === 'grid'">
+      <a-typography-title :level="3">PGrid - 增强数据表格</a-typography-title>
       <p>集成了查询表单、分页、工具栏等功能的数据表格组件</p>
       <div style="height: 600px">
         <p-grid v-bind="gridSetting" @toolbar-button-click="handleToolbarBtn" />
       </div>
     </div>
 
-         <!-- PForm 示例 -->
-     <div v-if="currentView === 'form'">
-       <a-typography-title :level="3">PForm - 增强表单</a-typography-title>
-       <p>基于配置的动态表单组件，支持多种字段类型和验证规则</p>
-       <a-card title="用户信息表单" style="margin-top: 16px">
-        <p-form 
-          v-bind="formSetting" 
+    <!-- PForm 示例 -->
+    <div v-if="currentView === 'form'">
+      <a-typography-title :level="3">PForm - 增强表单</a-typography-title>
+      <p>基于配置的动态表单组件，支持多种字段类型和验证规则</p>
+      <a-card title="用户信息表单" style="margin-top: 16px">
+        <p-form
+          v-bind="formSetting"
           :data="formData"
           @apply="handleFormSubmit"
           @reset="handleFormReset"
         />
-                          <template #actions>
-           <a-space style="margin-top: 16px">
-             <a-button type="primary" @click="handleFormSubmit">提交</a-button>
-             <a-button @click="handleFormReset">重置</a-button>
-           </a-space>
-         </template>
-       </a-card>
+        <template #actions>
+          <a-space style="margin-top: 16px">
+            <a-button type="primary" @click="handleFormSubmit">提交</a-button>
+            <a-button @click="handleFormReset">重置</a-button>
+          </a-space>
+        </template>
+      </a-card>
     </div>
 
-         <!-- PFormGroup 示例 -->
-     <div v-if="currentView === 'group'">
-       <a-typography-title :level="3">PFormGroup - 动态表单组</a-typography-title>
-       <p>支持动态添加、删除和管理多个表单实例的组件</p>
-       <div style="margin-top: 16px">
-         <p-form-group 
-           v-model="groupFormData"
-           v-bind="groupFormSetting"
-         />
-         <a-space style="margin-top: 16px">
-           <a-button type="primary" @click="handleGroupFormSubmit">保存所有项目</a-button>
-         </a-space>
+    <!-- PFormGroup 示例 -->
+    <div v-if="currentView === 'group'">
+      <a-typography-title :level="3">PFormGroup - 动态表单组</a-typography-title>
+      <p>支持动态添加、删除和管理多个表单实例的组件</p>
+      <div style="margin-top: 16px">
+        <p-form-group ref="groupEl" v-model="groupFormData" v-bind="groupFormSetting" />
+        <a-space style="margin-top: 16px">
+          <a-button type="primary" @click="handleValidateTabFields">校验随机tab指定列</a-button>
+          <a-button type="primary" @click="handleGroupFormSubmit">保存所有项目</a-button>
+        </a-space>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.demo-container {
-  margin: 20px 0;
-}
+  .demo-container {
+    margin: 20px 0;
+  }
 </style>

@@ -3,6 +3,7 @@
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';
   import type { Tabs } from 'ant-design-vue';
+  import type { Rule } from 'ant-design-vue/lib/form';
   import { Form } from 'ant-design-vue';
   import { clone, toString, isFunction, omit, max, debounce } from 'xe-utils';
   import PGroupBlock from '@/components/PGroupBlock.vue';
@@ -185,6 +186,32 @@
             )?.validate() ?? Promise.resolve()));
         // 校验通过，移除error_indexes中的__index
         error_indexes.value = error_indexes.value.filter((f) => f !== __index);
+        return Promise.resolve();
+      } catch (e) {
+        // 校验失败，加入error_indexes
+        if (!error_indexes.value.includes(__index) && !ignoreTabError) {
+          error_indexes.value = [...error_indexes.value, __index];
+        }
+        return Promise.reject(e);
+      }
+    },
+    validateFields: async (__index: number, fields: string[], ignoreTabError?: boolean) => {
+      const index = model.value.findIndex((f) => f.__index === __index);
+      const formSettings = props.getFormSetting(model.value[index]);
+      const rules = formSettings.rules as Record<string, Rule[]>;
+      const dataFormFactory = useForm(model.value[index], rules);
+      try {
+        await (fr.value
+          ? (blockInstance.value[index]?.$form?.validateFields(fields) ?? Promise.resolve())
+          : Promise.allSettled(
+              fields.map((m) =>
+                dataFormFactory.validateField(
+                  m,
+                  model.value[index][m],
+                  (rules[m] as Record<string, unknown>[]) ?? [],
+                ),
+              ),
+            ));
         return Promise.resolve();
       } catch (e) {
         // 校验失败，加入error_indexes

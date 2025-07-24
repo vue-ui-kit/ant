@@ -312,5 +312,6 @@ export interface PFormGroupInstance {
   activeKey: number;
   setActiveKey: (activeKey: number) => void;
   validateAll: () => Promise<void>;
-  validate: (index: number) => Promise<void>;
+  validate: (index: number, ignoreTabError?: boolean) => Promise<void>;
+  validateFields: (index: number, fields: string[], ignoreTabError?: boolean) => Promise<void>;
 }
