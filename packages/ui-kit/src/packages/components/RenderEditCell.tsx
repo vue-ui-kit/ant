@@ -3,27 +3,28 @@ import { CellRender, RenderTableParams } from '#/antProxy';
 import renderStore from '@/store/renderStore';
 
 export default defineComponent(
-  <D extends Recordable = Recordable>(props: {
-    cellRender: CellRender;
-    renderTableParams: RenderTableParams<D>;
-    defaultHandler: {
-      [key: string]: (...args: any[]) => any;
-    };
-  }) => {
+  <D extends Recordable = Recordable>(
+    props: {
+      cellRender: CellRender;
+      renderTableParams: RenderTableParams<D>;
+    },
+    { emit },
+  ) => {
     const { cellRender, renderTableParams } = props;
     const { data, row, field, rowIndex } = renderTableParams!;
     return () => {
       return (
-        renderStore.renders[cellRender!.name]?.renderDefault?.(
+        renderStore.renders[cellRender!.name]?.renderEdit?.(
           cellRender!,
           { data, row, field, rowIndex },
-          props.defaultHandler,
+          emit,
         ) ?? null
       );
     };
   },
   {
-    name: 'RenderAntCell',
-    props: ['cellRender', 'renderTableParams', 'defaultHandler'],
+    name: 'RenderEditCell',
+    props: ['cellRender', 'renderTableParams'],
+    emits: ['change'],
   },
 );

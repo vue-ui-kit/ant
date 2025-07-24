@@ -4,15 +4,14 @@ import { ColProps } from 'ant-design-vue/lib/grid/Col';
 import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
 import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
-
-export interface CellFuncArg<D = Recordable> {
+import type { ConfigType, Column as EVirtColumn } from 'e-virt-table';
+export interface CellFuncArg<D extends Recordable = Recordable> {
   row: D;
   column: ColumnProps<D>;
   rowIndex: number;
   cellValue: any;
 }
-
-export interface ItemFuncArg<F = Recordable> {
+export interface ItemFuncArg<F extends Recordable = Recordable> {
   data: F;
   field?: string;
 }
@@ -48,7 +47,7 @@ export interface TooltipConfig extends TooltipProps {
   title: TooltipProps['title'] | (() => any);
 }
 
-export interface PFormItemProps<F = Recordable> {
+export interface PFormItemProps<F extends Recordable = Recordable> {
   field?: string;
   title?: string;
   span?: number;
@@ -72,23 +71,26 @@ export interface PFormItemProps<F = Recordable> {
   };
 }
 
-export interface PFormProps<F = Recordable> extends FormProps {
+export interface PFormProps<F extends Recordable = Recordable> extends FormProps {
   items: PFormItemProps<F>[];
   customReset?: () => void;
 }
 
-export interface PBlockProps<F = Recordable> {
+export interface PBlockProps<F extends Recordable = Recordable> {
   getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
   source: Partial<F>;
 }
 
-export interface PromisePickerProps<D = Recordable, F = Recordable> {
+export interface PromisePickerProps<
+  D extends Recordable = Recordable,
+  F extends Recordable = Recordable,
+> {
   gridSetting: PGridProps<D, F>;
   title?: string;
   width?: string | number;
 }
 
-export type GroupMenuItemHandler<F = Recordable> = ({
+export type GroupMenuItemHandler<F extends Recordable = Recordable> = ({
   index,
   data,
   code,
@@ -98,14 +100,14 @@ export type GroupMenuItemHandler<F = Recordable> = ({
   data: Partial<F & { __index: number }>;
 }) => void;
 
-export interface GroupMenuItem<F = Recordable> {
+export interface GroupMenuItem<F extends Recordable = Recordable> {
   content: string;
   icon?: string;
   code: string;
   visibleMethod?: ({ data, index }: { data: Partial<F>; index: number }) => boolean;
 }
 
-export interface PFormGroupProps<F = Recordable> {
+export interface PFormGroupProps<F extends Recordable = Recordable> {
   getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
   title?: string;
   tabLabel?: string;
@@ -122,7 +124,8 @@ export interface PFormGroupProps<F = Recordable> {
   menuHandler?: GroupMenuItemHandler<F>;
 }
 
-export interface ColumnProps<D = Recordable> extends Omit<TableColumnType, 'slots'> {
+export interface ColumnProps<D extends Recordable = Recordable>
+  extends Omit<TableColumnType, 'slots'> {
   field?: string;
   children?: ColumnProps<D>[];
   formatter?:
@@ -160,7 +163,7 @@ export interface ToolbarConfig {
   disabled?: boolean;
 }
 
-export interface ResponsePathConfig<D = Recordable> {
+export interface ResponsePathConfig<D extends Recordable = Recordable> {
   /*非分页取值路径*/
   list?: string | ((res: Recordable) => D[]);
   /*分页取值路径*/
@@ -174,12 +177,12 @@ export interface ResponsePathConfig<D = Recordable> {
 
 export type HandlerMultiDel = (ids: Array<string | number>) => any;
 
-export interface AjaxConfig<F = Recordable> {
+export interface AjaxConfig<F extends Recordable = Recordable> {
   query: (Q: { page?: IPage; form: Partial<F> }) => Promise<Recordable>;
   multiDelete?: HandlerMultiDel;
 }
 
-export interface ProxyConfig<D = Recordable, F = Recordable> {
+export interface ProxyConfig<D extends Recordable = Recordable, F extends Recordable = Recordable> {
   // 结果集 取值路径
   response?: ResponsePathConfig<D>;
   ajax: AjaxConfig<F>;
@@ -192,13 +195,13 @@ export interface PageConfig {
   showQuickJumper?: boolean;
 }
 
-export interface SelectConfig<D = Recordable> {
+export interface SelectConfig<D extends Recordable = Recordable> {
   multiple?: boolean;
   showCount?: boolean;
   getCheckboxProps?: (record: D) => { disabled?: boolean };
 }
 
-export type PGridProps<D = Recordable, F = Recordable> = {
+export type PGridProps<D extends Recordable = Recordable, F extends Recordable = Recordable> = {
   selectConfig?: SelectConfig<D>;
   rowKey?: string;
   manualFetch?: boolean;
@@ -264,20 +267,28 @@ export interface RenderOptions {
   handleDelayTrigger?: (cusFields?: string | string[], time?: number) => void;
 }
 
-export interface RenderFormParams<F = Recordable> {
+export interface RenderFormParams<F extends Recordable = Recordable> {
   data: F;
   field?: string;
 }
 
-export interface RenderTableParams<D = Recordable> {
+export interface RenderTableParams<D extends Recordable = Recordable> {
   data?: D[];
   row: D;
   rowIndex?: number;
   field?: string;
   title?: string;
 }
-
-export interface PGridInstance<D = Recordable, F = Recordable> {
+export interface PCanvasGridColumnProps extends EVirtColumn {
+  field?: string;
+}
+export interface PCanvasGridProps {
+  gridConfig: ConfigType;
+}
+export interface PGridInstance<
+  D extends Recordable = Recordable,
+  F extends Recordable = Recordable,
+> {
   commitProxy: {
     query: () => Promise<D[]>;
     reload: () => Promise<D[]>;
@@ -299,7 +310,7 @@ export interface PFormInstance {
   $form: Recordable;
 }
 
-export interface PromisePickerInstance<D = Recordable> {
+export interface PromisePickerInstance<D extends Recordable = Recordable> {
   pick: () => Promise<{ row: D; field?: string }>;
   pickMultiple: () => Promise<D[]>;
   grid: PGridInstance<D>;

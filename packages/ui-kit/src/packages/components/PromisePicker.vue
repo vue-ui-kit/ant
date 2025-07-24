@@ -1,4 +1,9 @@
-<script lang="ts" setup name="PromisePicker" generic="D = Recordable, F = Recordable">
+<script
+  lang="ts"
+  setup
+  name="PromisePicker"
+  generic="D extends Recordable = Recordable, F extends Recordable = Recordable"
+>
   import { PropType, reactive, ref, computed } from 'vue';
   import { PGridInstance, PGridProps } from '#/antProxy';
   import PGrid from '@/components/PGrid.vue';
@@ -81,7 +86,7 @@
     grid: gridEl,
     hide: () => {
       visible.modal = false;
-    }
+    },
   });
 </script>
 <template>

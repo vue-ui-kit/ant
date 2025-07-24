@@ -3,11 +3,11 @@ import { ItemRender, RenderFormParams } from '#/antProxy';
 import renderStore from '@/store/renderStore';
 
 export default defineComponent(
-  <F = Recordable,>(
+  <F extends Recordable = Recordable>(
     props: {
       itemRender: ItemRender;
       renderFormParams: RenderFormParams<F>;
-      defaultHandler?: {
+      defaultHandler: {
         [key: string]: (...args: any[]) => any;
       };
     },

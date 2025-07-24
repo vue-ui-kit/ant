@@ -1,4 +1,4 @@
-<script generic="F = Recordable" lang="ts" name="PForm" setup>
+<script generic="F extends Recordable = Recordable" lang="ts" name="PForm" setup>
   import { PFormItemProps, PFormProps } from '#/antProxy';
   import { computed, ref, toRefs } from 'vue';
   import { omit } from 'xe-utils';
@@ -7,14 +7,11 @@
   import { eachTree } from '@/utils/treeHelper';
   import { getFormDefaults } from '@/utils/config';
   import PFormCol from '@/components/PFormCol.vue';
-  import {
-    Form as AForm,
-    Row as ARow,
-  } from 'ant-design-vue';
+  import { Form as AForm, Row as ARow } from 'ant-design-vue';
 
   const props = defineProps<PFormProps<F> & { data: F }>();
   const emit = defineEmits(['apply', 'reset']);
-  
+
   // 应用默认值
   const formDefaults = getFormDefaults();
   const propsWithDefaults = computed(() => ({
@@ -22,7 +19,7 @@
     labelCol: props.labelCol ?? formDefaults.labelCol ?? { span: 6 },
     wrapperCol: props.wrapperCol ?? formDefaults.wrapperCol ?? { span: 16 },
   }));
-  
+
   const { items, data: formData } = toRefs(props);
 
   function handleSubmit() {
@@ -46,12 +43,10 @@
           } else {
             obj[item.field] = undefined;
           }
-        }
-        else if (item.field && item.slots) {
+        } else if (item.field && item.slots) {
           if (isGoodValue(item.slots.defaultValue)) {
-            obj[item.field] = item.slots.defaultValue
-          }
-          else {
+            obj[item.field] = item.slots.defaultValue;
+          } else {
             obj[item.field] = undefined;
           }
         }

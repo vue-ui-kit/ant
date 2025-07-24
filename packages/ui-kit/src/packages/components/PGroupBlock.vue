@@ -1,4 +1,4 @@
-<script lang="ts" setup name="PGroupBlock" generic="F = Recordable">
+<script lang="ts" setup name="PGroupBlock" generic="F extends Recordable = Recordable">
   import { PBlockProps, PFormInstance, PFormProps } from '#/antProxy';
   import { computed, ref, toRefs } from 'vue';
   import PForm from '@/components/PForm.vue';

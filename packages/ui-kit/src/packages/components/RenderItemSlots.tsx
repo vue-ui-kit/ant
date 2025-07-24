@@ -2,7 +2,7 @@ import { defineComponent, toRefs } from 'vue';
 import { PFormItemProps } from '#/antProxy';
 
 export default defineComponent(
-  <F = Recordable,>(props: {
+  <F extends Recordable = Recordable>(props: {
     formData: F;
     item: PFormItemProps<F>;
     passTrigger: (cusFields?: string | string[]) => void;

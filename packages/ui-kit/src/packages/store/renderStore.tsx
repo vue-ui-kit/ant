@@ -36,7 +36,26 @@ interface BtnOptions extends ButtonProps {
   clickEvt?: (p: RenderTableParams) => any;
   hiddenIf?: (p: RenderTableParams) => boolean;
 }
-
+interface RenderWorkshop {
+  renderItemContent?: (
+    options: RenderOptions,
+    params: RenderFormParams,
+    defaultHandler: Recordable,
+  ) => any;
+  renderDefault?: (
+    options: RenderOptions,
+    params: RenderTableParams,
+    defaultHandler: Recordable,
+  ) => any;
+  renderEdit?: (
+    options: RenderOptions,
+    params: RenderTableParams,
+    emit?: (e: 'change', value: any) => void,
+  ) => any;
+}
+interface RenderFactory {
+  [key: string]: RenderWorkshop;
+}
 const antDefaultProps = {
   AInput: {
     autocomplete: 'off',
@@ -219,7 +238,7 @@ const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
       {btnOpt.content || (btnOpt?.getContent?.(params) ?? '')}
     </Button>
   );
-const renders = {
+const renders: RenderFactory = {
   ...Object.fromEntries(Object.keys(componentsMap).map((name) => [name, renderBasic(name)])),
   // 简单按钮
   $button: {
@@ -612,21 +631,7 @@ const renders = {
 };
 export const addRender = (
   name: string,
-  {
-    renderItemContent,
-    renderDefault,
-  }: {
-    renderItemContent?: (
-      options: RenderOptions,
-      params: RenderFormParams,
-      defaultHandler: Recordable,
-    ) => any;
-    renderDefault?: (
-      options: RenderOptions,
-      params: RenderTableParams,
-      defaultHandler: Recordable,
-    ) => any;
-  },
+  { renderItemContent, renderDefault, renderEdit }: RenderWorkshop,
 ) => {
   if (renders.hasOwnProperty(name)) {
     console.warn(`render ${name} already exists, you are trying to override it`);
@@ -634,6 +639,7 @@ export const addRender = (
   renders[name] = {
     renderItemContent,
     renderDefault,
+    renderEdit,
   };
 };
 export default {

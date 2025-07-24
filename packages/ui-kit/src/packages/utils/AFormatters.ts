@@ -28,7 +28,7 @@ export const antFormatters = {
     return valued(cellValue) ? (toNumber(cellValue) === 1 ? '男' : '女') : emptyStr;
   },
 };
-export const renderAntFormat = <D = Recordable>(
+export const renderAntFormat = <D extends Recordable = Recordable>(
   formatter: string | [string, ...Array<any>] | ((arg: CellFuncArg<D>) => any),
   {
     record,

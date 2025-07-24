@@ -1,4 +1,4 @@
-<script lang="ts" setup name="TableInput" generic="D = Recordable">
+<script lang="ts" setup name="TableInput" generic="D extends Recordable = Recordable">
   import { computed, PropType, watch } from 'vue';
   import { TableProps } from 'ant-design-vue';
   import { ColumnProps } from '#/antProxy';
