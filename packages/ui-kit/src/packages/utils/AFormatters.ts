@@ -3,7 +3,7 @@ import { valued } from '@/utils/is';
 import { CellFuncArg, ColumnProps } from '#/antProxy';
 
 const emptyStr = `-`;
-export const antFormatters = {
+export const antFormatters: Record<string, (a: CellFuncArg, ...args: any[]) => any> = {
   toString: ({ cellValue }) => (cellValue ? (cellValue.toString?.() ?? emptyStr) : emptyStr),
   // 格式化选项
   formatByOptions: ({ cellValue }, options: IOption[], separator = ',') => {

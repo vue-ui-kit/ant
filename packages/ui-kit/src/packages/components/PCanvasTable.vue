@@ -1,10 +1,20 @@
-<script lang="ts" setup>
+<script
+  lang="ts"
+  setup
+  generic="T extends Recordable = Recordable, B extends Recordable = Recordable"
+>
   import Cell from 'e-virt-table/dist/lib/Cell';
-  import type CellType from 'e-virt-table/dist/lib/Cell.d.ts';
-  import EVirtTable, { Column, ConfigType, OverlayerContainer } from 'e-virt-table';
+  import type CellType from 'e-virt-table/dist/lib/Cell';
+  import EVirtTable from 'e-virt-table';
+  import type {
+    Column as EVirtColumn,
+    ConfigType,
+    OverlayerContainer,
+    FormatterMethod,
+  } from 'e-virt-table';
   import { ref, onMounted, nextTick, computed, useAttrs, watch } from 'vue';
   import { EventCallback } from 'e-virt-table/dist/lib/EventBus';
-  import { isEqual } from 'xe-utils';
+  import { isEqual, isString } from 'xe-utils';
   import {
     Cascader as ACascader,
     DatePicker as ADatePicker,
@@ -15,25 +25,27 @@
   import renderStore from '@/store/renderStore';
   import RenderEditCell from './RenderEditCell';
   import RenderAntCell from './RenderAntCell';
+  import type { CanvasColumnProps, CellFuncArg, PFormatter } from '#/antProxy';
+  import { v4 as uuidv4 } from 'uuid';
+  import { antFormatters } from '@/utils/AFormatters';
 
-  type EDITOR_TYPE = 'text' | 'select' | 'date' | 'number' | 'time' | 'cascader';
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
     (e: 'ready', value: EVirtTable): void;
   }>();
   const props = defineProps({
     columns: {
-      type: Array as () => Column[],
+      type: Array as () => CanvasColumnProps<T>[],
       required: true,
       default: () => [],
     },
     data: {
-      type: Array as () => Recordable[],
+      type: Array as () => T[],
       required: true,
       default: () => [],
     },
     footerData: {
-      type: Array as () => Recordable[],
+      type: Array as () => B[],
       required: false,
       default: () => [],
     },
@@ -57,7 +69,7 @@
     () => props.columns,
     (newValue, oldValue) => {
       if (!isEqual(newValue, oldValue)) {
-        eVirtTable?.loadColumns(newValue);
+        eVirtTable?.loadColumns(newValue as EVirtColumn[]);
       }
     },
     { deep: true },
@@ -76,7 +88,7 @@
   const eVirtTableEmptyRef = ref(null);
   const eVirtTableOverlayerRef = ref(null);
   const editorCell = ref<Cell>();
-  const editorType = ref<EDITOR_TYPE>('text');
+  const editorType = ref<string>('text');
   const eVirtTableEditorSelectRef = ref<InstanceType<typeof ASelect> | null>(null);
   const selectValue = ref(null);
   const eVirtTableEditorCascaderRef = ref<InstanceType<typeof ACascader> | null>(null);
@@ -101,6 +113,19 @@
       height: `${cell.height}px`,
     };
   });
+  const getFormatter = (name: string) => antFormatters[name] || (({ cellValue }) => cellValue);
+  const transferFormatter =
+    (formatter: PFormatter): FormatterMethod =>
+    () => {
+      return () => {};
+    };
+  const paseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
+    return {
+      ...column,
+      key: column.key || column.field || uuidv4(),
+      formatter: isString(column.formatter) ? (column.formatter as string) : undefined,
+    };
+  };
   onMounted(() => {
     if (!eVirtTableRef.value) {
       return;
@@ -190,60 +215,11 @@
     <div ref="eVirtTableRef">
       <div ref="eVirtTableEditorRef">
         <!-- 自定义编辑器 -->
-        <a-select
-          ref="eVirtTableEditorSelectRef"
-          class="e-virt-table-editor-select"
-          v-if="editorType === 'select'"
-          v-model:value="selectValue"
-          clearable
-          :style="editorStyle"
-          v-bind="editorCell?.editorProps"
-          @change="saveCellValue"
-        />
-        <a-cascader
-          ref="eVirtTableEditorCascaderRef"
-          class="e-virt-table-editor-cascader"
-          v-if="editorType === 'cascader'"
-          v-model:value="cascaderValue"
-          clearable
-          :style="editorStyle"
-          v-bind="editorCell?.editorProps"
-          @change="saveCellValue"
-        />
-        <a-date-picker
-          ref="eVirtTableEditorDateRef"
-          class="e-virt-table-editor-date"
-          v-if="editorType === 'date'"
-          v-model:value="dateValue"
-          value-format="YYYY-MM-DD"
-          type="date"
-          :style="editorStyle"
-          v-bind="editorCell?.editorProps"
-          @change="saveCellValue"
-        />
-        <a-time-picker
-          ref="eVirtTableEditorTimeRef"
-          class="e-virt-table-editor-time"
-          v-if="editorType === 'time'"
-          v-model:value="timeValue"
-          :style="editorStyle"
-          value-format="HH:mm:ss"
-          v-bind="editorCell?.editorProps"
-          @change="saveCellValue"
-        />
-        <a-input-number
-          ref="eVirtTableEditorNumberRef"
-          class="e-virt-table-editor-number"
-          v-if="editorType === 'number'"
-          v-model="numberValue"
-          :style="editorStyle"
-          :controls="false"
-          v-bind="editorCell?.editorProps"
-          @change="saveCellValue"
-        />
         <render-edit-cell
           v-if="renderStore.renders[editorType]?.renderEdit"
-          :cell-render="renderStore.renders[editorType]?.renderEdit"
+          :cell-render="{
+            name: editorType,
+          }"
           :render-table-params="{
             data: props.data,
             row: editorCell?.row,

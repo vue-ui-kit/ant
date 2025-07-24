@@ -243,7 +243,6 @@
       title: '爱好',
       width: 200,
     },
-
     {
       key: 'score',
       title: '分数',

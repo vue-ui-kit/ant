@@ -5,15 +5,14 @@ import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
 import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
 import type { ConfigType, Column as EVirtColumn } from 'e-virt-table';
-export interface CanvasColumn extends EVirtColumn {
-  field?: string;
-}
+
 export interface CellFuncArg<D extends Recordable = Recordable> {
   row: D;
   column: ColumnProps<D>;
   rowIndex: number;
   cellValue: any;
 }
+export type PFormatter = Record<string, (a: CellFuncArg, ...args: any[]) => any>;
 export interface ItemFuncArg<F extends Recordable = Recordable> {
   data: F;
   field?: string;
@@ -282,11 +281,46 @@ export interface RenderTableParams<D extends Recordable = Recordable> {
   field?: string;
   title?: string;
 }
-export interface PCanvasGridColumnProps extends EVirtColumn {
+export interface CanvasColumnProps<T extends Recordable = Recordable>
+  extends Omit<EVirtColumn, 'children' | 'formatter'> {
   field?: string;
+  children?: CanvasColumnProps<T>[];
+  formatter?:
+    | string
+    | [string, ...Array<any>]
+    | ((arg: PartialByKeys<CellFuncArg<T>, 'cellValue'>) => any);
+  slots?: {
+    default?: ({
+      row,
+      column,
+      rowIndex,
+    }: {
+      row: T;
+      column: CanvasColumnProps<T>;
+      rowIndex: number;
+    }) => any;
+    edit?: ({
+      row,
+      column,
+      rowIndex,
+    }: {
+      row: T;
+      column: CanvasColumnProps<T>;
+      rowIndex: number;
+    }) => any;
+    title?: ({ column }: { column: CanvasColumnProps<T> }) => any;
+  };
+  cellRender?: CellRender;
+  editRender?: CellRender;
 }
-export interface PCanvasGridProps {
-  gridConfig: ConfigType;
+export interface CanvasTableProps<
+  T extends Recordable = Recordable,
+  B extends Recordable = Recordable,
+> {
+  columns: CanvasColumnProps[];
+  data: T[];
+  config: ConfigType;
+  footerData?: B[];
 }
 export interface PGridInstance<
   D extends Recordable = Recordable,
