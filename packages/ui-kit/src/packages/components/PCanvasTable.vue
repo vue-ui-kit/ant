@@ -186,114 +186,123 @@
   }
 </script>
 <template>
-  <div ref="eVirtTableRef" v-loading="loading">
-    <div ref="eVirtTableEditorRef">
-      <!-- 自定义编辑器 -->
-      <a-select
-        ref="eVirtTableEditorSelectRef"
-        class="e-virt-table-editor-select"
-        v-if="editorType === 'select'"
-        v-model:value="selectValue"
-        clearable
-        :style="editorStyle"
-        v-bind="editorCell?.editorProps"
-        @change="saveCellValue"
-      />
-      <a-cascader
-        ref="eVirtTableEditorCascaderRef"
-        class="e-virt-table-editor-cascader"
-        v-if="editorType === 'cascader'"
-        v-model:value="cascaderValue"
-        clearable
-        :style="editorStyle"
-        v-bind="editorCell?.editorProps"
-        @change="saveCellValue"
-      />
-      <a-date-picker
-        ref="eVirtTableEditorDateRef"
-        class="e-virt-table-editor-date"
-        v-if="editorType === 'date'"
-        v-model:value="dateValue"
-        value-format="YYYY-MM-DD"
-        type="date"
-        :style="editorStyle"
-        v-bind="editorCell?.editorProps"
-        @change="saveCellValue"
-      />
-      <a-time-picker
-        ref="eVirtTableEditorTimeRef"
-        class="e-virt-table-editor-time"
-        v-if="editorType === 'time'"
-        v-model:value="timeValue"
-        :style="editorStyle"
-        value-format="HH:mm:ss"
-        v-bind="editorCell?.editorProps"
-        @change="saveCellValue"
-      />
-      <a-input-number
-        ref="eVirtTableEditorNumberRef"
-        class="e-virt-table-editor-number"
-        v-if="editorType === 'number'"
-        v-model="numberValue"
-        :style="editorStyle"
-        :controls="false"
-        v-bind="editorCell?.editorProps"
-        @change="saveCellValue"
-      />
-      <render-edit-cell
-        v-if="renderStore.renders[editorType]?.renderEdit"
-        :cell-render="renderStore.renders[editorType]?.renderEdit"
-        :render-table-params="{
-          data: props.data,
-          row: editorCell?.row,
-          rowIndex: editorCell?.rowIndex ?? -1,
-          field: editorCell?.key ?? '',
-          title: editorCell?.column?.title ?? '',
-        }"
-        @change="saveCellValue"
-      />
-    </div>
-    <div ref="eVirtTableEmptyRef">
-      <slot name="empty">
-        <!-- 自定义空数据 -->
-        <a-empty description="空数据" />
-      </slot>
-    </div>
-    <div ref="eVirtTableOverlayerRef">
-      <!-- 自定覆盖层 -->
-      <div
-        :class="wrapper.class"
-        v-for="wrapper in overlayerView.views"
-        :style="wrapper.style"
-        :key="wrapper.type"
-      >
-        <div :style="view.style" v-for="view in wrapper.views" :key="view.key">
-          <div
-            class="cell"
-            v-for="cell in view.cells"
-            :key="`${cell.rowKey}_${cell.key}`"
-            :style="cell.style"
-          >
-            <component v-if="typeof cell.render === 'function'" :is="cell.render(cell)"></component>
-            <template v-if="typeof cell.render === 'string' && cell.render.startsWith('slot:')">
-              <slot :name="cell.render.replace('slot:', '')" v-bind="cell" :cell="cell"></slot>
-            </template>
-            <template v-else-if="typeof cell.render === 'string'">
-              <render-ant-cell
-                v-if="renderStore.renders[cell.render]"
-                :cell-render="renderStore.renders[cell.render]"
-                :render-table-params="{
-                  row: cell.row,
-                  rowIndex: (cell as CellType).rowIndex,
-                  field: cell.key,
-                  title: cell.column?.title ?? '',
-                }"
-                :default-handler="{}"
-              />
-            </template>
+  <a-spin :spinning="loading">
+    <div ref="eVirtTableRef">
+      <div ref="eVirtTableEditorRef">
+        <!-- 自定义编辑器 -->
+        <a-select
+          ref="eVirtTableEditorSelectRef"
+          class="e-virt-table-editor-select"
+          v-if="editorType === 'select'"
+          v-model:value="selectValue"
+          clearable
+          :style="editorStyle"
+          v-bind="editorCell?.editorProps"
+          @change="saveCellValue"
+        />
+        <a-cascader
+          ref="eVirtTableEditorCascaderRef"
+          class="e-virt-table-editor-cascader"
+          v-if="editorType === 'cascader'"
+          v-model:value="cascaderValue"
+          clearable
+          :style="editorStyle"
+          v-bind="editorCell?.editorProps"
+          @change="saveCellValue"
+        />
+        <a-date-picker
+          ref="eVirtTableEditorDateRef"
+          class="e-virt-table-editor-date"
+          v-if="editorType === 'date'"
+          v-model:value="dateValue"
+          value-format="YYYY-MM-DD"
+          type="date"
+          :style="editorStyle"
+          v-bind="editorCell?.editorProps"
+          @change="saveCellValue"
+        />
+        <a-time-picker
+          ref="eVirtTableEditorTimeRef"
+          class="e-virt-table-editor-time"
+          v-if="editorType === 'time'"
+          v-model:value="timeValue"
+          :style="editorStyle"
+          value-format="HH:mm:ss"
+          v-bind="editorCell?.editorProps"
+          @change="saveCellValue"
+        />
+        <a-input-number
+          ref="eVirtTableEditorNumberRef"
+          class="e-virt-table-editor-number"
+          v-if="editorType === 'number'"
+          v-model="numberValue"
+          :style="editorStyle"
+          :controls="false"
+          v-bind="editorCell?.editorProps"
+          @change="saveCellValue"
+        />
+        <render-edit-cell
+          v-if="renderStore.renders[editorType]?.renderEdit"
+          :cell-render="renderStore.renders[editorType]?.renderEdit"
+          :render-table-params="{
+            data: props.data,
+            row: editorCell?.row,
+            rowIndex: editorCell?.rowIndex ?? -1,
+            field: editorCell?.key ?? '',
+            title: editorCell?.column?.title ?? '',
+          }"
+          @change="saveCellValue"
+        />
+      </div>
+      <div ref="eVirtTableEmptyRef">
+        <slot name="empty">
+          <!-- 自定义空数据 -->
+          <a-empty description="空数据" />
+        </slot>
+      </div>
+      <div ref="eVirtTableOverlayerRef">
+        <!-- 自定覆盖层 -->
+        <div
+          :class="wrapper.class"
+          v-for="wrapper in overlayerView.views"
+          :style="wrapper.style"
+          :key="wrapper.type"
+        >
+          <div :style="view.style" v-for="view in wrapper.views" :key="view.key">
+            <div
+              class="cell"
+              v-for="cell in view.cells"
+              :key="`${cell.rowKey}_${cell.key}`"
+              :style="cell.style"
+            >
+              <component
+                v-if="typeof cell.render === 'function'"
+                :is="cell.render(cell)"
+              ></component>
+              <template
+                v-else-if="typeof cell.render === 'string' && cell.render.startsWith('slot:')"
+              >
+                <slot :name="cell.render.replace('slot:', '')" v-bind="cell" :cell="cell"></slot>
+              </template>
+              <template v-else-if="typeof cell.render === 'string'">
+                <render-ant-cell
+                  v-if="renderStore.renders[cell.render]?.renderDefault"
+                  :cell-render="{
+                    name: cell.render,
+                  }"
+                  :render-table-params="{
+                    row: cell.row,
+                    rowIndex: (cell as CellType).rowIndex,
+                    field: cell.key,
+                    title: cell.column?.title ?? '',
+                  }"
+                  :default-handler="{}"
+                />
+              </template>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </a-spin>
 </template>

@@ -152,7 +152,7 @@
     },
   }));
   const bigData = ref<Student[]>(
-    Array.from({ length: 10000 }, (_, i) => ({
+    Array.from({ length: 100000 }, (_, i) => ({
       name: `学生${i}`,
       enName: `Student${i}`,
       id: i,
