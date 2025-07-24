@@ -1,6 +1,7 @@
 import { App } from 'vue';
 import PForm from '@/components/PForm.vue';
 import PGrid from '@/components/PGrid.vue';
+import PCanvasGrid from '@/components/PCanvasGrid.vue';
 import PFormGroup from '@/components/PFormGroup.vue';
 import PGroupBlock from '@/components/PGroupBlock.vue';
 import PromisePicker from '@/components/PromisePicker.vue';
@@ -19,6 +20,7 @@ export default {
   install(app: App) {
     app.component('PForm', PForm);
     app.component('PGrid', PGrid);
+    app.component('PCanvasGrid', PCanvasGrid);
     // @ts-ignore
     app.component('PFormGroup', PFormGroup);
     app.component('PGroupBlock', PGroupBlock);
@@ -37,4 +39,13 @@ export * from '@/utils/core';
 export { setup, setUIKitConfig, getUIKitConfig, resetUIKitConfig, type UIKitConfig };
 
 // 直接导出组件，使用户可以直接导入使用
-export { PForm, PGrid, PFormGroup, PGroupBlock, PromisePicker, addFormatter, addRender };
+export {
+  PForm,
+  PGrid,
+  PCanvasGrid,
+  PFormGroup,
+  PGroupBlock,
+  PromisePicker,
+  addFormatter,
+  addRender,
+};

@@ -188,6 +188,8 @@ export interface ProxyConfig<D = Recordable, F = Recordable> {
 export interface PageConfig {
   pageSizes?: number[];
   pageSize?: number;
+  showSizeChanger?: boolean;
+  showQuickJumper?: boolean;
 }
 
 export interface SelectConfig<D = Recordable> {
