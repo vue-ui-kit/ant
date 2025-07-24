@@ -11,7 +11,18 @@
     toRefs,
     onBeforeUnmount,
   } from 'vue';
-  import { debounce, get, isArray, isBoolean, isFunction, isObject, isString, merge, omit, toNumber } from 'xe-utils';
+  import {
+    debounce,
+    get,
+    isArray,
+    isBoolean,
+    isFunction,
+    isObject,
+    isString,
+    merge,
+    omit,
+    toNumber,
+  } from 'xe-utils';
   import { eachTree } from '@/utils/treeHelper';
   import { message as $message } from 'ant-design-vue';
   import RenderTitleSlots from '@/components/RenderTitleSlots';
@@ -34,7 +45,7 @@
   import { DownOutlined } from '@ant-design/icons-vue';
 
   const props = defineProps<PGridProps<D, F>>();
-  
+
   // 应用默认值
   const gridDefaults = getGridDefaults();
   const propsWithDefaults = computed(() => ({
@@ -45,7 +56,7 @@
     lazyReset: props.lazyReset ?? gridDefaults.lazyReset ?? false,
     fitHeight: props.fitHeight ?? gridDefaults.fitHeight ?? 170,
   }));
-  
+
   const {
     formConfig,
     pageConfig,
@@ -61,12 +72,12 @@
     toolbar: false,
     form: false,
   });
-  const setLoadings = (value: boolean|Record<string, boolean>) => {
-    if(isObject(value)) {
-      Object.keys(value).forEach(key => {
+  const setLoadings = (value: boolean | Record<string, boolean>) => {
+    if (isObject(value)) {
+      Object.keys(value).forEach((key) => {
         loading[key] = value[key];
       });
-    } else if(isBoolean(value)) {
+    } else if (isBoolean(value)) {
       loading.form = value;
       loading.table = value;
       loading.toolbar = value;
@@ -126,7 +137,7 @@
   const tableEl = ref();
   const renderFormKey = ref(uuid_v4());
   const renderTableKey = ref(uuid_v4());
- 
+
   const codeLoadings = reactive<Record<string, boolean>>(
     [
       ...(props.toolbarConfig?.buttons?.map((m) => m.code) ?? []).filter((f) => f),
@@ -229,13 +240,11 @@
             } else {
               obj[item.field] = undefined;
             }
-          }
-          else if (item.field && item.slots) {
+          } else if (item.field && item.slots) {
             if (isGoodValue(item.slots.defaultValue)) {
-              obj[item.field] = item.slots.defaultValue
-            }
-            else {
-              obj[item.field] = undefined
+              obj[item.field] = item.slots.defaultValue;
+            } else {
+              obj[item.field] = undefined;
             }
           }
         });
@@ -278,8 +287,8 @@
         };
   const enoughSpacing = ref(true);
   const reload = () => {
-    selectedCaches.value = []
-    selectedRowKeys.value = []
+    selectedCaches.value = [];
+    selectedRowKeys.value = [];
     return resetQueryFormData();
   };
   const resetPage = () => {
@@ -417,10 +426,14 @@
     const formHeight = formOriginHeight.includes('px')
       ? toNumber(formOriginHeight.replace('px', ''))
       : 0;
-    const showCountHeight = selectConfig.value?.showCount ? 22 : 0
+    const showCountHeight = selectConfig.value?.showCount ? 22 : 0;
     renderHeight.value =
       props.renderY ??
-      toNumber(ph.replace('px', '')) -propsWithDefaults.value.fitHeight -(props.toolbarConfig ? 30 : 0) -formHeight- showCountHeight;
+      toNumber(ph.replace('px', '')) -
+        propsWithDefaults.value.fitHeight -
+        (props.toolbarConfig ? 30 : 0) -
+        formHeight -
+        showCountHeight;
     enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
   };
   defineExpose({
@@ -462,13 +475,17 @@
     }
     resetQueryFormData(props.manualFetch);
   });
-  const passFields = ['align']
-  const passDefaultColumnProps = (columns: ColumnProps<D>[]) => columns.map(c => ({
-    ...passFields.reduce((prev, cur) => ({
-      [cur]: propsWithDefaults.value[cur],
-    }), {} as ColumnProps<D>),
-    ...c,
-  }))
+  const passFields = ['align'];
+  const passDefaultColumnProps = (columns: ColumnProps<D>[]) =>
+    columns.map((c) => ({
+      ...passFields.reduce(
+        (prev, cur) => ({
+          [cur]: propsWithDefaults.value[cur],
+        }),
+        {} as ColumnProps<D>,
+      ),
+      ...c,
+    }));
   onBeforeUnmount(() => {
     window.removeEventListener('resize', resizeTable);
     observer.disconnect();
@@ -494,7 +511,7 @@
             <a-row :gutter="[6, 12]">
               <p-form-col
                 v-for="(item, idx) in formConfig!.items"
-                :key="`_col_${idx}`"
+                :key="`_col_${item.field || idx}`"
                 :form-data="queryFormData"
                 :item="item as PFormItemProps<Partial<F>>"
                 @reset="resetQueryFormData(propsWithDefaults.lazyReset)"
@@ -561,7 +578,10 @@
         </span>
       </div>
       <div :class="`p-pane flex-1 ${enoughSpacing ? 'h-0' : ''} p-${scrollMode ?? 'inner'}-scroll`">
-        <div v-if="selectConfig?.multiple && selectConfig.showCount" class="w-full text-slate-5 pl-4">
+        <div
+          v-if="selectConfig?.multiple && selectConfig.showCount"
+          class="w-full text-slate-5 pl-4"
+        >
           已选：{{ selectedRowKeys.length }}
         </div>
         <a-table

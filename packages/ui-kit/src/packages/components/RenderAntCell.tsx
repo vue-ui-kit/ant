@@ -1,10 +1,10 @@
 import { defineComponent } from 'vue';
-import { ItemRender, RenderTableParams } from '#/antProxy';
+import { CellRender, RenderTableParams } from '#/antProxy';
 import renderStore from '@/store/renderStore';
 
 export default defineComponent(
   <D = Recordable,>(props: {
-    cellRender: ItemRender;
+    cellRender: CellRender;
     renderTableParams: RenderTableParams<D>;
     defaultHandler?: {
       [key: string]: (...args: any[]) => any;
