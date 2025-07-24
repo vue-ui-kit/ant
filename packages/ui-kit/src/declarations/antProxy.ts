@@ -5,6 +5,9 @@ import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
 import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
 import type { ConfigType, Column as EVirtColumn } from 'e-virt-table';
+export interface CanvasColumn extends EVirtColumn {
+  field?: string;
+}
 export interface CellFuncArg<D extends Recordable = Recordable> {
   row: D;
   column: ColumnProps<D>;

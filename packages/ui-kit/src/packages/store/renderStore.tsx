@@ -36,7 +36,7 @@ interface BtnOptions extends ButtonProps {
   clickEvt?: (p: RenderTableParams) => any;
   hiddenIf?: (p: RenderTableParams) => boolean;
 }
-interface RenderWorkshop {
+export interface RenderWorkshop {
   renderItemContent?: (
     options: RenderOptions,
     params: RenderFormParams,

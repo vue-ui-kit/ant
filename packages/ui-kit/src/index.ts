@@ -1,6 +1,7 @@
 import { App } from 'vue';
 import PForm from '@/components/PForm.vue';
 import PGrid from '@/components/PGrid.vue';
+import PCanvasTable from '@/components/PCanvasTable.vue';
 import PCanvasGrid from '@/components/PCanvasGrid.vue';
 import PFormGroup from '@/components/PFormGroup.vue';
 import PGroupBlock from '@/components/PGroupBlock.vue';
@@ -20,8 +21,8 @@ export default {
   install(app: App) {
     app.component('PForm', PForm);
     app.component('PGrid', PGrid);
+    app.component('PCanvasTable', PCanvasTable);
     app.component('PCanvasGrid', PCanvasGrid);
-    // @ts-ignore
     app.component('PFormGroup', PFormGroup);
     app.component('PGroupBlock', PGroupBlock);
     app.component('PromisePicker', PromisePicker);
@@ -42,6 +43,7 @@ export { setup, setUIKitConfig, getUIKitConfig, resetUIKitConfig, type UIKitConf
 export {
   PForm,
   PGrid,
+  PCanvasTable,
   PCanvasGrid,
   PFormGroup,
   PGroupBlock,

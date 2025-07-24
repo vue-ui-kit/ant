@@ -2,6 +2,7 @@
   import { computed, ref } from 'vue';
   import { Student } from './Mock/apis/type';
   import { queryStudents } from './Mock/apis/school';
+  import type { Column as EVirtColumn } from 'e-virt-table';
   import { PGridProps, PFormProps, PFormGroupProps, labelColDict } from '@vue-ui-kit/ant';
   import {
     Card as ACard,
@@ -150,7 +151,40 @@
       },
     },
   }));
-
+  const bigData = ref<Student[]>(
+    Array.from({ length: 10000 }, (_, i) => ({
+      name: `学生${i}`,
+      enName: `Student${i}`,
+      id: i,
+      score: Math.floor(Math.random() * 100),
+    })),
+  );
+  const canvasTableColumns: EVirtColumn[] = [
+    {
+      key: 'id',
+      title: 'ID',
+      width: 180,
+      type: 'index-selection',
+    },
+    {
+      key: 'name',
+      title: '姓名',
+      width: 200,
+      render: 'capitalize',
+    },
+    {
+      key: 'enName',
+      title: '英文名',
+      width: 200,
+      render: 'capitalize',
+    },
+    {
+      key: 'score',
+      title: '分数',
+      width: 200,
+      render: 'colorFullScore',
+    },
+  ];
   const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
     columns: [
       {
@@ -563,10 +597,12 @@
       <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
       <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
       <div style="height: 600px; margin-top: 16px">
-        <p-canvas-grid
-          v-bind="canvasGridSetting"
-          @toolbar-button-click="handleCanvasToolbarBtn"
-          @toolbar-tool-click="handleCanvasToolClick"
+        <p-canvas-table
+          :data="bigData"
+          :columns="canvasTableColumns"
+          :config="{
+            HEIGHT: 600,
+          }"
         />
       </div>
     </div>
