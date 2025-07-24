@@ -12,6 +12,7 @@
     Typography,
     Switch as ASwitch,
   } from 'ant-design-vue';
+  import { sample } from 'xe-utils';
 
   const { Title } = Typography;
 
@@ -51,7 +52,7 @@
   ]);
 
   // 当前展示模式
-  const currentView = ref<'grid' | 'form' | 'group' | 'canvas'>('grid');
+  const currentView = ref<'grid' | 'form' | 'group' | 'canvasTable'>('grid');
 
   // PCanvasGrid 配置
   const canvasGridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
@@ -152,37 +153,103 @@
     },
   }));
   const bigData = ref<Student[]>(
-    Array.from({ length: 100000 }, (_, i) => ({
+    Array.from({ length: 10000 }, (_, i) => ({
       name: `学生${i}`,
       enName: `Student${i}`,
       id: i,
       score: Math.floor(Math.random() * 100),
+      age: Math.floor(Math.random() * 5) + 10,
+      gender: Math.random() > 0.5 ? 'male' : 'female',
+      class: `class${i}`,
+      address: `address${i}`,
+      phone: `phone${i}`,
+      email: `email${i}`,
+      birthDate: `birthDate${i}`,
+      createTime: `createTime${i}`,
+      hobby: sample(['reading', 'swimming', 'coding'], Math.floor(Math.random() * 3)),
+      isStudent: Math.random() > 0.5,
+      isTeacher: Math.random() > 0.5,
+      isAdmin: Math.random() > 0.5,
+      isSuperAdmin: Math.random() > 0.5,
     })),
   );
   const canvasTableColumns: EVirtColumn[] = [
     {
+      key: '#',
+      title: '',
+      width: 80,
+      type: 'selection',
+      fixed: 'left',
+    },
+    {
       key: 'id',
       title: 'ID',
       width: 180,
-      type: 'index-selection',
     },
     {
       key: 'name',
       title: '姓名',
-      width: 200,
+      minWidth: 300,
       render: 'capitalize',
     },
     {
       key: 'enName',
       title: '英文名',
-      width: 200,
+      width: 300,
       render: 'capitalize',
     },
+    {
+      key: 'age',
+      title: '年龄',
+      width: 200,
+    },
+    {
+      key: 'gender',
+      title: '性别',
+      width: 200,
+    },
+    {
+      key: 'class',
+      title: '班级',
+      width: 200,
+    },
+    {
+      key: 'address',
+      title: '地址',
+      width: 200,
+    },
+    {
+      key: 'phone',
+      title: '电话',
+      width: 200,
+    },
+    {
+      key: 'email',
+      title: '邮箱',
+      width: 200,
+    },
+    {
+      key: 'birthDate',
+      title: '生日',
+      width: 200,
+    },
+    {
+      key: 'createTime',
+      title: '创建时间',
+      width: 200,
+    },
+    {
+      key: 'hobby',
+      title: '爱好',
+      width: 200,
+    },
+
     {
       key: 'score',
       title: '分数',
       width: 200,
       render: 'colorFullScore',
+      fixed: 'right',
     },
   ];
   const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
@@ -541,10 +608,10 @@
           PFormGroup 示例
         </a-button>
         <a-button
-          :type="currentView === 'canvas' ? 'primary' : 'default'"
-          @click="currentView = 'canvas'"
+          :type="currentView === 'canvasTable' ? 'primary' : 'default'"
+          @click="currentView = 'canvasTable'"
         >
-          PCanvasGrid 示例
+          PCanvasTable 示例
         </a-button>
       </a-space>
     </div>
@@ -592,8 +659,7 @@
       </div>
     </div>
 
-    <!-- PCanvasGrid 示例 -->
-    <div v-if="currentView === 'canvas'">
+    <div v-if="currentView === 'canvasTable'">
       <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
       <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
       <div style="height: 600px; margin-top: 16px">
@@ -601,7 +667,7 @@
           :data="bigData"
           :columns="canvasTableColumns"
           :config="{
-            HEIGHT: 600,
+            HEIGHT: 500,
           }"
         />
       </div>
