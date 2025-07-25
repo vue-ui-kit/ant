@@ -173,7 +173,9 @@ const renderBasic = (name: string) => {
 };
 
 const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
-  btnOpt.dropdowns && btnOpt.dropdowns.length > 0 ? (
+  btnOpt.dropdowns &&
+  btnOpt.dropdowns.length > 0 &&
+  btnOpt.dropdowns.filter((f) => !f.hiddenIf?.(params)).length > 0 ? (
     <Dropdown>
       {{
         default: () => (
@@ -186,14 +188,16 @@ const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
               'clickEvt',
               'dropdowns',
             ])}
-            icon={btnOpt.icon ? <Icon icon={btnOpt.icon} /> : null}
+            icon={btnOpt.icon ? <Icon icon={btnOpt.icon} /> : <Icon icon="DownOutlined" />}
           >
             {btnOpt.content || (btnOpt?.getContent?.(params) ?? '')}
           </Button>
         ),
         overlay: () => (
           <div class={`dropdown-wrapper ${btnOpt?.dynamicClassName?.(params) ?? ''}`}>
-            {btnOpt.dropdowns!.map((b) => renderBtn(b, params))}
+            {btnOpt
+              .dropdowns!.filter((f) => !f.hiddenIf?.(params))
+              .map((b) => renderBtn(b, params))}
           </div>
         ),
       }}
@@ -209,6 +213,7 @@ const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
         'clickEvt',
         'dropdowns',
       ])}
+      disabled={(!!btnOpt.dropdowns && btnOpt.dropdowns.length > 0) || btnOpt.disabled}
       icon={btnOpt.icon ? <Icon icon={btnOpt.icon} /> : null}
       onClick={() => {
         if (btnOpt?.clickEvt) {
