@@ -318,7 +318,7 @@ export interface CanvasTableProps<
   T extends Recordable = Recordable,
   B extends Recordable = Recordable,
 > {
-  columns: CanvasColumnProps[];
+  columns: CanvasColumnProps<T>[];
   data: T[];
   config: ConfigType;
   footerData?: B[];

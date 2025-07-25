@@ -25,6 +25,7 @@
     CanvasTableProps,
     PFormatter,
     FormatterFunc,
+    CellRender,
   } from '#/antProxy';
   import { v4 as uuidv4 } from 'uuid';
   import { antFormatters } from '@/utils/AFormatters';
@@ -34,29 +35,7 @@
     (e: 'ready', value: EVirtTable): void;
   }>();
   const props = defineProps<CanvasTableProps<T, B>>();
-  watch(
-    props.data,
-    (newValue) => {
-      eVirtTable?.loadData(newValue);
-    },
-    { deep: true },
-  );
-  watch(
-    () => props.columns,
-    (newValue, oldValue) => {
-      if (!isEqual(newValue, oldValue)) {
-        eVirtTable?.loadColumns(newValue as EVirtColumn[]);
-      }
-    },
-    { deep: true },
-  );
-  watch(
-    props.footerData,
-    (newValue) => {
-      eVirtTable?.loadFooterData(newValue);
-    },
-    { deep: true },
-  );
+
   let eVirtTable: EVirtTable | null = null;
   const attrs = useAttrs();
   const eVirtTableRef = ref(null);
@@ -68,6 +47,21 @@
   const overlayerView = ref<OverlayerContainer>({
     views: [],
   });
+  const cacheEditorFuncSlots: Record<
+    string,
+    {
+      column: CanvasColumnProps<T>;
+      render: ({
+        row,
+        column,
+        rowIndex,
+      }: {
+        row: T;
+        column: CanvasColumnProps<T>;
+        rowIndex: number;
+      }) => any;
+    }
+  > = {};
   // 编辑器样式
   const editorStyle = computed(() => {
     const cell = editorCell.value;
@@ -80,7 +74,7 @@
     };
   });
   const getFormatter = (name: string) => antFormatters[name] || (({ cellValue }) => cellValue);
-  // 把大多数
+  const getCellRender = (name: string) => renderStore.renders[name]?.renderDefault;
   const transferFormatter =
     (formatter: FormatterFunc, ...restArgs: any[]): FormatterMethod =>
     ({ row, rowIndex, value }) =>
@@ -93,6 +87,9 @@
         ...restArgs,
       );
   const paseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
+    if (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)) {
+      cacheEditorFuncSlots[`__slot:${column.field || column.key}`] = column.slots?.edit;
+    }
     return {
       ...omit(column, ['formatter']),
       key: column.key || column.field || uuidv4(),
@@ -103,6 +100,35 @@
           : isFunction(column.formatter)
             ? transferFormatter(column.formatter as FormatterFunc)
             : undefined,
+      editorType:
+        column.editorType ??
+        (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)
+          ? `__slot:${column.field || column.key}`
+          : 'text'),
+      render:
+        column.slots?.default && isFunction(column.slots?.default)
+          ? (cell: CellParams) =>
+              column.slots?.default?.({
+                row: cell.row,
+                column: column,
+                rowIndex: cell.rowIndex,
+              })
+          : column.slots?.default && isString(column.slots?.default)
+            ? `slot:${column.slots?.default}`
+            : column.cellRender && column.cellRender.name
+              ? (cell: CellParams) =>
+                  getCellRender(column.cellRender!.name)?.(
+                    column.cellRender!,
+                    {
+                      data: props.data,
+                      row: cell.row,
+                      rowIndex: cell.rowIndex,
+                      field: column.field || cell.column.key,
+                      title: cell.column?.title ?? '',
+                    },
+                    {},
+                  )
+              : undefined,
       children: column.children?.map((child) => paseToEVirtColumn(child)),
     };
   };
@@ -112,7 +138,7 @@
     }
     eVirtTable = new EVirtTable(eVirtTableRef.value, {
       config: props.config,
-      columns: props.columns,
+      columns: props.columns.map((col) => paseToEVirtColumn(col)),
       data: props.data,
       emptyElement: eVirtTableEmptyRef.value || undefined,
       overlayerElement: eVirtTableOverlayerRef.value || undefined,
@@ -139,8 +165,6 @@
       if (editorType.value === 'text') {
         return;
       }
-      if (renderStore.renders[editorType.value]) {
-      }
     });
     eVirtTable.on('doneEdit', () => {
       editorType.value = 'text';
@@ -154,11 +178,48 @@
     const { rowKey, key } = editorCell.value;
     eVirtTable?.setItemValueByEditor(rowKey, key, value);
   }
+  watch(
+    props.data,
+    (newValue) => {
+      eVirtTable?.loadData(newValue);
+    },
+    { deep: true },
+  );
+  watch(
+    () => props.columns,
+    (newValue, oldValue) => {
+      if (!isEqual(newValue, oldValue)) {
+        eVirtTable?.loadColumns(newValue.map((col) => paseToEVirtColumn(col)));
+      }
+    },
+    { deep: true },
+  );
+  watch(
+    () => props.footerData,
+    (newValue) => {
+      eVirtTable?.loadFooterData(newValue || []);
+    },
+    { deep: true },
+  );
 </script>
 <template>
   <a-spin :spinning="loading">
     <div ref="eVirtTableRef">
       <div ref="eVirtTableEditorRef">
+        <!-- 插槽编辑器 -->
+        <component
+          v-if="editorType.startsWith('__slot:')"
+          :is="
+            cacheEditorFuncSlots[editorType]({
+              row: editorCell!.row,
+              column: editorCell!.column,
+              rowIndex: editorCell!.rowIndex,
+            })
+          "
+          v-bind="editorCell"
+          :cell="editorCell"
+        >
+        </component>
         <!-- 自定义编辑器 -->
         <render-edit-cell
           v-if="renderStore.renders[editorType]?.renderEdit"
@@ -205,21 +266,6 @@
                 v-else-if="typeof cell.render === 'string' && cell.render.startsWith('slot:')"
               >
                 <slot :name="cell.render.replace('slot:', '')" v-bind="cell" :cell="cell"></slot>
-              </template>
-              <template v-else-if="typeof cell.render === 'string'">
-                <render-ant-cell
-                  v-if="renderStore.renders[cell.render]?.renderDefault"
-                  :cell-render="{
-                    name: cell.render,
-                  }"
-                  :render-table-params="{
-                    row: cell.row,
-                    rowIndex: (cell as CellType).rowIndex,
-                    field: cell.key,
-                    title: cell.column?.title ?? '',
-                  }"
-                  :default-handler="{}"
-                />
               </template>
             </div>
           </div>
