@@ -188,6 +188,27 @@ const renderBasic = (name: string) => {
         <DynamicComponent is={name} {...props} />
       );
     },
+    renderEdit(
+      { props = antDefaultProps[name] ?? {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
+      { data, row, field }: RenderTableParams,
+    ) {
+      if (isGoodValue(defaultValue) && valued(field) && isBadValue(row[field!])) {
+        row[field!] = defaultValue;
+      }
+      return field ? (
+        <DynamicComponent
+          is={name}
+          v-model:value={row[field]}
+          {...attrs}
+          {...merge({}, antDefaultProps[name], props)}
+          onChange={(...arg) => {
+            events.change?.({ data, row, field }, ...arg);
+          }}
+        />
+      ) : (
+        <DynamicComponent is={name} {...props} />
+      );
+    },
   };
 };
 

@@ -1,9 +1,14 @@
-<script setup lang="ts">
+<script setup lang="tsx">
   import { computed, ref } from 'vue';
   import { Student } from './Mock/apis/type';
   import { queryStudents } from './Mock/apis/school';
-  import type { Column as EVirtColumn } from 'e-virt-table';
-  import { PGridProps, PFormProps, PFormGroupProps, labelColDict } from '@vue-ui-kit/ant';
+  import {
+    PGridProps,
+    PFormProps,
+    PFormGroupProps,
+    labelColDict,
+    CanvasColumnProps,
+  } from '@vue-ui-kit/ant';
   import {
     Card as ACard,
     Button as AButton,
@@ -54,104 +59,6 @@
   // 当前展示模式
   const currentView = ref<'grid' | 'form' | 'group' | 'canvasTable'>('grid');
 
-  // PCanvasGrid 配置
-  const canvasGridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
-    columns: [
-      {
-        field: 'name',
-        width: 200,
-        title: '姓名',
-      },
-      {
-        field: 'enName',
-        width: 200,
-        title: '英文名',
-        formatter: 'capitalize',
-      },
-      {
-        field: 'id',
-        width: 200,
-        title: 'ID',
-      },
-      {
-        field: 'score',
-        width: 200,
-        title: '分数',
-      },
-    ],
-    formConfig: {
-      items: [
-        {
-          field: 'keyword',
-          title: '关键字',
-          labelCol: labelColDict[3],
-          itemRender: {
-            name: '$input',
-            props: {
-              placeholder: '请输入关键字',
-            },
-          },
-        },
-      ],
-    },
-    pageConfig: {
-      pageSize: 10,
-    },
-    tableConfig: {
-      rowSelection: {
-        type: 'checkbox',
-      },
-    },
-    toolbarConfig: {
-      buttons: [
-        {
-          type: 'primary',
-          code: 'add',
-          content: '新增',
-          icon: 'PlusOutlined',
-        },
-        {
-          type: 'default',
-          code: 'edit',
-          content: '编辑',
-          icon: 'EditOutlined',
-        },
-        {
-          type: 'danger',
-          code: 'delete',
-          content: '删除',
-          icon: 'DeleteOutlined',
-        },
-      ],
-      tools: [
-        {
-          type: 'default',
-          code: 'export',
-          content: '导出',
-          icon: 'ExportOutlined',
-        },
-        {
-          type: 'default',
-          code: 'refresh',
-          content: '刷新',
-          icon: 'ReloadOutlined',
-        },
-      ],
-    },
-    proxyConfig: {
-      response: {
-        result: 'list',
-        total: 'total',
-      },
-      ajax: {
-        query: ({ form, page }) =>
-          queryStudents({
-            ...form,
-            ...page,
-          } as IPage & { keyword?: string }),
-      },
-    },
-  }));
   const bigData = ref<Student[]>(
     Array.from({ length: 10000 }, (_, i) => ({
       name: `学生${i}`,
@@ -166,14 +73,44 @@
       email: `email${i}`,
       birthDate: `birthDate${i}`,
       createTime: `createTime${i}`,
-      hobby: sample(['reading', 'swimming', 'coding'], Math.floor(Math.random() * 3)),
+      hobby: sample(
+        [
+          'reading',
+          'swimming',
+          'coding',
+          'running',
+          'dancing',
+          'singing',
+          'painting',
+          'writing',
+          'reading',
+          'swimming',
+          'coding',
+          'running',
+          'dancing',
+          'singing',
+          'painting',
+          'writing',
+          'reading',
+          'swimming',
+          'coding',
+          'running',
+          'dancing',
+          'singing',
+          'painting',
+          'writing',
+          'reading',
+          'swimming',
+        ],
+        Math.floor(Math.random() * 3),
+      ),
       isStudent: Math.random() > 0.5,
       isTeacher: Math.random() > 0.5,
       isAdmin: Math.random() > 0.5,
       isSuperAdmin: Math.random() > 0.5,
     })),
   );
-  const canvasTableColumns: EVirtColumn[] = [
+  const canvasTableColumns: CanvasColumnProps<Student>[] = [
     {
       key: '#',
       title: '',
@@ -206,6 +143,15 @@
     {
       key: 'gender',
       title: '性别',
+      editRender: {
+        name: '$select',
+        props: {
+          options: [
+            { label: '男', value: 'male' },
+            { label: '女', value: 'female' },
+          ],
+        },
+      },
       width: 200,
     },
     {
@@ -226,6 +172,29 @@
     {
       key: 'email',
       title: '邮箱',
+      slots: {
+        edit: ({ row }) => {
+          return (
+            <a-space-compact>
+              <a-input
+                value={row.email?.substring(0, row.email?.indexOf('@'))}
+                onBlur={(e: any) => {
+                  row.email =
+                    e.target.value + '@' + row.email?.substring(row.email?.indexOf('@') + 1);
+                }}
+                suffix="@"
+              />
+              <a-input
+                value={row.email?.substring(row.email?.indexOf('@') + 1)}
+                onBlur={(e: any) => {
+                  row.email =
+                    row.email?.substring(0, row.email?.indexOf('@')) + '@' + e.target.value;
+                }}
+              />
+            </a-space-compact>
+          );
+        },
+      },
       width: 200,
     },
     {
@@ -242,12 +211,25 @@
       key: 'hobby',
       title: '爱好',
       width: 200,
+      slots: {
+        default: ({ row, column, rowIndex }) => (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {(row.hobby ?? []).map((o, index) => (
+              <a-tag color="blue" key={index}>
+                {o}
+              </a-tag>
+            ))}
+          </div>
+        ),
+      },
     },
     {
       key: 'score',
       title: '分数',
       width: 200,
-      render: 'colorFullScore',
+      cellRender: {
+        name: 'colorFullScore',
+      },
       fixed: 'right',
     },
   ];

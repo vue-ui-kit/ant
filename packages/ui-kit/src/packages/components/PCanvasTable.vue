@@ -35,7 +35,6 @@
     (e: 'ready', value: EVirtTable): void;
   }>();
   const props = defineProps<CanvasTableProps<T, B>>();
-
   let eVirtTable: EVirtTable | null = null;
   const attrs = useAttrs();
   const eVirtTableRef = ref(null);
@@ -47,21 +46,8 @@
   const overlayerView = ref<OverlayerContainer>({
     views: [],
   });
-  const cacheEditorFuncSlots: Record<
-    string,
-    {
-      column: CanvasColumnProps<T>;
-      render: ({
-        row,
-        column,
-        rowIndex,
-      }: {
-        row: T;
-        column: CanvasColumnProps<T>;
-        rowIndex: number;
-      }) => any;
-    }
-  > = {};
+  const cacheEditorSlotColumns: Record<string, CanvasColumnProps<T>> = {};
+  const cacheEditorRenders: Record<string, CellRender> = {};
   // 编辑器样式
   const editorStyle = computed(() => {
     const cell = editorCell.value;
@@ -88,7 +74,9 @@
       );
   const paseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
     if (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)) {
-      cacheEditorFuncSlots[`__slot:${column.field || column.key}`] = column.slots?.edit;
+      cacheEditorSlotColumns[`__slot:${column.field || column.key}`] = column;
+    } else if (column.editRender?.name && (column.field || column.key)) {
+      cacheEditorRenders[column.field || column.key] = column.editRender;
     }
     return {
       ...omit(column, ['formatter']),
@@ -104,7 +92,7 @@
         column.editorType ??
         (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)
           ? `__slot:${column.field || column.key}`
-          : 'text'),
+          : undefined),
       render:
         column.slots?.default && isFunction(column.slots?.default)
           ? (cell: CellParams) =>
@@ -171,6 +159,7 @@
     });
     emit('ready', eVirtTable);
   });
+  /* tbd 如果是相应式的话 可能不需要*/
   function saveCellValue(value) {
     if (!eVirtTable || !editorCell.value) {
       return;
@@ -210,22 +199,20 @@
         <component
           v-if="editorType.startsWith('__slot:')"
           :is="
-            cacheEditorFuncSlots[editorType]({
+            cacheEditorSlotColumns[editorType]!.slots!.edit!({
               row: editorCell!.row,
-              column: editorCell!.column,
+              column: cacheEditorSlotColumns[editorType],
               rowIndex: editorCell!.rowIndex,
             })
           "
-          v-bind="editorCell"
+          v-model:value="editorCell!.value"
           :cell="editorCell"
         >
         </component>
         <!-- 自定义编辑器 -->
         <render-edit-cell
-          v-if="renderStore.renders[editorType]?.renderEdit"
-          :cell-render="{
-            name: editorType,
-          }"
+          v-else-if="renderStore.renders[editorType]?.renderEdit"
+          :cell-render="cacheEditorRenders[editorType]"
           :style="editorStyle"
           :render-table-params="{
             data: props.data,
