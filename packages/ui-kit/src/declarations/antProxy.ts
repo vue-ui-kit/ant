@@ -8,11 +8,12 @@ import type { ConfigType, Column as EVirtColumn } from 'e-virt-table';
 
 export interface CellFuncArg<D extends Recordable = Recordable> {
   row: D;
-  column: ColumnProps<D>;
+  column?: ColumnProps<D>;
   rowIndex: number;
   cellValue: any;
 }
-export type PFormatter = Record<string, (a: CellFuncArg, ...args: any[]) => any>;
+export type FormatterFunc = (c: CellFuncArg, ...args: any[]) => any;
+export type PFormatter = Record<string, FormatterFunc>;
 export interface ItemFuncArg<F extends Recordable = Recordable> {
   data: F;
   field?: string;
@@ -321,6 +322,7 @@ export interface CanvasTableProps<
   data: T[];
   config: ConfigType;
   footerData?: B[];
+  loading?: boolean;
 }
 export interface PGridInstance<
   D extends Recordable = Recordable,

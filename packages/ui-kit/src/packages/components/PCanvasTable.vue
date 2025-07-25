@@ -9,23 +9,23 @@
   import type {
     Column as EVirtColumn,
     ConfigType,
+    CellParams,
     OverlayerContainer,
     FormatterMethod,
   } from 'e-virt-table';
   import { ref, onMounted, nextTick, computed, useAttrs, watch } from 'vue';
   import { EventCallback } from 'e-virt-table/dist/lib/EventBus';
-  import { isEqual, isString } from 'xe-utils';
-  import {
-    Cascader as ACascader,
-    DatePicker as ADatePicker,
-    InputNumber as AInputNumber,
-    Select as ASelect,
-    TimePicker as ATimePicker,
-  } from 'ant-design-vue';
+  import { isArray, isEqual, isFunction, isString, omit } from 'xe-utils';
   import renderStore from '@/store/renderStore';
   import RenderEditCell from './RenderEditCell';
   import RenderAntCell from './RenderAntCell';
-  import type { CanvasColumnProps, CellFuncArg, PFormatter } from '#/antProxy';
+  import type {
+    CanvasColumnProps,
+    CellFuncArg,
+    CanvasTableProps,
+    PFormatter,
+    FormatterFunc,
+  } from '#/antProxy';
   import { v4 as uuidv4 } from 'uuid';
   import { antFormatters } from '@/utils/AFormatters';
 
@@ -33,31 +33,7 @@
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
     (e: 'ready', value: EVirtTable): void;
   }>();
-  const props = defineProps({
-    columns: {
-      type: Array as () => CanvasColumnProps<T>[],
-      required: true,
-      default: () => [],
-    },
-    data: {
-      type: Array as () => T[],
-      required: true,
-      default: () => [],
-    },
-    footerData: {
-      type: Array as () => B[],
-      required: false,
-      default: () => [],
-    },
-    config: {
-      type: Object as () => ConfigType,
-      default: () => ({}),
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-  });
+  const props = defineProps<CanvasTableProps<T, B>>();
   watch(
     props.data,
     (newValue) => {
@@ -89,16 +65,6 @@
   const eVirtTableOverlayerRef = ref(null);
   const editorCell = ref<Cell>();
   const editorType = ref<string>('text');
-  const eVirtTableEditorSelectRef = ref<InstanceType<typeof ASelect> | null>(null);
-  const selectValue = ref(null);
-  const eVirtTableEditorCascaderRef = ref<InstanceType<typeof ACascader> | null>(null);
-  const cascaderValue = ref(null);
-  const eVirtTableEditorNumberRef = ref<InstanceType<typeof AInputNumber> | null>(null);
-  const numberValue = ref();
-  const eVirtTableEditorDateRef = ref<InstanceType<typeof ADatePicker> | null>(null);
-  const dateValue = ref('');
-  const eVirtTableEditorTimeRef = ref<InstanceType<typeof ATimePicker> | null>(null);
-  const timeValue = ref('');
   const overlayerView = ref<OverlayerContainer>({
     views: [],
   });
@@ -114,16 +80,30 @@
     };
   });
   const getFormatter = (name: string) => antFormatters[name] || (({ cellValue }) => cellValue);
+  // 把大多数
   const transferFormatter =
-    (formatter: PFormatter): FormatterMethod =>
-    () => {
-      return () => {};
-    };
+    (formatter: FormatterFunc, ...restArgs: any[]): FormatterMethod =>
+    ({ row, rowIndex, value }) =>
+      formatter(
+        {
+          row,
+          rowIndex,
+          cellValue: value,
+        },
+        ...restArgs,
+      );
   const paseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
     return {
-      ...column,
+      ...omit(column, ['formatter']),
       key: column.key || column.field || uuidv4(),
-      formatter: isString(column.formatter) ? (column.formatter as string) : undefined,
+      formatter: isString(column.formatter)
+        ? transferFormatter(getFormatter(column.formatter as string))
+        : isArray(column.formatter) && isString(column.formatter[0])
+          ? transferFormatter(getFormatter(column.formatter[0]), ...column.formatter.slice(1))
+          : isFunction(column.formatter)
+            ? transferFormatter(column.formatter as FormatterFunc)
+            : undefined,
+      children: column.children?.map((child) => paseToEVirtColumn(child)),
     };
   };
   onMounted(() => {
@@ -159,42 +139,7 @@
       if (editorType.value === 'text') {
         return;
       }
-      if (editorType.value === 'select') {
-        nextTick(() => {
-          selectValue.value = cell.value;
-          /* @ts-ignore */
-          eVirtTableEditorSelectRef.value?.focus();
-        });
-        return;
-      } else if (editorType.value === 'cascader') {
-        nextTick(() => {
-          cascaderValue.value = cell.value;
-          /* @ts-ignore */
-          eVirtTableEditorCascaderRef.value?.focus();
-        });
-        return;
-      } else if (editorType.value === 'date') {
-        nextTick(() => {
-          dateValue.value = cell.value;
-          const dateRef = eVirtTableEditorDateRef.value as any;
-          dateRef?.focus();
-        });
-        return;
-      } else if (editorType.value === 'time') {
-        nextTick(() => {
-          timeValue.value = cell.value;
-          const timeRef = eVirtTableEditorTimeRef.value as any;
-          timeRef?.focus();
-        });
-        return;
-      } else if (editorType.value === 'number') {
-        nextTick(() => {
-          numberValue.value = cell.value;
-          /* @ts-ignore */
-          eVirtTableEditorNumberRef.value?.focus();
-        });
-        return;
-      } else if (renderStore.renders[editorType.value]) {
+      if (renderStore.renders[editorType.value]) {
       }
     });
     eVirtTable.on('doneEdit', () => {
@@ -220,6 +165,7 @@
           :cell-render="{
             name: editorType,
           }"
+          :style="editorStyle"
           :render-table-params="{
             data: props.data,
             row: editorCell?.row,

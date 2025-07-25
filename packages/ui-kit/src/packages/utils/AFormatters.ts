@@ -1,9 +1,9 @@
 import { isArray, isFunction, isString, toNumber } from 'xe-utils';
 import { valued } from '@/utils/is';
-import { CellFuncArg, ColumnProps } from '#/antProxy';
+import { CellFuncArg, ColumnProps, PFormatter } from '#/antProxy';
 
 const emptyStr = `-`;
-export const antFormatters: Record<string, (a: CellFuncArg, ...args: any[]) => any> = {
+export const antFormatters: PFormatter = {
   toString: ({ cellValue }) => (cellValue ? (cellValue.toString?.() ?? emptyStr) : emptyStr),
   // 格式化选项
   formatByOptions: ({ cellValue }, options: IOption[], separator = ',') => {
