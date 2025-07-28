@@ -59,6 +59,7 @@
       height: `${cell.height}px`,
     };
   });
+  const a: string = 123;
   const getFormatter = (name: string) => antFormatters[name] || (({ cellValue }) => cellValue);
   const getCellRender = (name: string) => renderStore.renders[name]?.renderDefault;
   const transferFormatter =
@@ -110,26 +111,32 @@
     } else if (column.editRender?.name && (column.field || column.key)) {
       cacheEditorRenders[column.field || column.key] = column.editRender;
     }
-    return {
-      ...omit(column, ['formatter']),
-      key: column.key || column.field || uuidv4(),
-      formatter: isString(column.formatter)
-        ? transferFormatter(getFormatter(column.formatter as string))
-        : isArray(column.formatter) && isString(column.formatter[0])
-          ? transferFormatter(getFormatter(column.formatter[0]), ...column.formatter.slice(1))
-          : isFunction(column.formatter)
-            ? transferFormatter(column.formatter as FormatterFunc)
-            : undefined,
-      editorType:
-        column.editorType ??
-        (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)
-          ? `__slot:${column.field || column.key}`
-          : column.editRender?.name
-            ? column.editRender.name
-            : undefined),
-      render: getRenderFunction(column),
-      children: column.children?.map((child) => parseToEVirtColumn(child)),
-    };
+    return column.children?.length
+      ? {
+          ...omit(column, ['formatter', 'children', 'editorType', 'render']),
+          key: column.key || column.field || uuidv4(),
+          title: column.title || '',
+          children: column.children?.map((child) => parseToEVirtColumn(child)),
+        }
+      : {
+          ...omit(column, ['formatter', 'children']),
+          key: column.key || column.field || uuidv4(),
+          formatter: isString(column.formatter)
+            ? transferFormatter(getFormatter(column.formatter as string))
+            : isArray(column.formatter) && isString(column.formatter[0])
+              ? transferFormatter(getFormatter(column.formatter[0]), ...column.formatter.slice(1))
+              : isFunction(column.formatter)
+                ? transferFormatter(column.formatter as FormatterFunc)
+                : undefined,
+          editorType:
+            column.editorType ??
+            (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)
+              ? `__slot:${column.field || column.key}`
+              : column.editRender?.name
+                ? column.editRender.name
+                : undefined),
+          render: getRenderFunction(column),
+        };
   };
   onMounted(() => {
     if (!eVirtTableRef.value) {
