@@ -1,32 +1,18 @@
 <script lang="ts" setup name="PromisePicker" generic="D = Recordable, F = Recordable">
-  import { PropType, reactive, ref, computed } from 'vue';
-  import { PGridInstance, PGridProps } from '#/antProxy';
+  import { reactive, ref, computed } from 'vue';
+  import { PGridInstance, PromisePickerProps } from '#/antProxy';
   import PGrid from '@/components/PGrid.vue';
   import { $warning } from '@/hooks/useMessage';
   import { Button as AButton, Modal as AModal } from 'ant-design-vue';
 
   const gridEl = ref<PGridInstance<D>>();
-  const props = defineProps({
-    gridSetting: {
-      type: Object as PropType<PGridProps<D, F>>,
-      required: true,
-    },
-    title: {
-      type: String as PropType<string>,
-      default: '数据选择',
-    },
-    width: {
-      type: [String, Number] as PropType<string | number>,
-      default: '70%',
-    },
-    multipleAllowEmpty: {
-      type: Boolean,
-      default: false,
-    },
-    bodyStyle: {
-      type: Object,
-      default: () => ({}),
-    },
+
+  const props = withDefaults(defineProps<PromisePickerProps<D, F>>(), {
+    title: '数据选择',
+    width: '70%',
+    multipleAllowEmpty: false,
+    bodyStyle: () => ({}),
+    beforePick: () => Promise.resolve(),
   });
   const isMultiple = computed(() => props.gridSetting.selectConfig?.multiple);
   let resolvePromise: (
@@ -52,8 +38,10 @@
   const selectRow = ({ row, field }: { row: D; field?: string }) => {
     // 单选才关闭结束选择
     if (resolvePromise && !isMultiple.value) {
-      visible.modal = false;
-      resolvePromise({ row, field });
+      props.beforePick(row).then(() => {
+        visible.modal = false;
+        resolvePromise({ row, field });
+      });
     }
   };
   const endMultiplePicker = () => {
@@ -61,8 +49,10 @@
     if (records.length === 0 && !props.multipleAllowEmpty) {
       $warning('请选择数据');
     } else {
-      visible.modal = false;
-      multipleResolver(records);
+      props.beforePick(records).then(() => {
+        visible.modal = false;
+        multipleResolver(records);
+      });
     }
   };
   defineExpose({
@@ -81,7 +71,7 @@
     grid: gridEl,
     hide: () => {
       visible.modal = false;
-    }
+    },
   });
 </script>
 <template>

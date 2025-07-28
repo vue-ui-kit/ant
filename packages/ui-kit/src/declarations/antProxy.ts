@@ -86,6 +86,9 @@ export interface PromisePickerProps<D = Recordable, F = Recordable> {
   gridSetting: PGridProps<D, F>;
   title?: string;
   width?: string | number;
+  multipleAllowEmpty?: boolean;
+  bodyStyle?: Recordable;
+  beforePick?: (rowOrRows: D | Array<D>) => Promise<void>;
 }
 
 export type GroupMenuItemHandler<F = Recordable> = ({
