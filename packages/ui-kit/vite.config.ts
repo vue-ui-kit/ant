@@ -25,9 +25,9 @@ export default defineConfig({
           const variablesContent = readFileSync('src/packages/styles/variables.scss', 'utf-8');
           const mainScssContent = readFileSync('src/packages/styles/index.scss', 'utf-8');
 
-          // 将variables内容内联，替换@import语句
+          // 将variables内容内联，替换@use语句
           const combinedScssContent = mainScssContent.replace(
-            "@import 'variables';",
+            "@use 'variables';",
             `// Variables inlined for npm distribution\n${variablesContent}`,
           );
 

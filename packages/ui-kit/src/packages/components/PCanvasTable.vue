@@ -163,6 +163,9 @@
     eVirtTable.on('doneEdit', () => {
       editorType.value = 'text';
     });
+    eVirtTable.on('selectionChange', (selection) => {
+      console.log('selection', selection);
+    });
     emit('ready', eVirtTable);
   });
   function saveCellValue(value) {
@@ -172,6 +175,9 @@
     const { rowKey, key } = editorCell.value;
     eVirtTable?.setItemValueByEditor(rowKey, key, value);
   }
+  const getPopupContainer = () => {
+    return document.body;
+  };
   watch(
     props.data,
     (newValue) => {
@@ -202,9 +208,9 @@
     },
     { deep: true },
   );
-  const getPopupContainer = () => {
-    return document.body;
-  };
+  defineExpose({
+    $table: eVirtTable,
+  });
 </script>
 <template>
   <a-spin :spinning="loading">
