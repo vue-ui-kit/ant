@@ -118,6 +118,16 @@
       isSuperAdmin: Math.random() > 0.5,
     })),
   );
+  const footerData: Record<string, string>[] = [
+    {
+      name: '总人数',
+      enName: '10000',
+    },
+    {
+      name: '平均分',
+      score: '50',
+    },
+  ];
   const canvasTableColumns: CanvasColumnProps<Student>[] = [
     {
       field: '#',
@@ -261,6 +271,11 @@
         name: 'colorFullScore',
       },
       fixed: 'right',
+      renderFooter: ({ row }: { row: Student }) => (
+        <div>
+          <span style={{ color: 'red', fontWeight: 'bold' }}>{row.score}</span>
+        </div>
+      ),
     },
   ];
   const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
@@ -338,9 +353,6 @@
       title: '选择学生',
       width: '80%',
       multipleAllowEmpty: false,
-      bodyStyle: {
-        height: '500px',
-      },
       beforePick: async (rowOrRows) => {
         // 模拟异步验证
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -812,6 +824,7 @@
             :data="bigData"
             :columns="canvasTableColumns"
             :config="canvasTableConfig"
+            :footer-data="footerData"
           />
         </div>
       </div>

@@ -4,22 +4,15 @@
   name="PromisePicker"
   generic="D extends Recordable = Recordable, F extends Recordable = Recordable"
 >
-  import { reactive, ref, computed } from 'vue';
+  import { reactive, ref, computed, onMounted, nextTick } from 'vue';
   import { PGridInstance, PromisePickerProps } from '#/antProxy';
   import PGrid from '@/components/PGrid.vue';
   import { $warning } from '@/hooks/useMessage';
   import { Button as AButton, Modal as AModal } from 'ant-design-vue';
 
   const gridEl = ref<PGridInstance<D>>();
-  const defaultBodyStyle = {
-    minHeight: '642px',
-  };
-  const mergedBodyStyle = computed(() => {
-    return {
-      ...defaultBodyStyle,
-      ...props.bodyStyle,
-    };
-  });
+
+  const rendered = ref(false);
   const props = withDefaults(defineProps<PromisePickerProps<D, F>>(), {
     title: '数据选择',
     width: '70%',
@@ -68,18 +61,27 @@
       });
     }
   };
+  onMounted(() => {});
   defineExpose({
     pick: () =>
       new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
         resolvePromise = resolve;
         rejectPromise = reject;
+        rendered.value = false;
         visible.modal = true;
+        nextTick(() => {
+          rendered.value = true;
+        });
       }),
     pickMultiple: () =>
       new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
         multipleResolver = resolve;
         rejectPromise = reject;
+        rendered.value = false;
         visible.modal = true;
+        nextTick(() => {
+          rendered.value = true;
+        });
       }),
     grid: gridEl,
     hide: () => {
@@ -95,9 +97,11 @@
     :width="width"
     :footer="isMultiple ? undefined : null"
     @cancel="handleCancel"
-    :body-style="mergedBodyStyle"
+    :body-style="bodyStyle"
   >
-    <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
+    <div :style="{ minHeight: rendered ? 'unset' : '642px' }">
+      <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
+    </div>
     <template v-if="isMultiple" #footer>
       <div class="w-full text-right p-2">
         <span>

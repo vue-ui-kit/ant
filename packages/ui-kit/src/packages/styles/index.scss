@@ -205,7 +205,12 @@
     margin: unset;
     padding: 16px 0;
   }
-
+  .h-lack {
+    .ant-table-wrapper .ant-table-pagination.ant-pagination {
+      padding: unset;
+      margin-top: 8px;
+    }
+  }
   .p-inner-scroll {
     & > .ant-table-wrapper {
       height: 100%;
@@ -219,11 +224,15 @@
           flex-direction: column;
 
           & > .ant-table {
-            //flex: 1;
-            //height: 0;
-            //overflow: auto;
+            flex: 1;
+            height: 0;
+            overflow-y: hidden;
             /*border-radius: unset; 修复模糊问题 according to https://stackoverflow.com/questions/49349337/chrome-text-blur-with-overflow-yscroll-and-fixed-height*/
             border-radius: unset;
+
+            & > .ant-table-container > .ant-table-body {
+              position: relative;
+            }
           }
         }
       }
@@ -234,6 +243,9 @@
     .ant-select {
       width: 100px;
     }
+  }
+  .ant-table-cell:not(.normal-break) {
+    word-break: break-all;
   }
 }
 .p-error-group-tab {
@@ -251,6 +263,11 @@
     animation: heartbeat 2s infinite;
   }
 }
+.ant-picker-dropdown {
+  .ant-picker-footer {
+    padding-left: 4px;
+  }
+}
 .p-error-hang-out {
   .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(
       .ant-input-affix-wrapper-borderless
@@ -265,11 +282,17 @@
     display: none;
   }
 }
+
 .no-error-border {
   border-color: #d9d9d9 !important;
 
   &:focus {
     border-color: #4096ff !important;
+  }
+}
+@media (max-width: 575px) {
+  .p-wrapper .ant-form .ant-form-item .ant-form-item-label {
+    justify-content: flex-start;
   }
 }
 //endregion
