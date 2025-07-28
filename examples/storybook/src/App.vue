@@ -70,7 +70,7 @@
       class: `class${i}`,
       address: `address${i}`,
       phone: `phone${i}`,
-      email: `email${i}`,
+      email: `email${i}@qq.com`,
       birthDate: `birthDate${i}`,
       createTime: `createTime${i}`,
       hobby: sample(
@@ -188,6 +188,7 @@
           return (
             <a-space-compact>
               <a-input
+                bordered={false}
                 value={row.email?.substring(0, row.email?.indexOf('@'))}
                 onBlur={(e: any) => {
                   row.email =
@@ -196,6 +197,7 @@
                 suffix="@"
               />
               <a-input
+                bordered={false}
                 value={row.email?.substring(row.email?.indexOf('@') + 1)}
                 onBlur={(e: any) => {
                   row.email =

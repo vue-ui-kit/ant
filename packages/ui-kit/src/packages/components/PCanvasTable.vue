@@ -100,7 +100,7 @@
     if (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)) {
       cacheEditorSlotColumns[`__slot:${column.field || column.key}`] = column;
     } else if (column.editRender?.name && (column.field || column.key)) {
-      cacheEditorRenders[column.field || column.key] = column.editRender;
+      cacheEditorRenders[column.field! || column.key!] = column.editRender;
     }
     return {
       ...omit(column, ['formatter']),
@@ -221,6 +221,7 @@
             })
           "
           :bordered="false"
+          :style="editorStyle"
           class="ev-editor-wrapper"
           :get-popup-container="getPopupContainer"
           v-model:value="editorCell!.value"
