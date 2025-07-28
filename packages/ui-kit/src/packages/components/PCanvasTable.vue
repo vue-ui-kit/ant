@@ -135,6 +135,7 @@
       },
       columns: props.columns.map((col) => parseToEVirtColumn(col)),
       data: props.data,
+      footerData: props.footerData,
       emptyElement: eVirtTableEmptyRef.value || undefined,
       overlayerElement: eVirtTableOverlayerRef.value || undefined,
       editorElement: eVirtTableEditorRef.value || undefined,
