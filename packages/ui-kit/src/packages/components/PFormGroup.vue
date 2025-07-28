@@ -1,4 +1,4 @@
-<script lang="ts" generic="F = Recordable" setup name="PFormGroup">
+<script lang="ts" generic="F extends Recordable = Recordable" setup name="PFormGroup">
   import { computed, nextTick, PropType, ref, watch, watchEffect } from 'vue';
   import { PFormGroupProps, PFormBlockInstance } from '#/antProxy';
   import { MoreOutlined } from '@ant-design/icons-vue';

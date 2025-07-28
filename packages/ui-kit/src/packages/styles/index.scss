@@ -100,9 +100,9 @@
     z-index: 4;
   }
   .p-error-hang-out {
-    .ant-input-affix-wrapper-status-error:not(
-        .ant-input-affix-wrapper-disabled
-      ):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper {
+    .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(
+        .ant-input-affix-wrapper-borderless
+      ).ant-input-affix-wrapper {
       border-color: #d9d9d9 !important;
 
       &:focus {
@@ -122,7 +122,9 @@
     transform: translateY(-10px);
     max-height: 0;
     overflow: hidden;
-    transition: opacity 0.3s ease-out 0.3s, transform 0.3s ease-out 0.3s,
+    transition:
+      opacity 0.3s ease-out 0.3s,
+      transform 0.3s ease-out 0.3s,
       max-height 0.3s ease-out 0.3s;
   }
   .ant-form-item-has-error .ant-form-item-explain-error {
@@ -234,25 +236,25 @@
     }
   }
 }
-.p-error-group-tab{
-  position:relative;
+.p-error-group-tab {
+  position: relative;
   overflow: visible;
-  color:#f5222d!important;
-  &:after{
-    content:'🏷️';
-    position:absolute;
-    top:-1em;
-    right:0;
-    width:1em;
-    height:1em;
-    font-size:0.8em;
+  color: #f5222d !important;
+  &:after {
+    content: '🏷️';
+    position: absolute;
+    top: -1em;
+    right: 0;
+    width: 1em;
+    height: 1em;
+    font-size: 0.8em;
     animation: heartbeat 2s infinite;
   }
 }
 .p-error-hang-out {
-  .ant-input-affix-wrapper-status-error:not(
-      .ant-input-affix-wrapper-disabled
-    ):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper {
+  .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(
+      .ant-input-affix-wrapper-borderless
+    ).ant-input-affix-wrapper {
     border-color: #d9d9d9 !important;
 
     &:focus {
@@ -272,6 +274,10 @@
 }
 //endregion
 
+/* #region EVirtTable */
+
+/* #endregion */
+
 @each $align in right center {
   /**/
   .p-content-align-#{$align}.ant-form-item .ant-form-item-control-input-content {
@@ -287,15 +293,37 @@
 }
 
 @keyframes heartbeat {
-  0%   { transform: scale(1); }
-  6%   { transform: scale(1.22); }
-  12%  { transform: scale(1); }
-  18%  { transform: scale(1.18); }
-  24%  { transform: scale(1); }
-  48%  { transform: scale(1); }   // 长停顿
-  54%  { transform: scale(1.22); }
-  60%  { transform: scale(1); }
-  66%  { transform: scale(1.18); }
-  72%  { transform: scale(1); }
-  100% { transform: scale(1); }   // 长停顿
+  0% {
+    transform: scale(1);
+  }
+  6% {
+    transform: scale(1.22);
+  }
+  12% {
+    transform: scale(1);
+  }
+  18% {
+    transform: scale(1.18);
+  }
+  24% {
+    transform: scale(1);
+  }
+  48% {
+    transform: scale(1);
+  } // 长停顿
+  54% {
+    transform: scale(1.22);
+  }
+  60% {
+    transform: scale(1);
+  }
+  66% {
+    transform: scale(1.18);
+  }
+  72% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  } // 长停顿
 }

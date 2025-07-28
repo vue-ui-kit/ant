@@ -2,7 +2,7 @@
   "name": "ui-kit",
   "homepage": "https://github.com/vue-ui-kit/ant",
   "type": "module",
-  "version": "1.9.4",
+  "version": "2.0.0",
   "description": "Vue3 UI Kit based on Ant Design",
   "workspaces": [
     "packages/*",
@@ -35,11 +35,13 @@
   "devDependencies": {
     "@commitlint/cli": "^19.4.1",
     "@commitlint/config-conventional": "^19.4.1",
+    "@types/node": "^24.1.0",
     "husky": "^9.1.5",
     "lint-staged": "^15.2.9",
     "oxlint": "^1.7.0",
     "prettier": "^3.3.3",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,vue}": [

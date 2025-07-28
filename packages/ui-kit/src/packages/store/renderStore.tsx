@@ -26,7 +26,7 @@ import { ButtonProps } from 'ant-design-vue/lib/button';
 import { isBadValue, isGoodValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
-import { computed } from 'vue';
+import { computed, Ref } from 'vue';
 
 interface BtnOptions extends ButtonProps {
   content?: string;
@@ -36,7 +36,27 @@ interface BtnOptions extends ButtonProps {
   clickEvt?: (p: RenderTableParams) => any;
   hiddenIf?: (p: RenderTableParams) => boolean;
 }
-
+export interface RenderWorkshop {
+  renderItemContent?: (
+    options: RenderOptions,
+    params: RenderFormParams,
+    defaultHandler: Recordable,
+  ) => any;
+  renderDefault?: (
+    options: RenderOptions,
+    params: RenderTableParams,
+    defaultHandler: Recordable,
+  ) => any;
+  renderEdit?: (
+    model: Ref<any>,
+    options: RenderOptions,
+    params: RenderTableParams,
+    emit?: (e: 'blur', value: any) => void,
+  ) => any;
+}
+interface RenderFactory {
+  [key: string]: RenderWorkshop;
+}
 const antDefaultProps = {
   AInput: {
     autocomplete: 'off',
@@ -169,6 +189,25 @@ const renderBasic = (name: string) => {
         <DynamicComponent is={name} {...props} />
       );
     },
+    renderEdit(
+      model: Ref<any>,
+      { props = antDefaultProps[name] ?? {}, attrs = {}, events = {} }: RenderOptions,
+      params: RenderTableParams,
+      emit?: (e: 'blur', value: any[]) => void,
+    ) {
+      return (
+        <DynamicComponent
+          is={name}
+          v-model:value={model.value}
+          {...attrs}
+          {...merge({}, antDefaultProps[name], props)}
+          onBlur={(...args) => {
+            emit?.('blur', model.value);
+            events.blur?.(params, ...args);
+          }}
+        />
+      );
+    },
   };
 };
 
@@ -224,7 +263,7 @@ const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
       {btnOpt.content || (btnOpt?.getContent?.(params) ?? '')}
     </Button>
   );
-const renders = {
+const renders: RenderFactory = {
   ...Object.fromEntries(Object.keys(componentsMap).map((name) => [name, renderBasic(name)])),
   // 简单按钮
   $button: {
@@ -617,21 +656,7 @@ const renders = {
 };
 export const addRender = (
   name: string,
-  {
-    renderItemContent,
-    renderDefault,
-  }: {
-    renderItemContent?: (
-      options: RenderOptions,
-      params: RenderFormParams,
-      defaultHandler: Recordable,
-    ) => any;
-    renderDefault?: (
-      options: RenderOptions,
-      params: RenderTableParams,
-      defaultHandler: Recordable,
-    ) => any;
-  },
+  { renderItemContent, renderDefault, renderEdit }: RenderWorkshop,
 ) => {
   if (renders.hasOwnProperty(name)) {
     console.warn(`render ${name} already exists, you are trying to override it`);
@@ -639,6 +664,7 @@ export const addRender = (
   renders[name] = {
     renderItemContent,
     renderDefault,
+    renderEdit,
   };
 };
 export default {

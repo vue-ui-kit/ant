@@ -1,4 +1,9 @@
-<script generic="D = Recordable, F = Recordable" lang="ts" name="PGrid" setup>
+<script
+  generic="D extends Recordable = Recordable, F extends Recordable = Recordable"
+  lang="ts"
+  name="PGrid"
+  setup
+>
   import { ColumnProps, PFormItemProps, PGridProps, ResponsePathConfig } from '#/antProxy';
   import {
     computed,

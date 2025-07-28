@@ -4,7 +4,7 @@ import { renderAntFormat } from '@/utils/AFormatters';
 import RenderAntCell from '@/components/RenderAntCell';
 
 export default defineComponent(
-  <D = Recordable,>(props: {
+  <D extends Recordable = Recordable>(props: {
     tableData: D[];
     row: D;
     column: ColumnProps<D>;

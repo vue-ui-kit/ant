@@ -1,4 +1,4 @@
-<script generic="F = Recordable" lang="ts" name="PForm" setup>
+<script generic="F extends Recordable = Recordable" lang="ts" name="PForm" setup>
   import { PFormItemProps, PFormProps } from '#/antProxy';
   import { computed, ref, toRefs } from 'vue';
   import { omit } from 'xe-utils';
