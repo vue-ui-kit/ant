@@ -199,11 +199,14 @@ const renderBasic = (name: string) => {
       return field ? (
         <DynamicComponent
           is={name}
-          v-model:value={row[field]}
+          value={row[field]}
           {...attrs}
           {...merge({}, antDefaultProps[name], props)}
           onBlur={(...args) => {
-            emit?.('blur', [row[field], ...args]);
+            if (args[0]?.target?.value) {
+              row[field] = args[0]?.target?.value;
+              emit?.('blur', row[field]);
+            }
             events.blur?.({ data, row, field }, ...args);
           }}
         />
@@ -212,7 +215,8 @@ const renderBasic = (name: string) => {
           is={name}
           {...props}
           onBlur={(...args) => {
-            emit?.('blur', args);
+            /* 暂行办法 取第一个 */
+            emit?.('blur', args[0]);
             events.blur?.({ data, row, field }, ...args);
           }}
         />

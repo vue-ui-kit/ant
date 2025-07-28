@@ -13,7 +13,7 @@
     OverlayerContainer,
     FormatterMethod,
   } from 'e-virt-table';
-  import { ref, onMounted, nextTick, computed, useAttrs, watch } from 'vue';
+  import { ref, onMounted, computed, useAttrs, watch } from 'vue';
   import { EventCallback } from 'e-virt-table/dist/lib/EventBus';
   import { isArray, isEqual, isFunction, isString, omit } from 'xe-utils';
   import renderStore from '@/store/renderStore';
@@ -43,9 +43,7 @@
   const eVirtTableOverlayerRef = ref(null);
   const editorCell = ref<Cell>();
   const editorType = ref<string>('text');
-  const overlayerView = ref<OverlayerContainer>({
-    views: [],
-  });
+  const overlayerView = ref<OverlayerContainer>();
   const cacheEditorSlotColumns: Record<string, CanvasColumnProps<T>> = {};
   const cacheEditorRenders: Record<string, CellRender> = {};
   // 编辑器样式
@@ -255,7 +253,7 @@
         <!-- 自定覆盖层 -->
         <div
           :class="wrapper.class"
-          v-for="wrapper in overlayerView.views"
+          v-for="wrapper in overlayerView?.views || []"
           :style="wrapper.style"
           :key="wrapper.type"
         >
