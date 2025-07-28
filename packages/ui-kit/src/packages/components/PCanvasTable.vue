@@ -170,6 +170,7 @@
   });
   /* tbd 如果是相应式的话 可能不需要*/
   function saveCellValue(value) {
+    console.log('saveCellValue', value);
     if (!eVirtTable || !editorCell.value) {
       return;
     }

@@ -26,7 +26,7 @@ import { ButtonProps } from 'ant-design-vue/lib/button';
 import { isBadValue, isGoodValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 interface BtnOptions extends ButtonProps {
   content?: string;
@@ -196,31 +196,31 @@ const renderBasic = (name: string) => {
       if (isGoodValue(defaultValue) && valued(field) && isBadValue(row[field!])) {
         row[field!] = defaultValue;
       }
-      return field ? (
-        <DynamicComponent
-          is={name}
-          value={row[field]}
-          {...attrs}
-          {...merge({}, antDefaultProps[name], props)}
-          onBlur={(...args) => {
-            if (args[0]?.target?.value) {
-              row[field] = args[0]?.target?.value;
-              emit?.('blur', row[field]);
-            }
-            events.blur?.({ data, row, field }, ...args);
-          }}
-        />
-      ) : (
-        <DynamicComponent
-          is={name}
-          {...props}
-          onBlur={(...args) => {
-            /* 暂行办法 取第一个 */
-            emit?.('blur', args[0]);
-            events.blur?.({ data, row, field }, ...args);
-          }}
-        />
-      );
+      if (field) {
+        const innerValue = ref(row[field]);
+        return (
+          <DynamicComponent
+            is={name}
+            v-model:value={innerValue.value}
+            {...attrs}
+            {...merge({}, antDefaultProps[name], props)}
+            onBlur={(...args) => {
+              emit?.('blur', innerValue.value);
+              events.blur?.({ data, row, field }, ...args);
+            }}
+          />
+        );
+      } else {
+        return (
+          <DynamicComponent
+            is={name}
+            {...props}
+            onBlur={(...args) => {
+              events.blur?.({ data, row, field }, ...args);
+            }}
+          />
+        );
+      }
     },
   };
 };
