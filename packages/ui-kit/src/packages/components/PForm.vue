@@ -39,15 +39,15 @@
       eachTree(items.value, (item) => {
         if (item.field && item.itemRender) {
           if (isGoodValue(item.itemRender.defaultValue)) {
-            obj[item.field] = item.itemRender.defaultValue;
+            obj[item.field as keyof F] = item.itemRender.defaultValue;
           } else {
-            obj[item.field] = undefined;
+            obj[item.field as keyof F] = undefined;
           }
         } else if (item.field && item.slots) {
           if (isGoodValue(item.slots.defaultValue)) {
-            obj[item.field] = item.slots.defaultValue;
+            obj[item.field as keyof F] = item.slots.defaultValue;
           } else {
-            obj[item.field] = undefined;
+            obj[item.field as keyof F] = undefined;
           }
         }
       });

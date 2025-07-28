@@ -1,4 +1,9 @@
-<script lang="ts" setup name="PromisePicker" generic="D = Recordable, F = Recordable">
+<script
+  lang="ts"
+  setup
+  name="PromisePicker"
+  generic="D extends Recordable = Recordable, F extends Recordable = Recordable"
+>
   import { reactive, ref, computed } from 'vue';
   import { PGridInstance, PromisePickerProps } from '#/antProxy';
   import PGrid from '@/components/PGrid.vue';
