@@ -8,6 +8,7 @@
     PFormGroupProps,
     labelColDict,
     CanvasColumnProps,
+    PCanvasTableInstance,
   } from '@vue-ui-kit/ant';
   import {
     Card as ACard,
@@ -21,6 +22,7 @@
 
   const { Title } = Typography;
 
+  const canvasTableInstance = ref<PCanvasTableInstance<Student>>();
   interface IPage {
     /**
      * 第几页
@@ -585,6 +587,9 @@
         break;
     }
   };
+  const getSelectedRows = () => {
+    console.log('已选项:', canvasTableInstance.value?.selectedRecords);
+  };
   const canvasTableConfig = ref({
     DISABLED: true,
     HEIGHT: 500,
@@ -668,15 +673,18 @@
       <div v-if="currentView === 'canvasTable'">
         <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
         <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
-        <div>
+        <a-space>
           <span>编辑状态：</span>
           <a-radio-group v-model:value="canvasTableConfig.DISABLED">
             <a-radio-button :value="true">禁用</a-radio-button>
             <a-radio-button :value="false">启用</a-radio-button>
           </a-radio-group>
-        </div>
+
+          <a-button @click="getSelectedRows">输出已选项</a-button>
+        </a-space>
         <div style="height: 600px; margin-top: 16px">
           <p-canvas-table
+            ref="canvasTableInstance"
             :data="bigData"
             :columns="canvasTableColumns"
             :config="canvasTableConfig"

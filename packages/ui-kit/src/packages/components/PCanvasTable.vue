@@ -28,6 +28,7 @@
   const defaultConfig = {
     DISABLED: true,
   };
+  const selectedRecords = ref<T[]>([]);
   const props = defineProps<CanvasTableProps<T, B>>();
   let eVirtTable: EVirtTable | null = null;
   const attrs = useAttrs();
@@ -164,7 +165,7 @@
       editorType.value = 'text';
     });
     eVirtTable.on('selectionChange', (selection) => {
-      console.log('selection', selection);
+      selectedRecords.value = selection;
     });
     emit('ready', eVirtTable);
   });
@@ -210,6 +211,7 @@
   );
   defineExpose({
     $table: eVirtTable,
+    selectedRecords: computed(() => selectedRecords.value),
   });
 </script>
 <template>
