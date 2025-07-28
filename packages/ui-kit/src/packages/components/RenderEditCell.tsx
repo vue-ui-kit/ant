@@ -1,4 +1,4 @@
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { CellRender, RenderTableParams } from '#/antProxy';
 import renderStore from '@/store/renderStore';
 
@@ -11,16 +11,22 @@ export default defineComponent(
     { emit },
   ) => {
     const { cellRender, renderTableParams } = props;
-    const { data, row, field, rowIndex } = renderTableParams!;
-    return () => {
-      return (
-        renderStore.renders[cellRender!.name]?.renderEdit?.(
-          cellRender!,
-          { data, row, field, rowIndex },
-          emit,
-        ) ?? null
-      );
-    };
+    const { row, field } = renderTableParams!;
+    if (field) {
+      const innerValue = ref(row[field]);
+      return () => {
+        return (
+          renderStore.renders[cellRender!.name]?.renderEdit?.(
+            innerValue,
+            cellRender!,
+            renderTableParams,
+            emit,
+          ) ?? null
+        );
+      };
+    } else {
+      return () => null;
+    }
   },
   {
     name: 'RenderEditCell',

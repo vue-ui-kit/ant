@@ -26,7 +26,7 @@ import { ButtonProps } from 'ant-design-vue/lib/button';
 import { isBadValue, isGoodValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
-import { computed, ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 
 interface BtnOptions extends ButtonProps {
   content?: string;
@@ -48,6 +48,7 @@ export interface RenderWorkshop {
     defaultHandler: Recordable,
   ) => any;
   renderEdit?: (
+    model: Ref<any>,
     options: RenderOptions,
     params: RenderTableParams,
     emit?: (e: 'blur', value: any) => void,
@@ -189,38 +190,23 @@ const renderBasic = (name: string) => {
       );
     },
     renderEdit(
-      { props = antDefaultProps[name] ?? {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
-      { data, row, field }: RenderTableParams,
+      model: Ref<any>,
+      { props = antDefaultProps[name] ?? {}, attrs = {}, events = {} }: RenderOptions,
+      params: RenderTableParams,
       emit?: (e: 'blur', value: any[]) => void,
     ) {
-      if (isGoodValue(defaultValue) && valued(field) && isBadValue(row[field!])) {
-        row[field!] = defaultValue;
-      }
-      if (field) {
-        const innerValue = ref(row[field]);
-        return (
-          <DynamicComponent
-            is={name}
-            v-model:value={innerValue.value}
-            {...attrs}
-            {...merge({}, antDefaultProps[name], props)}
-            onBlur={(...args) => {
-              emit?.('blur', innerValue.value);
-              events.blur?.({ data, row, field }, ...args);
-            }}
-          />
-        );
-      } else {
-        return (
-          <DynamicComponent
-            is={name}
-            {...props}
-            onBlur={(...args) => {
-              events.blur?.({ data, row, field }, ...args);
-            }}
-          />
-        );
-      }
+      return (
+        <DynamicComponent
+          is={name}
+          v-model:value={model.value}
+          {...attrs}
+          {...merge({}, antDefaultProps[name], props)}
+          onBlur={(...args) => {
+            emit?.('blur', model.value);
+            events.blur?.(params, ...args);
+          }}
+        />
+      );
     },
   };
 };
