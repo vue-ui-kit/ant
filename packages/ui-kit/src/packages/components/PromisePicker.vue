@@ -11,7 +11,15 @@
   import { Button as AButton, Modal as AModal } from 'ant-design-vue';
 
   const gridEl = ref<PGridInstance<D>>();
-
+  const defaultBodyStyle = {
+    minHeight: '642px',
+  };
+  const mergedBodyStyle = computed(() => {
+    return {
+      ...defaultBodyStyle,
+      ...props.bodyStyle,
+    };
+  });
   const props = withDefaults(defineProps<PromisePickerProps<D, F>>(), {
     title: '数据选择',
     width: '70%',
@@ -87,7 +95,7 @@
     :width="width"
     :footer="isMultiple ? undefined : null"
     @cancel="handleCancel"
-    :body-style="bodyStyle"
+    :body-style="mergedBodyStyle"
   >
     <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
     <template v-if="isMultiple" #footer>
