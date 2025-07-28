@@ -25,6 +25,6 @@ export default defineComponent(
   {
     name: 'RenderEditCell',
     props: ['cellRender', 'renderTableParams'],
-    emits: ['change'],
+    emits: ['blur'],
   },
 );

@@ -72,7 +72,39 @@
         },
         ...restArgs,
       );
-  const paseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
+  // 将复杂的三元运算符拆分成函数
+  const getRenderFunction = (column: CanvasColumnProps<T>) => {
+    if (column.slots?.default && isFunction(column.slots?.default)) {
+      return (cell: CellParams) =>
+        column.slots?.default?.({
+          row: cell.row,
+          column: column,
+          rowIndex: cell.rowIndex,
+        });
+    }
+
+    if (column.slots?.default && isString(column.slots?.default)) {
+      return `slot:${column.slots?.default}`;
+    }
+
+    if (column.cellRender && column.cellRender.name) {
+      return (cell: CellParams) =>
+        getCellRender(column.cellRender!.name)?.(
+          column.cellRender!,
+          {
+            data: props.data,
+            row: cell.row,
+            rowIndex: cell.rowIndex,
+            field: column.field || cell.column.key,
+            title: cell.column?.title ?? '',
+          },
+          {},
+        );
+    }
+
+    return undefined;
+  };
+  const parseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
     if (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)) {
       cacheEditorSlotColumns[`__slot:${column.field || column.key}`] = column;
     } else if (column.editRender?.name && (column.field || column.key)) {
@@ -92,32 +124,11 @@
         column.editorType ??
         (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)
           ? `__slot:${column.field || column.key}`
-          : undefined),
-      render:
-        column.slots?.default && isFunction(column.slots?.default)
-          ? (cell: CellParams) =>
-              column.slots?.default?.({
-                row: cell.row,
-                column: column,
-                rowIndex: cell.rowIndex,
-              })
-          : column.slots?.default && isString(column.slots?.default)
-            ? `slot:${column.slots?.default}`
-            : column.cellRender && column.cellRender.name
-              ? (cell: CellParams) =>
-                  getCellRender(column.cellRender!.name)?.(
-                    column.cellRender!,
-                    {
-                      data: props.data,
-                      row: cell.row,
-                      rowIndex: cell.rowIndex,
-                      field: column.field || cell.column.key,
-                      title: cell.column?.title ?? '',
-                    },
-                    {},
-                  )
-              : undefined,
-      children: column.children?.map((child) => paseToEVirtColumn(child)),
+          : column.editRender?.name
+            ? column.editRender.name
+            : undefined),
+      render: getRenderFunction(column),
+      children: column.children?.map((child) => parseToEVirtColumn(child)),
     };
   };
   onMounted(() => {
@@ -126,7 +137,7 @@
     }
     eVirtTable = new EVirtTable(eVirtTableRef.value, {
       config: props.config,
-      columns: props.columns.map((col) => paseToEVirtColumn(col)),
+      columns: props.columns.map((col) => parseToEVirtColumn(col)),
       data: props.data,
       emptyElement: eVirtTableEmptyRef.value || undefined,
       overlayerElement: eVirtTableOverlayerRef.value || undefined,
@@ -178,7 +189,7 @@
     () => props.columns,
     (newValue, oldValue) => {
       if (!isEqual(newValue, oldValue)) {
-        eVirtTable?.loadColumns(newValue.map((col) => paseToEVirtColumn(col)));
+        eVirtTable?.loadColumns(newValue.map((col) => parseToEVirtColumn(col)));
       }
     },
     { deep: true },
@@ -190,6 +201,9 @@
     },
     { deep: true },
   );
+  const getPopupContainer = () => {
+    return document.body;
+  };
 </script>
 <template>
   <a-spin :spinning="loading">
@@ -205,14 +219,19 @@
               rowIndex: editorCell!.rowIndex,
             })
           "
+          :bordered="false"
+          class="ev-editor-wrapper"
+          :get-popup-container="getPopupContainer"
           v-model:value="editorCell!.value"
           :cell="editorCell"
+          @blur="saveCellValue"
         >
         </component>
         <!-- 自定义编辑器 -->
         <render-edit-cell
           v-else-if="renderStore.renders[editorType]?.renderEdit"
-          :cell-render="cacheEditorRenders[editorType]"
+          :cell-render="cacheEditorRenders[editorCell!.key]"
+          class="ev-editor-wrapper"
           :style="editorStyle"
           :render-table-params="{
             data: props.data,
@@ -221,7 +240,9 @@
             field: editorCell?.key ?? '',
             title: editorCell?.column?.title ?? '',
           }"
-          @change="saveCellValue"
+          :bordered="false"
+          :get-popup-container="getPopupContainer"
+          @blur="saveCellValue"
         />
       </div>
       <div ref="eVirtTableEmptyRef">

@@ -134,11 +134,21 @@
       title: '英文名',
       width: 300,
       render: 'capitalize',
+      editRender: {
+        name: '$input',
+      },
     },
     {
       key: 'age',
       title: '年龄',
       width: 200,
+      editRender: {
+        name: '$number',
+        props: {
+          min: 1,
+          max: 120,
+        },
+      },
     },
     {
       key: 'gender',
@@ -566,8 +576,8 @@
 </script>
 
 <template>
-  <div style="height: 100vh; width: 100%; padding: 20px; overflow-y: auto">
-    <div style="margin-bottom: 20px">
+  <div class="w-full flex flex-col">
+    <div class="mb-4">
       <a-typography-title :level="2">Vue UI Kit 示例</a-typography-title>
       <a-space>
         <a-button
@@ -596,61 +606,61 @@
         </a-button>
       </a-space>
     </div>
-
     <a-divider />
-
-    <!-- PGrid 示例 -->
-    <div v-if="currentView === 'grid'">
-      <a-typography-title :level="3">PGrid - 增强数据表格</a-typography-title>
-      <p>集成了查询表单、分页、工具栏等功能的数据表格组件</p>
-      <div style="height: 600px">
-        <p-grid v-bind="gridSetting" @toolbar-button-click="handleToolbarBtn" />
+    <div class="flex-1 h-0 overflow-y-auto">
+      <!-- PGrid 示例 -->
+      <div v-if="currentView === 'grid'">
+        <a-typography-title :level="3">PGrid - 增强数据表格</a-typography-title>
+        <p>集成了查询表单、分页、工具栏等功能的数据表格组件</p>
+        <div style="height: 600px">
+          <p-grid v-bind="gridSetting" @toolbar-button-click="handleToolbarBtn" />
+        </div>
       </div>
-    </div>
 
-    <!-- PForm 示例 -->
-    <div v-if="currentView === 'form'">
-      <a-typography-title :level="3">PForm - 增强表单</a-typography-title>
-      <p>基于配置的动态表单组件，支持多种字段类型和验证规则</p>
-      <a-card title="用户信息表单" style="margin-top: 16px">
-        <p-form
-          v-bind="formSetting"
-          :data="formData"
-          @apply="handleFormSubmit"
-          @reset="handleFormReset"
-        />
-        <template #actions>
+      <!-- PForm 示例 -->
+      <div v-if="currentView === 'form'">
+        <a-typography-title :level="3">PForm - 增强表单</a-typography-title>
+        <p>基于配置的动态表单组件，支持多种字段类型和验证规则</p>
+        <a-card title="用户信息表单" style="margin-top: 16px">
+          <p-form
+            v-bind="formSetting"
+            :data="formData"
+            @apply="handleFormSubmit"
+            @reset="handleFormReset"
+          />
+          <template #actions>
+            <a-space style="margin-top: 16px">
+              <a-button type="primary" @click="handleFormSubmit">提交</a-button>
+              <a-button @click="handleFormReset">重置</a-button>
+            </a-space>
+          </template>
+        </a-card>
+      </div>
+
+      <!-- PFormGroup 示例 -->
+      <div v-if="currentView === 'group'">
+        <a-typography-title :level="3">PFormGroup - 动态表单组</a-typography-title>
+        <p>支持动态添加、删除和管理多个表单实例的组件</p>
+        <div style="margin-top: 16px">
+          <p-form-group v-model="groupFormData" v-bind="groupFormSetting" />
           <a-space style="margin-top: 16px">
-            <a-button type="primary" @click="handleFormSubmit">提交</a-button>
-            <a-button @click="handleFormReset">重置</a-button>
+            <a-button type="primary" @click="handleGroupFormSubmit">保存所有项目</a-button>
           </a-space>
-        </template>
-      </a-card>
-    </div>
-
-    <!-- PFormGroup 示例 -->
-    <div v-if="currentView === 'group'">
-      <a-typography-title :level="3">PFormGroup - 动态表单组</a-typography-title>
-      <p>支持动态添加、删除和管理多个表单实例的组件</p>
-      <div style="margin-top: 16px">
-        <p-form-group v-model="groupFormData" v-bind="groupFormSetting" />
-        <a-space style="margin-top: 16px">
-          <a-button type="primary" @click="handleGroupFormSubmit">保存所有项目</a-button>
-        </a-space>
+        </div>
       </div>
-    </div>
 
-    <div v-if="currentView === 'canvasTable'">
-      <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
-      <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
-      <div style="height: 600px; margin-top: 16px">
-        <p-canvas-table
-          :data="bigData"
-          :columns="canvasTableColumns"
-          :config="{
-            HEIGHT: 500,
-          }"
-        />
+      <div v-if="currentView === 'canvasTable'">
+        <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
+        <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
+        <div style="height: 600px; margin-top: 16px">
+          <p-canvas-table
+            :data="bigData"
+            :columns="canvasTableColumns"
+            :config="{
+              HEIGHT: 500,
+            }"
+          />
+        </div>
       </div>
     </div>
   </div>

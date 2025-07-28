@@ -50,7 +50,7 @@ export interface RenderWorkshop {
   renderEdit?: (
     options: RenderOptions,
     params: RenderTableParams,
-    emit?: (e: 'change', value: any) => void,
+    emit?: (e: 'blur', value: any) => void,
   ) => any;
 }
 interface RenderFactory {
@@ -191,6 +191,7 @@ const renderBasic = (name: string) => {
     renderEdit(
       { props = antDefaultProps[name] ?? {}, attrs = {}, events = {}, defaultValue }: RenderOptions,
       { data, row, field }: RenderTableParams,
+      emit?: (e: 'blur', value: any[]) => void,
     ) {
       if (isGoodValue(defaultValue) && valued(field) && isBadValue(row[field!])) {
         row[field!] = defaultValue;
@@ -201,12 +202,20 @@ const renderBasic = (name: string) => {
           v-model:value={row[field]}
           {...attrs}
           {...merge({}, antDefaultProps[name], props)}
-          onChange={(...arg) => {
-            events.change?.({ data, row, field }, ...arg);
+          onBlur={(...args) => {
+            emit?.('blur', [row[field], ...args]);
+            events.blur?.({ data, row, field }, ...args);
           }}
         />
       ) : (
-        <DynamicComponent is={name} {...props} />
+        <DynamicComponent
+          is={name}
+          {...props}
+          onBlur={(...args) => {
+            emit?.('blur', args);
+            events.blur?.({ data, row, field }, ...args);
+          }}
+        />
       );
     },
   };
