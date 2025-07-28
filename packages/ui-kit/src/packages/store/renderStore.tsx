@@ -26,7 +26,7 @@ import { ButtonProps } from 'ant-design-vue/lib/button';
 import { isBadValue, isGoodValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
-import { computed, Ref, ref } from 'vue';
+import { computed, Ref } from 'vue';
 
 interface BtnOptions extends ButtonProps {
   content?: string;

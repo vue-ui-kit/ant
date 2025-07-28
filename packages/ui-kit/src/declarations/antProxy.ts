@@ -283,7 +283,8 @@ export interface RenderTableParams<D extends Recordable = Recordable> {
   title?: string;
 }
 export interface CanvasColumnProps<T extends Recordable = Recordable>
-  extends Omit<EVirtColumn, 'children' | 'formatter'> {
+  extends Omit<EVirtColumn, 'children' | 'formatter' | 'key'> {
+  key?: string;
   field?: string;
   children?: CanvasColumnProps<T>[];
   formatter?:

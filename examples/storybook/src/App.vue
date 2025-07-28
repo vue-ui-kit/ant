@@ -112,25 +112,25 @@
   );
   const canvasTableColumns: CanvasColumnProps<Student>[] = [
     {
-      key: '#',
+      field: '#',
       title: '',
       width: 80,
       type: 'selection',
       fixed: 'left',
     },
     {
-      key: 'id',
+      field: 'id',
       title: 'ID',
       width: 180,
     },
     {
-      key: 'name',
+      field: 'name',
       title: '姓名',
       minWidth: 300,
       render: 'capitalize',
     },
     {
-      key: 'enName',
+      field: 'enName',
       title: '英文名',
       width: 300,
       render: 'capitalize',
@@ -139,19 +139,20 @@
       },
     },
     {
-      key: 'age',
+      field: 'age',
       title: '年龄',
       width: 200,
       editRender: {
         name: '$number',
         props: {
-          min: 1,
+          min: 10,
           max: 120,
+          placeholder: '请输入年龄(10-120)',
         },
       },
     },
     {
-      key: 'gender',
+      field: 'gender',
       title: '性别',
       editRender: {
         name: '$select',
@@ -165,22 +166,22 @@
       width: 200,
     },
     {
-      key: 'class',
+      field: 'class',
       title: '班级',
       width: 200,
     },
     {
-      key: 'address',
+      field: 'address',
       title: '地址',
       width: 200,
     },
     {
-      key: 'phone',
+      field: 'phone',
       title: '电话',
       width: 200,
     },
     {
-      key: 'email',
+      field: 'email',
       title: '邮箱',
       slots: {
         edit: ({ row }) => {
@@ -208,22 +209,31 @@
       width: 200,
     },
     {
-      key: 'birthDate',
+      field: 'birthDate',
       title: '生日',
       width: 200,
     },
     {
-      key: 'createTime',
+      field: 'createTime',
       title: '创建时间',
       width: 200,
     },
     {
-      key: 'hobby',
+      field: 'hobby',
       title: '爱好',
       width: 200,
       slots: {
         default: ({ row, column, rowIndex }) => (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+          <div
+            style={{
+              display: 'flex',
+              height: '100%',
+              padding: '4px',
+              flexWrap: 'wrap',
+              gap: '4px',
+              alignItems: 'center',
+            }}
+          >
             {(row.hobby ?? []).map((o, index) => (
               <a-tag color="blue" key={index}>
                 {o}
@@ -234,7 +244,7 @@
       },
     },
     {
-      key: 'score',
+      field: 'score',
       title: '分数',
       width: 200,
       cellRender: {
@@ -573,6 +583,10 @@
         break;
     }
   };
+  const canvasTableConfig = ref({
+    DISABLED: true,
+    HEIGHT: 500,
+  });
 </script>
 
 <template>
@@ -652,13 +666,18 @@
       <div v-if="currentView === 'canvasTable'">
         <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
         <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
+        <div>
+          <span>编辑状态：</span>
+          <a-radio-group v-model:value="canvasTableConfig.DISABLED">
+            <a-radio-button :value="true">禁用</a-radio-button>
+            <a-radio-button :value="false">启用</a-radio-button>
+          </a-radio-group>
+        </div>
         <div style="height: 600px; margin-top: 16px">
           <p-canvas-table
             :data="bigData"
             :columns="canvasTableColumns"
-            :config="{
-              HEIGHT: 500,
-            }"
+            :config="canvasTableConfig"
           />
         </div>
       </div>

@@ -8,7 +8,6 @@
   import EVirtTable from 'e-virt-table';
   import type {
     Column as EVirtColumn,
-    ConfigType,
     CellParams,
     OverlayerContainer,
     FormatterMethod,
@@ -18,15 +17,7 @@
   import { isArray, isEqual, isFunction, isString, omit } from 'xe-utils';
   import renderStore from '@/store/renderStore';
   import RenderEditCell from './RenderEditCell';
-  import RenderAntCell from './RenderAntCell';
-  import type {
-    CanvasColumnProps,
-    CellFuncArg,
-    CanvasTableProps,
-    PFormatter,
-    FormatterFunc,
-    CellRender,
-  } from '#/antProxy';
+  import type { CanvasColumnProps, CanvasTableProps, FormatterFunc, CellRender } from '#/antProxy';
   import { v4 as uuidv4 } from 'uuid';
   import { antFormatters } from '@/utils/AFormatters';
 
@@ -34,6 +25,9 @@
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
     (e: 'ready', value: EVirtTable): void;
   }>();
+  const defaultConfig = {
+    DISABLED: true,
+  };
   const props = defineProps<CanvasTableProps<T, B>>();
   let eVirtTable: EVirtTable | null = null;
   const attrs = useAttrs();
@@ -134,7 +128,10 @@
       return;
     }
     eVirtTable = new EVirtTable(eVirtTableRef.value, {
-      config: props.config,
+      config: {
+        ...defaultConfig,
+        ...props.config,
+      },
       columns: props.columns.map((col) => parseToEVirtColumn(col)),
       data: props.data,
       emptyElement: eVirtTableEmptyRef.value || undefined,
@@ -168,9 +165,7 @@
     });
     emit('ready', eVirtTable);
   });
-  /* tbd 如果是相应式的话 可能不需要*/
   function saveCellValue(value) {
-    console.log('saveCellValue', value);
     if (!eVirtTable || !editorCell.value) {
       return;
     }
@@ -190,6 +185,13 @@
       if (!isEqual(newValue, oldValue)) {
         eVirtTable?.loadColumns(newValue.map((col) => parseToEVirtColumn(col)));
       }
+    },
+    { deep: true },
+  );
+  watch(
+    () => props.config,
+    (newValue) => {
+      eVirtTable?.loadConfig(newValue);
     },
     { deep: true },
   );
