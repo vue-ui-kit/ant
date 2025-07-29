@@ -14,12 +14,8 @@
       "import": "./dist/es/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./style": "./dist/style.css",
     "./style.css": "./dist/style.css",
-    "./style.scss": "./dist/style.scss",
-    "./dist/style.css": "./dist/style.css",
-    "./dist/style.scss": "./dist/style.scss",
-    "./package.json": "./package.json"
+    "./style.scss": "./src/packages/styles/index.scss"
   },
   "files": [
     "dist",
