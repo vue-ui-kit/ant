@@ -138,8 +138,8 @@
     });
     return cols;
   });
-  const formEl = ref();
-  const tableEl = ref();
+  const formEl = ref<InstanceType<typeof AForm>>();
+  const tableEl = ref<InstanceType<typeof ATable>>();
   const renderFormKey = ref(uuid_v4());
   const renderTableKey = ref(uuid_v4());
 

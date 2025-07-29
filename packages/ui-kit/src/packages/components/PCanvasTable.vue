@@ -24,6 +24,7 @@
 
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
+    (e: 'selectionChange', value: T[]): void;
     (e: 'ready', value: EVirtTable): void;
   }>();
 
@@ -31,7 +32,6 @@
   const props = withDefaults(defineProps<CanvasTableProps<T, B>>(), {
     config: () => ({}),
   });
-  const loading = ref(false);
   // 应用默认值 - 参考PGrid的模式
   const canvasTableDefaults = getCanvasTableDefaults();
   const propsWithDefaults = computed(() => ({
@@ -176,6 +176,7 @@
     });
     eVirtTable.on('selectionChange', (selection) => {
       selectedRecords.value = selection;
+      emit('selectionChange', selection);
     });
     emit('ready', eVirtTable);
   });
@@ -220,14 +221,20 @@
     },
     { deep: true },
   );
+  watch(
+    () => props.loading,
+    (n, p) => {
+      if (n !== p) {
+        eVirtTable?.setLoading(n);
+      }
+    },
+    { immediate: true },
+  );
   defineExpose({
     $table: eVirtTable,
     selectedRecords: computed(() => selectedRecords.value),
     reloadData: () => {
       eVirtTable?.loadData(props.data);
-    },
-    setLoading: (value: boolean) => {
-      loading.value = value;
     },
   });
 </script>

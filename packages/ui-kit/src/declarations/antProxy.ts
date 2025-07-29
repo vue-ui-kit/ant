@@ -327,6 +327,27 @@ export interface CanvasTableProps<
   data: T[];
   config?: ConfigType;
   footerData?: B[];
+  loading?: boolean;
+}
+
+export interface PCanvasGridProps<
+  D extends Recordable = Recordable,
+  F extends Recordable = Recordable,
+> {
+  selectConfig?: SelectConfig<D>;
+  manualFetch?: boolean;
+  formConfig?: PFormProps<F>;
+  columns: CanvasColumnProps<D>[];
+  toolbarConfig?: ToolbarConfig;
+  pageConfig?: PageConfig;
+  proxyConfig?: ProxyConfig<D, F>;
+  config?: ConfigType;
+  // 重置后不自动提交
+  lazyReset?: boolean;
+  /**
+   * 适应展示区到页面顶部的高度，通常和容器最上的y值有关（正比）
+   */
+  fitHeight?: number;
 }
 export interface PGridInstance<
   D extends Recordable = Recordable,

@@ -37,6 +37,10 @@
   // 族谱成员列表配置
   const familyColumns = [
     {
+      width: 10,
+      type: 'selection',
+    },
+    {
       field: 'name',
       width: 200,
       title: '姓名',
@@ -185,6 +189,7 @@
           <p-canvas-table
             :columns="familyColumns"
             :data="familyTreeData"
+            :config="{ HEIGHT: 500 }"
             @toolbar-button-click="handleToolbarBtn"
           />
         </div>
