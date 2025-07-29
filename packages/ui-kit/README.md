@@ -28,8 +28,11 @@ import Antd from 'ant-design-vue';
 import UIKit from '@vue-ui-kit/ant';
 
 // Import styles - choose one of the following methods:
-// Method 1: Import SCSS source files (recommended, allows variable override)
+// Method 1: Import SCSS source files (for development, allows variable override)
 import '@vue-ui-kit/ant/style.scss';
+
+// Method 1.1: Import compiled SCSS file (for production, standalone file)
+// import '@vue-ui-kit/ant/dist/style.scss';
 
 // Method 2: Import compiled CSS file
 // import '@vue-ui-kit/ant/style.css';
@@ -69,6 +72,8 @@ If you encounter issues with the standard import, try these alternatives:
 
 ```scss
 // In your main.scss file
+@use '@vue-ui-kit/ant/dist/style.scss';
+// or
 @import '@vue-ui-kit/ant/dist/style.scss';
 ```
 
@@ -117,8 +122,10 @@ import '@vue-ui-kit/ant/dist/style.css';
 ### 方法3: SCSS @use 语法
 
 ```scss
+// 开发环境（源码文件）
 @use '@vue-ui-kit/ant/style.scss';
-// 或者使用完整路径
+
+// 生产环境（编译后的独立文件）
 @use '@vue-ui-kit/ant/dist/style.scss';
 ```
 
