@@ -12,6 +12,7 @@ export interface UIKitConfig {
     align?: 'left' | 'right' | 'center';
     lazyReset?: boolean;
     fitHeight?: number;
+    fitCanvasHeight?: number;
   };
   canvasTable?: ConfigType;
 }

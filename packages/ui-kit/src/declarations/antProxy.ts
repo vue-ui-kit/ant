@@ -227,6 +227,10 @@ export type PGridProps<D extends Recordable = Recordable, F extends Recordable =
    */
   fitHeight?: number;
   /**
+   * 适应展示区到页面顶部的canvas渲染高度 通常比table的小
+   */
+  fitCanvasHeight?: number;
+  /**
    * 虚拟列表 Y区计算高度
    */
   renderY?: number;

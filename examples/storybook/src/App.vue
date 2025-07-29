@@ -12,6 +12,7 @@
   import PFormExample from './view/PFormExample.vue';
   import PFormGroupExample from './view/PFormGroupExample.vue';
   import PCanvasTableExample from './view/PCanvasTableExample.vue';
+  import PCanvasGridExample from './view/PCanvasGridExample.vue';
   import PromisePickerExample from './view/PromisePickerExample.vue';
   import FamilyTreeExample from './view/FamilyTreeExample.vue';
 
@@ -19,7 +20,7 @@
 
   // 当前展示模式
   const currentView = ref<
-    'grid' | 'form' | 'group' | 'canvasTable' | 'promisePicker' | 'familyTree'
+    'grid' | 'form' | 'group' | 'canvasTable' | 'canvasGrid' | 'promisePicker' | 'familyTree'
   >('grid');
 </script>
 
@@ -51,6 +52,12 @@
           @click="currentView = 'canvasTable'"
         >
           PCanvasTable 示例
+        </a-button>
+        <a-button
+          :type="currentView === 'canvasGrid' ? 'primary' : 'default'"
+          @click="currentView = 'canvasGrid'"
+        >
+          PCanvasGrid 示例
         </a-button>
         <a-button
           :type="currentView === 'promisePicker' ? 'primary' : 'default'"
@@ -86,6 +93,11 @@
       <!-- PCanvasTable 示例 -->
       <div v-if="currentView === 'canvasTable'">
         <p-canvas-table-example />
+      </div>
+
+      <!-- PCanvasGrid 示例 -->
+      <div v-if="currentView === 'canvasGrid'">
+        <p-canvas-grid-example />
       </div>
 
       <!-- PromisePicker 示例 -->

@@ -28,6 +28,7 @@
     uniq,
   } from 'xe-utils';
   import {
+    CanvasColumnProps,
     PCanvasGridProps,
     PCanvasTableInstance,
     PFormItemProps,
@@ -46,7 +47,6 @@
     Spin as ASpin,
     Pagination as APagination,
   } from 'ant-design-vue';
-  import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
   import { DownOutlined } from '@ant-design/icons-vue';
   import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
   import { eachTree } from '@/utils/treeHelper';
@@ -78,7 +78,7 @@
       ...props.config,
     },
     lazyReset: props.lazyReset ?? gridDefaults.lazyReset ?? false,
-    fitHeight: props.fitHeight ?? gridDefaults.fitHeight ?? 170,
+    fitCanvasHeight: props.fitHeight ?? gridDefaults.fitCanvasHeight ?? 100,
   }));
   const mode = computed<'list' | 'pagination' | 'bad'>(() =>
     proxyConfig.value && proxyConfig.value.ajax
@@ -260,9 +260,9 @@
           });
       }
     });
-  const handleTableChange = (p: TablePaginationConfig, _filters, _sorter) => {
-    pagination.page = p.current!;
-    pagination.size = p.pageSize!;
+  const handleTableChange = (current: number, pageSize: number) => {
+    pagination.page = current;
+    pagination.size = pageSize;
     return fetchData();
   };
   const resetPage = () => {
@@ -307,6 +307,19 @@
         break;
     }
   };
+  const finalColumns = computed<CanvasColumnProps<D>[]>(() =>
+    selectConfig.value?.multiple
+      ? [
+          {
+            type: 'selection',
+            width: 40,
+            widthFillDisable: true,
+            title: '',
+          },
+          ...columns.value,
+        ]
+      : columns.value,
+  );
   const resetQueryFormData = (lazy?: boolean) => {
     if (formConfig.value && formConfig.value.items.length > 0) {
       if (formConfig.value.customReset) {
@@ -354,7 +367,7 @@
     const showCountHeight = selectConfig.value?.showCount ? 22 : 0;
     renderHeight.value =
       toNumber(ph.replace('px', '')) -
-      propsWithDefaults.value.fitHeight -
+      propsWithDefaults.value.fitCanvasHeight -
       (props.toolbarConfig ? 30 : 0) -
       formHeight -
       showCountHeight;
@@ -432,7 +445,7 @@
       </div>
       <div
         v-if="toolbarConfig"
-        class="p-toolbar-wrapper flex items-center w-full justify-between p-theme-bg pt-8px px-16px"
+        class="p-canvas-toolbar-wrapper flex items-center w-full justify-between p-theme-bg pt-8px px-16px"
       >
         <div class="flex items-center flex-1 gap-4px">
           <template v-if="toolbarConfig.buttons && toolbarConfig.buttons.length > 0">
@@ -496,7 +509,7 @@
         </div>
         <p-canvas-table
           ref="canvasTableRef"
-          :columns="columns"
+          :columns="finalColumns"
           :config="{
             ...config,
             HEIGHT: renderHeight,
@@ -504,11 +517,11 @@
           @selection-change="handleSelectionChange"
           :data="tableData"
           :loading="loading.table"
-          :selected-row-keys="selectedRowKeys"
-          :selected-records="selectedRecords"
         />
         <a-pagination
+          class="p-canvas-pagination"
           v-if="mode === 'pagination'"
+          size="small"
           :current="pagination.page"
           :page-size="pagination.size"
           :total="totalCount"

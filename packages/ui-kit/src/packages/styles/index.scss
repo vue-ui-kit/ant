@@ -5,7 +5,9 @@
   padding: 16px;
   border-radius: 4px;
 }
-
+.text-slate-5 {
+  color: #64748b;
+}
 /* #region patch for env without unocss/tailwind/windicss */
 .w-full {
   width: 100%;
@@ -99,6 +101,9 @@
   .p-form-wrapper {
     z-index: 4;
   }
+  .p-canvas-pagination.ant-pagination {
+    padding: 16px 0;
+  }
   .p-error-hang-out {
     .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(
         .ant-input-affix-wrapper-borderless
@@ -136,6 +141,10 @@
     box-shadow: 0 8px #fff;
     border-radius: 0.5em 0.5em 0 0;
     margin-bottom: -0.5em;
+  }
+  .p-canvas-toolbar-wrapper {
+    box-shadow: 0 8px #fff;
+    border-radius: 0.5em 0.5em 0 0;
   }
 
   .ant-form {

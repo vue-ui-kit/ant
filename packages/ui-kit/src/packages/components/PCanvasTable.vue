@@ -193,7 +193,6 @@
   watch(
     () => props.data,
     (newValue) => {
-      console.log('newValue', newValue);
       eVirtTable?.loadData(newValue);
     },
     { deep: true },
