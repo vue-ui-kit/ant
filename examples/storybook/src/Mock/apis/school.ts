@@ -7,6 +7,7 @@ export const students: Student[] = Array.from(
   },
   (_i, index) => ({
     id: index,
+    age: Math.floor(Math.random() * 100),
     name: numberToCNName(index),
     enName: numberToLetters(index),
     score: Math.floor(Math.random() * 100),

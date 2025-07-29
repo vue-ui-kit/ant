@@ -40,6 +40,12 @@
         field: 'age',
         width: 80,
         title: '年龄',
+        cellRender: {
+          name: '$number',
+          props: {
+            disabled: true,
+          },
+        },
       },
       {
         field: 'grade',

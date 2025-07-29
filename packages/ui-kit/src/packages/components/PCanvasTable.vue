@@ -302,6 +302,7 @@
               <component
                 v-if="typeof cell.render === 'function'"
                 :is="cell.render(cell)"
+                :bordered="false"
               ></component>
               <template
                 v-else-if="typeof cell.render === 'string' && cell.render.startsWith('slot:')"
