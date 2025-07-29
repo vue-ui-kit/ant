@@ -12,3 +12,6 @@ export * from './project';
 
 // 导出订单相关接口
 export * from './order';
+
+// 导出族谱相关接口
+export * from './family';

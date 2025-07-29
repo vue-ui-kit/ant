@@ -13,11 +13,14 @@
   import PFormGroupExample from './view/PFormGroupExample.vue';
   import PCanvasTableExample from './view/PCanvasTableExample.vue';
   import PromisePickerExample from './view/PromisePickerExample.vue';
+  import FamilyTreeExample from './view/FamilyTreeExample.vue';
 
   const { Title } = Typography;
 
   // 当前展示模式
-  const currentView = ref<'grid' | 'form' | 'group' | 'canvasTable' | 'promisePicker'>('grid');
+  const currentView = ref<
+    'grid' | 'form' | 'group' | 'canvasTable' | 'promisePicker' | 'familyTree'
+  >('grid');
 </script>
 
 <template>
@@ -55,6 +58,12 @@
         >
           PromisePicker 示例
         </a-button>
+        <a-button
+          :type="currentView === 'familyTree' ? 'primary' : 'default'"
+          @click="currentView = 'familyTree'"
+        >
+          族谱树示例
+        </a-button>
       </a-space>
     </div>
     <a-divider />
@@ -82,6 +91,11 @@
       <!-- PromisePicker 示例 -->
       <div v-if="currentView === 'promisePicker'">
         <promise-picker-example />
+      </div>
+
+      <!-- 族谱树示例 -->
+      <div v-if="currentView === 'familyTree'">
+        <family-tree-example />
       </div>
     </div>
   </div>

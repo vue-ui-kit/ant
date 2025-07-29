@@ -6,7 +6,7 @@
   border-radius: 4px;
 }
 
-//region patch for env without unocss/tailwind/windicss
+/* #region patch for env without unocss/tailwind/windicss */
 .w-full {
   width: 100%;
 }
@@ -88,9 +88,9 @@
   overflow-y: auto;
 }
 
-//endregion
+/* #endregion */
 
-//region P family styles
+/* #region P family styles */
 .p-theme-bg {
   background-color: var(--p-theme-bg);
 }
@@ -295,10 +295,12 @@
     justify-content: flex-start;
   }
 }
-//endregion
+/* #endregion */
 
 /* #region EVirtTable */
-
+// .canvas-cell{
+// tbd
+// }
 /* #endregion */
 
 @each $align in right center {

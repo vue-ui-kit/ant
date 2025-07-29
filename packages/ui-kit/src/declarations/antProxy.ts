@@ -325,9 +325,8 @@ export interface CanvasTableProps<
 > {
   columns: CanvasColumnProps<T>[];
   data: T[];
-  config: ConfigType;
+  config?: ConfigType;
   footerData?: B[];
-  loading?: boolean;
 }
 export interface PGridInstance<
   D extends Recordable = Recordable,
@@ -375,4 +374,5 @@ export interface PFormGroupInstance {
 export interface PCanvasTableInstance<T extends Recordable = Recordable> {
   $table: InstanceType<typeof EVirtTable>;
   selectedRecords: T[];
+  setLoading: (value: boolean) => void;
 }

@@ -1,4 +1,5 @@
 import { PFormProps, PGridProps } from '#/antProxy';
+import { ConfigType } from 'e-virt-table';
 import { clone } from 'xe-utils';
 
 // 全局配置接口
@@ -12,6 +13,7 @@ export interface UIKitConfig {
     lazyReset?: boolean;
     fitHeight?: number;
   };
+  canvasTable?: ConfigType;
 }
 
 // 默认配置
@@ -24,6 +26,9 @@ const defaultConfig: UIKitConfig = {
     align: 'left',
     lazyReset: false,
     fitHeight: 170,
+  },
+  canvasTable: {
+    DISABLED: true,
   },
 };
 
@@ -40,6 +45,10 @@ export function setUIKitConfig(config: Partial<UIKitConfig>): void {
     grid: {
       ...currentConfig.grid,
       ...config.grid,
+    },
+    canvasTable: {
+      ...currentConfig.canvasTable,
+      ...config.canvasTable,
     },
   };
 }
@@ -66,7 +75,12 @@ export function getGridDefaults(): Partial<PGridProps> {
   };
 }
 
+// 获取CanvasTable默认配置
+export function getCanvasTableDefaults(): ConfigType {
+  return currentConfig.canvasTable || ({} as ConfigType);
+}
+
 // 重置为默认配置
 export function resetUIKitConfig(): void {
   currentConfig = JSON.parse(JSON.stringify(defaultConfig));
-} 
+}

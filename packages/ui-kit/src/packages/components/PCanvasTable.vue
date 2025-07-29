@@ -20,16 +20,28 @@
   import type { CanvasColumnProps, CanvasTableProps, FormatterFunc, CellRender } from '#/antProxy';
   import { v4 as uuidv4 } from 'uuid';
   import { antFormatters } from '@/utils/AFormatters';
+  import { getCanvasTableDefaults } from '@/utils/config';
 
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
     (e: 'ready', value: EVirtTable): void;
   }>();
-  const defaultConfig = {
-    DISABLED: true,
-  };
+
   const selectedRecords = ref<T[]>([]);
-  const props = defineProps<CanvasTableProps<T, B>>();
+  const props = withDefaults(defineProps<CanvasTableProps<T, B>>(), {
+    config: () => ({}),
+  });
+  const loading = ref(false);
+  // 应用默认值 - 参考PGrid的模式
+  const canvasTableDefaults = getCanvasTableDefaults();
+  const propsWithDefaults = computed(() => ({
+    ...props,
+    config: {
+      DISABLED: true, // 内部写死的默认配置
+      ...canvasTableDefaults, // 全局配置
+      ...props.config, // 用户传入的配置
+    },
+  }));
   let eVirtTable: EVirtTable | null = null;
   const attrs = useAttrs();
   const eVirtTableRef = ref(null);
@@ -129,10 +141,7 @@
       return;
     }
     eVirtTable = new EVirtTable(eVirtTableRef.value, {
-      config: {
-        ...defaultConfig,
-        ...props.config,
-      },
+      config: propsWithDefaults.value.config,
       columns: props.columns.map((col) => parseToEVirtColumn(col)),
       data: props.data,
       footerData: props.footerData,
@@ -181,8 +190,9 @@
     return document.body;
   };
   watch(
-    props.data,
+    () => props.data,
     (newValue) => {
+      console.log('newValue', newValue);
       eVirtTable?.loadData(newValue);
     },
     { deep: true },
@@ -197,7 +207,7 @@
     { deep: true },
   );
   watch(
-    () => props.config,
+    () => propsWithDefaults.value.config,
     (newValue) => {
       eVirtTable?.loadConfig(newValue);
     },
@@ -213,6 +223,12 @@
   defineExpose({
     $table: eVirtTable,
     selectedRecords: computed(() => selectedRecords.value),
+    reloadData: () => {
+      eVirtTable?.loadData(props.data);
+    },
+    setLoading: (value: boolean) => {
+      loading.value = value;
+    },
   });
 </script>
 <template>
@@ -272,7 +288,7 @@
         >
           <div :style="view.style" v-for="view in wrapper.views" :key="view.key">
             <div
-              class="cell"
+              class="canvas-cell"
               v-for="cell in view.cells"
               :key="`${cell.rowKey}_${cell.key}`"
               :style="cell.style"
