@@ -39,7 +39,13 @@
   import { defaultLabelCol } from '@/utils/core';
   import Icon from '@/renders/Icon';
   import { $confirm, $error, $success, $warning } from '@/hooks/useMessage';
-  import { Button as AButton, Form as AForm, Row as ARow, Spin as ASpin } from 'ant-design-vue';
+  import {
+    Button as AButton,
+    Form as AForm,
+    Row as ARow,
+    Spin as ASpin,
+    Pagination as APagination,
+  } from 'ant-design-vue';
   import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
   import { DownOutlined } from '@ant-design/icons-vue';
   import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
@@ -254,7 +260,11 @@
           });
       }
     });
-
+  const handleTableChange = (p: TablePaginationConfig, _filters, _sorter) => {
+    pagination.page = p.current!;
+    pagination.size = p.pageSize!;
+    return fetchData();
+  };
   const resetPage = () => {
     pagination.page = 1;
     pageSelections.value = {};
@@ -496,6 +506,13 @@
           :loading="loading.table"
           :selected-row-keys="selectedRowKeys"
           :selected-records="selectedRecords"
+        />
+        <a-pagination
+          v-if="mode === 'pagination'"
+          :current="pagination.page"
+          :page-size="pagination.size"
+          :total="totalCount"
+          @change="handleTableChange"
         />
       </div>
     </template>
