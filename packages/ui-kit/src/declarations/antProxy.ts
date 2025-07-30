@@ -338,7 +338,11 @@ export interface PCanvasGridProps<
   D extends Recordable = Recordable,
   F extends Recordable = Recordable,
 > {
-  selectConfig?: SelectConfig<D>;
+  staticConfig?: {
+    selectable?: boolean;
+    showCount?: boolean;
+    tree?: boolean;
+  };
   manualFetch?: boolean;
   formConfig?: PFormProps<F>;
   columns: CanvasColumnProps<D>[];

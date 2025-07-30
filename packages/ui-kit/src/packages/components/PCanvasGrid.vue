@@ -65,7 +65,7 @@
     (event: 'resetQuery'): void;
   }>();
 
-  const { formConfig, pageConfig, columns, toolbarConfig, proxyConfig, config, selectConfig } =
+  const { formConfig, pageConfig, columns, toolbarConfig, proxyConfig, config, staticConfig } =
     toRefs(props);
   const gridDefaults = getGridDefaults();
   const canvasTableDefaults = getCanvasTableDefaults();
@@ -307,19 +307,40 @@
         break;
     }
   };
-  const finalColumns = computed<CanvasColumnProps<D>[]>(() =>
-    selectConfig.value?.multiple
-      ? [
-          {
-            type: 'selection',
+  const finalColumns = computed<CanvasColumnProps<D>[]>(() => {
+    if (!staticConfig.value || (!staticConfig.value.selectable && !staticConfig.value.tree)) {
+      return columns.value;
+    }
+    const firstColumn: CanvasColumnProps<D> =
+      staticConfig.value.selectable && staticConfig.value.tree
+        ? {
+            type: 'tree-selection',
             width: 40,
             widthFillDisable: true,
             title: '',
-          },
-          ...columns.value,
-        ]
-      : columns.value,
-  );
+          }
+        : staticConfig.value.selectable
+          ? {
+              type: 'selection',
+              width: 40,
+              widthFillDisable: true,
+              title: '',
+            }
+          : staticConfig.value.tree
+            ? {
+                type: 'tree',
+                width: 40,
+                widthFillDisable: true,
+                title: '',
+              }
+            : {
+                type: 'index',
+                width: 40,
+                widthFillDisable: true,
+                title: '',
+              };
+    return [firstColumn, ...columns.value];
+  });
   const resetQueryFormData = (lazy?: boolean) => {
     if (formConfig.value && formConfig.value.items.length > 0) {
       if (formConfig.value.customReset) {
@@ -364,7 +385,7 @@
     const formHeight = formOriginHeight.includes('px')
       ? toNumber(formOriginHeight.replace('px', ''))
       : 0;
-    const showCountHeight = selectConfig.value?.showCount ? 22 : 0;
+    const showCountHeight = staticConfig.value?.showCount ? 22 : 0;
     renderHeight.value =
       toNumber(ph.replace('px', '')) -
       propsWithDefaults.value.fitCanvasHeight -
@@ -502,7 +523,7 @@
       </div>
       <div :class="`p-pane flex-1 h-0 p-inner-scroll`">
         <div
-          v-if="selectConfig?.multiple && selectConfig.showCount"
+          v-if="staticConfig?.selectable && staticConfig.showCount"
           class="w-full text-slate-5 pl-4"
         >
           已选：{{ selectedRowKeys.length }}
