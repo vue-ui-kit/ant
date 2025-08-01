@@ -52,7 +52,10 @@
     { content: '复制', code: 'copy' },
     { content: '删除', code: 'delete' },
   ];
-  const getPopupContainer = () => rootRef.value?.$el ?? document.body;
+  const getPopupContainer = (el) =>
+    el?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement ??
+    rootRef.value?.$el ??
+    document.body;
   // 实际是否强制渲染
   const fr = computed(() => {
     return props.forceRender || model.value.length <= 5;

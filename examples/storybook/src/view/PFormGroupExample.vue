@@ -20,7 +20,9 @@
     title: '项目管理',
     showAdd: true,
     tabLabel: '项目',
-    max: 5,
+    max: 115,
+    editAble: true,
+    itemMenus: [{ content: '测试', code: 'test' }],
     getFormSetting: (data) => ({
       labelCol: { span: 6 },
       wrapperCol: { span: 16 },
