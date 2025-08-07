@@ -1,7 +1,8 @@
 import { ColumnProps, Responsive } from '#/antProxy';
 import { TableColumnGroupType, TableColumnType } from 'ant-design-vue';
-import { isArray, isNumber, omit, zipObject } from 'xe-utils';
+import { clone, isArray, isNumber, omit, zipObject } from 'xe-utils';
 import { valued } from '@/utils/is';
+import { toValue, watch, WatchCallback, WatchOptions, WatchSource } from 'vue';
 
 export const cleanCol = (col: ColumnProps): TableColumnType | TableColumnGroupType<Recordable> => {
   return {
@@ -50,3 +51,23 @@ export const getButtonResponsive = (itemResponsive: number | Responsive[]) => {
     ),
   );
 };
+
+export function watchPreviousDeep<T extends object>(
+  source: WatchSource<T>,
+  cb: (value: T, oldValue: T, onCleanup: () => void) => void,
+  options?: WatchOptions,
+) {
+  const val = toValue(source);
+  if (typeof val !== 'object' || val === null) {
+    return watch(source, cb as WatchCallback<T>, options);
+  }
+  let previousValue = clone(val) as T;
+  return watch(
+    source,
+    (crtValue, _, onCleanup) => {
+      cb(crtValue as T, previousValue, onCleanup as () => void);
+      previousValue = clone(crtValue) as T;
+    },
+    options,
+  );
+}

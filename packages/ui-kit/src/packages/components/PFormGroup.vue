@@ -52,7 +52,7 @@
     { content: '复制', code: 'copy' },
     { content: '删除', code: 'delete' },
   ];
-  const getPopupContainer = (el) =>
+  const getPopupContainer = (el: HTMLElement) =>
     el?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement ??
     rootRef.value?.$el ??
     document.body;

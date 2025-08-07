@@ -21,6 +21,7 @@
   import { v4 as uuidv4 } from 'uuid';
   import { antFormatters } from '@/utils/AFormatters';
   import { getCanvasTableDefaults } from '@/utils/config';
+  import { watchPreviousDeep } from '@/utils/core';
 
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
@@ -197,7 +198,7 @@
     },
     { deep: true },
   );
-  watch(
+  watchPreviousDeep(
     () => props.columns,
     (newValue, oldValue) => {
       if (!isEqual(newValue, oldValue)) {
