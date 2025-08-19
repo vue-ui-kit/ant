@@ -19,11 +19,12 @@
   import { valued } from '@/utils/is';
   import { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
   import { $warning } from '@/hooks/useMessage';
+  import CollapseCard from './CollapseCard.vue';
 
   const useForm = Form.useForm;
   const tabsRef = ref<InstanceType<typeof Tabs>>();
   const props = defineProps<PFormGroupProps<F>>();
-  const rootRef = ref<InstanceType<typeof ACard>>();
+  const rootRef = ref<InstanceType<typeof CollapseCard>>();
   const model = defineModel({
     type: Array as PropType<Partial<F & { __index: number }>[]>,
     default: () => [],
@@ -146,6 +147,12 @@
     }
   });
   defineExpose({
+    collapse: () => {
+      rootRef.value?.collapse?.();
+    },
+    expand: () => {
+      rootRef.value?.expand?.();
+    },
     activeKey: computed(() => activeKey.value),
     setActiveKey,
     validateAll: () => {
@@ -227,7 +234,13 @@
   });
 </script>
 <template>
-  <a-card ref="rootRef" :title="title" size="small">
+  <collapse-card
+    ref="rootRef"
+    :title="title"
+    size="small"
+    :collapsible="collapsible"
+    :default-collapsed="defaultCollapsed"
+  >
     <a-spin v-if="loading" class="w-full" />
     <a-tabs
       v-else
@@ -281,5 +294,5 @@
         />
       </a-tab-pane>
     </a-tabs>
-  </a-card>
+  </collapse-card>
 </template>

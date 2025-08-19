@@ -22,6 +22,8 @@
     tabLabel: '项目',
     max: 115,
     editAble: true,
+    collapsible: true,
+    defaultCollapsed: true,
     itemMenus: [{ content: '测试', code: 'test' }],
     getFormSetting: (data) => ({
       labelCol: { span: 6 },

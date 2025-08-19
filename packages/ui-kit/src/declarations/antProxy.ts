@@ -120,6 +120,10 @@ export interface PFormGroupProps<F extends Recordable = Recordable> {
   tabLabel?: string;
   editAble?: boolean;
   showAdd?: boolean;
+  /* 是否启用折叠 */
+  collapsible?: boolean;
+  /** 是否默认折叠 */
+  defaultCollapsed?: boolean;
   lazyErrorMark?: boolean;
   forceRender?: boolean;
   /* 是否保持连续编号 */
@@ -399,6 +403,8 @@ export interface PFormGroupInstance {
   validateAll: () => Promise<void>;
   validate: (index: number, ignoreTabError?: boolean) => Promise<void>;
   validateFields: (index: number, fields: string[], ignoreTabError?: boolean) => Promise<void>;
+  collapse: () => void;
+  expand: () => void;
 }
 export interface PCanvasTableInstance<T extends Recordable = Recordable> {
   $table: InstanceType<typeof EVirtTable>;
