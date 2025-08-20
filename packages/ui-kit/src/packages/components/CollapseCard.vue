@@ -44,27 +44,3 @@
     <slot />
   </a-card>
 </template>
-
-<style scoped lang="scss">
-  //样式改成card样式
-  .collapsible-card {
-    background-color: #fff;
-    border-color: #f0f0f0;
-    :deep(.ant-collapse-header) {
-      padding: 0 12px;
-      min-height: 38px;
-      display: flex;
-      align-items: center;
-      font-weight: 600;
-    }
-    :deep(.ant-collapse-content) {
-      border-color: #f0f0f0;
-      .ant-collapse-content-box {
-        padding: var(--collapsible-card-body-padding, 12px);
-      }
-    }
-    :deep(.ant-collapse-item) {
-      border-color: #f0f0f0;
-    }
-  }
-</style>
