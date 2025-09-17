@@ -314,7 +314,7 @@
     const firstColumn: CanvasColumnProps<D> =
       staticConfig.value.selectable && staticConfig.value.tree
         ? {
-            type: 'tree-selection',
+            type: 'selection-tree',
             width: 40,
             widthFillDisable: true,
             title: '',

@@ -26,7 +26,7 @@ import { ButtonProps } from 'ant-design-vue/lib/button';
 import { isBadValue, isGoodValue, valued } from '@/utils/is';
 import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
-import { computed, Ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 
 interface BtnOptions extends ButtonProps {
   content?: string;
@@ -210,12 +210,20 @@ const renderBasic = (name: string) => {
     },
   };
 };
-
-const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
+type GetPopupContainer = () => HTMLElement;
+const renderBtn = (
+  btnOpt: BtnOptions,
+  params: RenderTableParams,
+  getPopupContainer?: GetPopupContainer,
+) =>
   btnOpt.dropdowns &&
   btnOpt.dropdowns.length > 0 &&
   btnOpt.dropdowns.filter((f) => !f.hiddenIf?.(params)).length > 0 ? (
-    <Dropdown>
+    <Dropdown
+      getPopupContainer={
+        getPopupContainer ?? (() => document.querySelector('.p-wrapper') as HTMLElement)
+      }
+    >
       {{
         default: () => (
           <Button
@@ -236,7 +244,7 @@ const renderBtn = (btnOpt: BtnOptions, params: RenderTableParams) =>
           <div class={`dropdown-wrapper ${btnOpt?.dynamicClassName?.(params) ?? ''}`}>
             {btnOpt
               .dropdowns!.filter((f) => !f.hiddenIf?.(params))
-              .map((b) => renderBtn(b, params))}
+              .map((b) => renderBtn(b, params, getPopupContainer))}
           </div>
         ),
       }}
@@ -456,20 +464,31 @@ const renders: RenderFactory = {
   },
   ButtonTree: {
     renderDefault({ children = [], props = {} as Recordable }, params: RenderTableParams) {
+      const spanRef = ref<HTMLElement | null>(null);
       return (
-        <span class={props.noGap ? 'align-no-gap-box' : 'align-gap-box'}>
+        <span ref={spanRef} class={props.noGap ? 'align-no-gap-box' : 'align-gap-box'}>
           {(children as BtnOptions[])
             .filter((f) => !f.hiddenIf?.(params))
-            .map((item) => renderBtn(item, params)) ?? []}
+            .map((item) =>
+              renderBtn(item, params, () => {
+                return (
+                  spanRef.value?.parentElement?.parentElement?.parentElement?.parentElement ||
+                  document.body
+                );
+              }),
+            ) ?? []}
         </span>
       );
     },
   },
   $radio: {
     renderItemContent(
-      { props = {}, events = {}, options }: RenderOptions,
+      { props = {}, events = {}, options, defaultValue }: RenderOptions,
       { data, field }: RenderFormParams,
     ) {
+      if (isGoodValue(defaultValue) && valued(field) && isBadValue(data[field!])) {
+        data[field!] = defaultValue;
+      }
       return valued(field) ? (
         <RadioGroup
           v-model:value={data[field!]}
@@ -518,9 +537,12 @@ const renders: RenderFactory = {
   },
   $switch: {
     renderItemContent(
-      { props = {}, events = {} }: RenderOptions,
+      { props = {}, events = {}, defaultValue }: RenderOptions,
       { data, field }: RenderFormParams,
     ) {
+      if (isGoodValue(defaultValue) && valued(field) && isBadValue(data[field!])) {
+        data[field!] = defaultValue;
+      }
       return valued(field) ? (
         <Switch
           v-model:checked={data[field!]}
@@ -534,9 +556,12 @@ const renders: RenderFactory = {
   },
   $checkbox: {
     renderItemContent(
-      { props = {}, options, events = {} }: RenderOptions,
+      { props = {}, options, events = {}, defaultValue }: RenderOptions,
       { data, field }: RenderFormParams,
     ) {
+      if (isGoodValue(defaultValue) && valued(field) && isBadValue(data[field!])) {
+        data[field!] = defaultValue;
+      }
       return valued(field) ? (
         <CheckboxGroup
           v-model:value={data[field!]}
@@ -596,11 +621,14 @@ const renders: RenderFactory = {
   },
   PercentInput: {
     renderItemContent(
-      { props = {}, attrs = {} }: RenderOptions,
+      { props = {}, attrs = {}, defaultValue }: RenderOptions,
       { data, field }: RenderFormParams,
     ) {
       const rate = props.parse ? 100 : 1;
       if (valued(field)) {
+        if (isGoodValue(defaultValue) && isBadValue(data[field!])) {
+          data[field!] = defaultValue;
+        }
         const percentage = computed({
           get: () => (data[field!] ?? 0) * rate,
           set: (val) => {
