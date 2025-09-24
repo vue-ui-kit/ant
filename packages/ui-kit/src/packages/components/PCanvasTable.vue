@@ -38,6 +38,7 @@
   const propsWithDefaults = computed(() => ({
     ...props,
     config: {
+      AUTO_ROW_HEIGHT: true,
       DISABLED: true, // 内部写死的默认配置
       ...canvasTableDefaults, // 全局配置
       ...props.config, // 用户传入的配置
@@ -299,6 +300,7 @@
               v-for="cell in view.cells"
               :key="`${cell.rowKey}_${cell.key}`"
               :style="cell.style"
+              v-bind="cell.domDataset"
             >
               <component
                 v-if="typeof cell.render === 'function'"

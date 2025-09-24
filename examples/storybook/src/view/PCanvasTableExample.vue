@@ -55,8 +55,9 @@
           'reading',
           'swimming',
         ],
-        Math.floor(Math.random() * 3),
+        Math.floor(Math.random() * 6),
       ),
+      grade: `grade${Math.floor(Math.random() * 6)}`,
       isStudent: Math.random() > 0.5,
       isTeacher: Math.random() > 0.5,
       isAdmin: Math.random() > 0.5,
@@ -136,6 +137,31 @@
       width: 200,
     },
     {
+      field: 'hobby',
+      title: '爱好',
+      width: 200,
+      slots: {
+        default: ({ row, column, rowIndex }) => (
+          <div
+            style={{
+              display: 'flex',
+              height: '100%',
+              padding: '4px',
+              flexWrap: 'wrap',
+              gap: '4px',
+              alignItems: 'center',
+            }}
+          >
+            {(row.hobby ?? []).map((o, index) => (
+              <a-tag color="blue" key={index}>
+                {o}
+              </a-tag>
+            ))}
+          </div>
+        ),
+      },
+    },
+    {
       field: 'address',
       title: '地址',
       width: 200,
@@ -185,31 +211,7 @@
       title: '创建时间',
       width: 200,
     },
-    {
-      field: 'hobby',
-      title: '爱好',
-      width: 200,
-      slots: {
-        default: ({ row, column, rowIndex }) => (
-          <div
-            style={{
-              display: 'flex',
-              height: '100%',
-              padding: '4px',
-              flexWrap: 'wrap',
-              gap: '4px',
-              alignItems: 'center',
-            }}
-          >
-            {(row.hobby ?? []).map((o, index) => (
-              <a-tag color="blue" key={index}>
-                {o}
-              </a-tag>
-            ))}
-          </div>
-        ),
-      },
-    },
+
     {
       field: 'score',
       title: '分数',
