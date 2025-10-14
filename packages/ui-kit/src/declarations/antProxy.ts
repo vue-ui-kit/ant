@@ -166,8 +166,9 @@ export interface ToolbarConfig {
   buttons?: Array<ToolbarButtonProps>;
   tools?: Array<{
     code: string;
-    icon: string;
+    icon?: string;
     type?: ButtonType;
+    content?: string;
     disabled?: boolean;
     size?: 'small' | 'large' | 'middle';
   }>;
