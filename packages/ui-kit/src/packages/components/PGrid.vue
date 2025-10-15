@@ -583,7 +583,8 @@
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
-              <Icon :icon="tool.icon" />
+              <Icon v-if="tool.icon" :icon="tool.icon" />
+              {{ tool.content }}
             </a-button>
           </template>
         </span>
