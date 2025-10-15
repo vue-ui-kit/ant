@@ -61,12 +61,12 @@ export function watchPreviousDeep<T extends object>(
   if (typeof val !== 'object' || val === null) {
     return watch(source, cb as WatchCallback<T>, options);
   }
-  let previousValue = clone(val) as T;
+  let previousValue = clone(val, true) as T;
   return watch(
     source,
     (crtValue, _, onCleanup) => {
       cb(crtValue as T, previousValue, onCleanup as () => void);
-      previousValue = clone(crtValue) as T;
+      previousValue = clone(crtValue, true) as T;
     },
     options,
   );

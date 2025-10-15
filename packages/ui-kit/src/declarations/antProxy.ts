@@ -371,6 +371,7 @@ export interface PGridInstance<
     reload: () => Promise<D[]>;
     reloadPage: () => Promise<D[]>;
     passQuery: (query: Partial<F>, lazy?: boolean) => Promise<void | D[]>;
+    forcePassQuery: (query: Partial<F>, lazy?: boolean) => Promise<void | D[]>;
   };
   selectedRowKeys: string[] | number[];
   selectedRecords: D[];

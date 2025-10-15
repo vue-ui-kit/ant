@@ -276,6 +276,11 @@
     pagination.page = 1;
     return lazy ? Promise.resolve() : debounceFetchData();
   };
+  const forcePassQuery = (params: Partial<F>, lazy?: boolean) => {
+    queryFormData.value = params;
+    pagination.page = 1;
+    return lazy ? Promise.resolve() : debounceFetchData();
+  };
   const innerToolbarHandler = (code: string) => {
     const { ajax } = proxyConfig.value!;
     switch (code) {
@@ -424,6 +429,7 @@
       reload,
       reloadPage: resetPage,
       passQuery,
+      forcePassQuery,
     },
     $canvasTable: computed(() => canvasTableRef.value),
     selectedRowKeys,

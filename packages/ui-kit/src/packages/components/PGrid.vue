@@ -362,6 +362,11 @@
     pagination.page = 1;
     return lazy ? Promise.resolve() : debounceFetchData();
   };
+  const forcePassQuery = (params: Partial<F>, lazy?: boolean) => {
+    queryFormData.value = params;
+    pagination.page = 1;
+    return lazy ? Promise.resolve() : debounceFetchData();
+  };
   const pg = computed(() =>
     mode.value === 'pagination'
       ? {
@@ -447,6 +452,7 @@
       reload,
       reloadPage: resetPage,
       passQuery,
+      forcePassQuery,
     },
     $table: computed(() => tableEl.value),
     selectedRowKeys: computed(() => selectedRowKeys.value),

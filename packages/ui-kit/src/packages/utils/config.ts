@@ -34,7 +34,7 @@ const defaultConfig: UIKitConfig = {
 };
 
 // 当前配置（可被修改）
-let currentConfig: UIKitConfig = clone(defaultConfig);
+let currentConfig: UIKitConfig = clone(defaultConfig, true);
 
 // 设置配置
 export function setUIKitConfig(config: Partial<UIKitConfig>): void {
