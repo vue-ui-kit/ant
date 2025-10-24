@@ -567,6 +567,10 @@
                 :size="btn.size ?? 'middle'"
                 :disabled="toolbarConfig.disabled || btn.disabled"
                 :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
+                :danger="btn.danger"
+                :shape="btn.shape"
+                :ghost="btn.ghost"
+                :block="btn.block"
                 @click="debounceToolBtnClick(btn.code)"
               >
                 <Icon v-if="btn.icon" :icon="btn.icon" />

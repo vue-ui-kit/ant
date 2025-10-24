@@ -490,6 +490,10 @@
                   :size="btn.size ?? 'middle'"
                   :disabled="toolbarConfig.disabled || btn.disabled"
                   :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
+                  :danger="btn.danger"
+                  :shape="btn.shape"
+                  :ghost="btn.ghost"
+                  :block="btn.block"
                 >
                   <Icon v-if="btn.icon" :icon="btn.icon" />
                   {{ btn.content }}
@@ -502,6 +506,10 @@
                 :size="btn.size ?? 'middle'"
                 :disabled="toolbarConfig.disabled || btn.disabled"
                 :loading="loading.toolbar || (!!btn.code && codeLoadings[btn.code])"
+                :danger="btn.danger"
+                :shape="btn.shape"
+                :ghost="btn.ghost"
+                :block="btn.block"
                 @click="debounceToolBtnClick(btn.code)"
               >
                 <Icon v-if="btn.icon" :icon="btn.icon" />
@@ -519,6 +527,10 @@
               :type="tool.type"
               :size="tool.size ?? 'middle'"
               :disabled="toolbarConfig.disabled || tool.disabled"
+              :danger="tool.danger"
+              :shape="tool.shape"
+              :ghost="tool.ghost"
+              :block="tool.block"
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
