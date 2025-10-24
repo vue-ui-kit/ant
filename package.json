@@ -2,7 +2,7 @@
   "name": "ui-kit",
   "homepage": "https://github.com/vue-ui-kit/ant",
   "type": "module",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Vue3 UI Kit based on Ant Design",
   "workspaces": [
     "packages/*",

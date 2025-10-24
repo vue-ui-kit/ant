@@ -153,25 +153,18 @@ export interface ColumnProps<D extends Recordable = Recordable>
 export interface PButtonProps extends ButtonProps {
   content?: string;
   icon?: string;
-  type?: ButtonType;
 }
 
 export interface ToolbarButtonProps extends PButtonProps {
   code: string;
   dropdowns?: ToolbarButtonProps[];
-  size?: 'small' | 'large' | 'middle';
 }
-
+export interface ToolbarToolProps extends PButtonProps {
+  code: string;
+}
 export interface ToolbarConfig {
   buttons?: Array<ToolbarButtonProps>;
-  tools?: Array<{
-    code: string;
-    icon?: string;
-    type?: ButtonType;
-    content?: string;
-    disabled?: boolean;
-    size?: 'small' | 'large' | 'middle';
-  }>;
+  tools?: Array<ToolbarToolProps>;
   disabled?: boolean;
 }
 
