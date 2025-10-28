@@ -5,17 +5,7 @@
   name="PCanvasGrid"
 >
   import PCanvasTable from './PCanvasTable.vue';
-  import {
-    computed,
-    useAttrs,
-    ref,
-    Ref,
-    reactive,
-    onMounted,
-    watch,
-    toRefs,
-    onBeforeUnmount,
-  } from 'vue';
+  import { computed, useAttrs, ref, Ref, reactive, onMounted, toRefs, onBeforeUnmount } from 'vue';
   import {
     debounce,
     get,
@@ -70,7 +60,6 @@
 
   const { formConfig, pageConfig, columns, toolbarConfig, proxyConfig, config, staticConfig } =
     toRefs(props);
-  const gridDefaults = getGridDefaults();
   const canvasTableDefaults = getCanvasTableDefaults();
   const renderFormKey = ref(uuid_v4());
   const queryFormData = ref<Partial<F>>({}) as Ref<Partial<F>>;

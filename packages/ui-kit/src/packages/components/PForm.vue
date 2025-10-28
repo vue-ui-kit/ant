@@ -15,9 +15,6 @@
   });
   const emit = defineEmits(['apply', 'reset']);
 
-  // 应用默认值
-  const formDefaults = getFormDefaults();
-
   const { items, data: formData } = toRefs(props);
 
   function handleSubmit() {

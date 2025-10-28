@@ -57,9 +57,6 @@
     fitHeight: () => getGridDefaults().fitHeight ?? 170,
   });
 
-  // 应用默认值
-  const gridDefaults = getGridDefaults();
-
   const {
     formConfig,
     pageConfig,
