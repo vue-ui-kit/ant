@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "main": "./dist/cjs/index.js",

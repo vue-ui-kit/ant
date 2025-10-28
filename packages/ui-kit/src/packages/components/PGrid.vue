@@ -49,18 +49,16 @@
   import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
   import { DownOutlined } from '@ant-design/icons-vue';
 
-  const props = defineProps<PGridProps<D, F>>();
+  const props = withDefaults(defineProps<PGridProps<D, F>>(), {
+    rowKey: 'id',
+    scrollMode: 'inner',
+    align: () => getGridDefaults().align ?? 'left',
+    lazyReset: () => getGridDefaults().lazyReset ?? false,
+    fitHeight: () => getGridDefaults().fitHeight ?? 170,
+  });
 
   // 应用默认值
   const gridDefaults = getGridDefaults();
-  const propsWithDefaults = computed(() => ({
-    ...props,
-    rowKey: props.rowKey ?? 'id',
-    scrollMode: props.scrollMode ?? 'inner',
-    align: props.align ?? gridDefaults.align ?? 'left',
-    lazyReset: props.lazyReset ?? gridDefaults.lazyReset ?? false,
-    fitHeight: props.fitHeight ?? gridDefaults.fitHeight ?? 170,
-  }));
 
   const {
     formConfig,
@@ -440,7 +438,7 @@
     renderHeight.value =
       props.renderY ??
       toNumber(ph.replace('px', '')) -
-        propsWithDefaults.value.fitHeight -
+        props.fitHeight -
         (props.toolbarConfig ? 30 : 0) -
         formHeight -
         showCountHeight;
@@ -491,7 +489,7 @@
     columns.map((c) => ({
       ...passFields.reduce(
         (prev, cur) => ({
-          [cur]: propsWithDefaults.value[cur],
+          [cur]: props[cur],
         }),
         {} as ColumnProps<D>,
       ),
@@ -525,7 +523,7 @@
                 :key="`_col_${item.field || idx}`"
                 :form-data="queryFormData"
                 :item="item as PFormItemProps<Partial<F>>"
-                @reset="resetQueryFormData(propsWithDefaults.lazyReset)"
+                @reset="resetQueryFormData(props.lazyReset)"
               />
             </a-row>
           </a-form>
