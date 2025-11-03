@@ -14,6 +14,7 @@ export const students: Student[] = Array.from(
     grade: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'][
       Math.floor(Math.random() * 6)
     ],
+    address: `北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区北京市朝阳区第${index}街道`,
   }),
 );
 

@@ -328,9 +328,12 @@
 /* #endregion */
 
 /* #region EVirtTable */
-// .canvas-cell{
-// tbd
-// }
+.canvas-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8px;
+}
 /* #endregion */
 
 @each $align in right center {
