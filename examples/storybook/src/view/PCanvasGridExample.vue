@@ -28,8 +28,14 @@
         width: 120,
         title: '姓名',
         slots: {
+          title: ({ column }) => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '100%' }}>
+              <UserOutlined style={{ color: '#1890ff' }} />
+              <span>{column.title}</span>
+            </div>
+          ),
           default: ({ row }) => (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', height: '100%' }}>
               <UserOutlined style={{ color: '#1890ff' }} />
               <span>{row.name}</span>
             </div>
@@ -135,10 +141,11 @@
       ],
     },
     pageConfig: {
-      pageSize: 10,
+      pageSize: 50,
     },
-    selectConfig: {
+    staticConfig: {
       multiple: true,
+      selectable: true,
     },
     toolbarConfig: {
       buttons: [
@@ -177,6 +184,13 @@
           } as IPage & { keyword?: string; grade?: string }),
       },
     },
+    config: {
+      SELECTABLE_METHOD: ({ row }) => {
+        return row.age > 18;
+      },
+      ENABLE_AUTOFILL: true,
+      AUTO_ROW_HEIGHT: true,
+    },
   }));
 
   // 工具栏按钮事件处理
@@ -214,7 +228,7 @@
     <p>展示PCanvasGrid的代理模式和分页功能</p>
 
     <a-card title="学生列表" style="margin-top: 16px">
-      <div style="height: 600px">
+      <div style="height: 580px">
         <p-canvas-grid v-bind="studentsGridSetting" @toolbar-button-click="handleToolbarBtn" />
       </div>
     </a-card>

@@ -111,6 +111,13 @@
 
     return undefined;
   };
+  const getRenderHeaderFunction = (column: CanvasColumnProps<T>) => {
+    if (column.slots?.title && isFunction(column.slots?.title)) {
+      return (cell: CellParams) => column.slots?.title?.({ column });
+    }
+
+    return undefined;
+  };
   const parseToEVirtColumn = (column: CanvasColumnProps<T>): EVirtColumn => {
     if (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)) {
       cacheEditorSlotColumns[`__slot:${column.field || column.key}`] = column;
@@ -135,6 +142,7 @@
             ? column.editRender.name
             : undefined),
       render: getRenderFunction(column),
+      renderHeader: getRenderHeaderFunction(column),
       children: column.children?.map((child) => parseToEVirtColumn(child)),
     };
   };
@@ -164,6 +172,7 @@
     });
     eVirtTable.on('overlayerChange', (overlayer: OverlayerContainer) => {
       overlayerView.value = overlayer;
+      console.log('overlayerChange', overlayer);
     });
     eVirtTable.on('startEdit', (cell) => {
       editorCell.value = cell;
@@ -299,7 +308,10 @@
               class="canvas-cell"
               v-for="cell in view.cells"
               :key="`${cell.rowKey}_${cell.key}`"
-              :style="cell.style"
+              :style="{
+                ...cell.style,
+                height: cell.height ? `${cell.height - 2}px` : 'auto',
+              }"
               v-bind="cell.domDataset"
             >
               <component
