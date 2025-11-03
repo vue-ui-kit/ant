@@ -58,13 +58,15 @@
         width: 100,
         title: '年级',
         slots: {
-          default: ({ row }) => <a-tag color="blue">{row.grade}</a-tag>,
-        },
+          // default: ({ row }) => <a-tag color="blue">{row.grade}</a-tag>,
+          default: 'grade',
+        } as any,
       },
       {
         field: 'score',
         width: 100,
         title: '成绩',
+        sortBy: 'number',
         slots: {
           default: ({ row }) => (
             <span
@@ -229,7 +231,11 @@
 
     <a-card title="学生列表" style="margin-top: 16px">
       <div style="height: 580px">
-        <p-canvas-grid v-bind="studentsGridSetting" @toolbar-button-click="handleToolbarBtn" />
+        <p-canvas-grid v-bind="studentsGridSetting" @toolbar-button-click="handleToolbarBtn">
+          <template #grade="{ row }">
+            <a-tag color="blue">{{ row.grade }}</a-tag>
+          </template>
+        </p-canvas-grid>
       </div>
     </a-card>
 

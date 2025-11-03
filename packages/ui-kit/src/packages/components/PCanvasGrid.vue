@@ -554,10 +554,14 @@
             ...config,
             HEIGHT: renderHeight,
           }"
-          @selection-change="handleSelectionChange"
           :data="tableData"
           :loading="loading.table"
-        />
+          @selection-change="handleSelectionChange"
+        >
+          <template v-for="(_, name) in $slots" #[name]="slotProps">
+            <slot :name="name" v-bind="slotProps"></slot>
+          </template>
+        </p-canvas-table>
         <a-pagination
           class="p-canvas-pagination"
           v-if="mode === 'pagination'"
