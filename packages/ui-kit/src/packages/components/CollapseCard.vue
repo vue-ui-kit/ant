@@ -14,9 +14,6 @@
     defaultCollapsed: false,
     collapsible: false,
   });
-  const slots = defineSlots<{
-    title: () => any;
-  }>();
   const activeKey = ref(props.defaultCollapsed ? [] : ['content']);
   defineExpose({
     collapse: () => {
@@ -31,16 +28,14 @@
 <template>
   <a-collapse v-if="collapsible" v-model:active-key="activeKey" class="collapsible-card">
     <a-collapse-panel key="content" force-render :header="title">
-      <template v-if="slots.title" #header>
-        <slot name="title" />
+      <template v-for="(_, name) in $slots" :key="name" #[name]>
+        <slot :name="name" />
       </template>
-      <slot />
     </a-collapse-panel>
   </a-collapse>
   <a-card v-else size="small" :title="title">
-    <template v-if="slots.title" #title>
-      <slot name="title" />
+    <template v-for="(_, name) in $slots" :key="name" #[name]>
+      <slot :name="name" />
     </template>
-    <slot />
   </a-card>
 </template>

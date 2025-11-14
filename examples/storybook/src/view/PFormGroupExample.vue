@@ -22,7 +22,7 @@
     tabLabel: '项目',
     max: 115,
     editAble: true,
-    collapsible: true,
+    collapsible: false,
     defaultCollapsed: true,
     itemMenus: [{ content: '测试', code: 'test' }],
     getFormSetting: (data) => ({
@@ -113,7 +113,12 @@
     <a-typography-title :level="3">PFormGroup - 动态表单组</a-typography-title>
     <p>支持动态添加、删除和管理多个表单实例的组件</p>
     <div style="margin-top: 16px">
-      <p-form-group v-model="groupFormData" v-bind="groupFormSetting" />
+      <p-form-group v-model="groupFormData" v-bind="groupFormSetting">
+        <!-- 使用 group-** 插槽，会自动传递给内部 collapse-card 的 ** 插槽 -->
+        <template #group-extra>
+          <a-button type="primary" size="small"> 菜单 </a-button>
+        </template>
+      </p-form-group>
       <a-space style="margin-top: 16px">
         <a-button type="primary" @click="handleGroupFormSubmit">保存所有项目</a-button>
       </a-space>
