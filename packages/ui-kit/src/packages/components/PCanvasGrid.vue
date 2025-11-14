@@ -5,17 +5,7 @@
   name="PCanvasGrid"
 >
   import PCanvasTable from './PCanvasTable.vue';
-  import {
-    computed,
-    useAttrs,
-    ref,
-    Ref,
-    reactive,
-    onMounted,
-    watch,
-    toRefs,
-    onBeforeUnmount,
-  } from 'vue';
+  import { computed, useAttrs, ref, Ref, reactive, onMounted, toRefs, onBeforeUnmount } from 'vue';
   import {
     debounce,
     get,
@@ -50,7 +40,10 @@
   import { DownOutlined } from '@ant-design/icons-vue';
   import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
   import { eachTree } from '@/utils/treeHelper';
-  const props = defineProps<PCanvasGridProps<D, F>>();
+  const props = withDefaults(defineProps<PCanvasGridProps<D, F>>(), {
+    lazyReset: () => getGridDefaults().lazyReset ?? false,
+    fitHeight: () => getGridDefaults().fitCanvasHeight ?? 100,
+  });
   const attrs = useAttrs();
   const emit = defineEmits<{
     (
@@ -67,18 +60,17 @@
 
   const { formConfig, pageConfig, columns, toolbarConfig, proxyConfig, config, staticConfig } =
     toRefs(props);
-  const gridDefaults = getGridDefaults();
   const canvasTableDefaults = getCanvasTableDefaults();
   const renderFormKey = ref(uuid_v4());
   const queryFormData = ref<Partial<F>>({}) as Ref<Partial<F>>;
+
+  // 只处理 config 的合并，其他属性通过 withDefaults 处理
   const propsWithDefaults = computed(() => ({
     ...props,
     config: {
       ...canvasTableDefaults,
       ...props.config,
     },
-    lazyReset: props.lazyReset ?? gridDefaults.lazyReset ?? false,
-    fitCanvasHeight: props.fitHeight ?? gridDefaults.fitCanvasHeight ?? 100,
   }));
   const mode = computed<'list' | 'pagination' | 'bad'>(() =>
     proxyConfig.value && proxyConfig.value.ajax
@@ -162,14 +154,16 @@
   const selectedRecords = computed<D[]>(() =>
     uniq(
       Object.values(pageSelections.value).flat(),
-      (f) => f[props.config?.ROW_KEY ?? 'id'] as string | number,
+      (f) => f[propsWithDefaults.value.config?.ROW_KEY ?? 'id'] as string | number,
     ),
   );
   const handleFormSubmit = () => {
     resetPage();
   };
   const selectedRowKeys = computed<Array<string | number>>(() =>
-    selectedRecords.value.map((f) => f[props.config?.ROW_KEY ?? 'id'] as string | number),
+    selectedRecords.value.map(
+      (f) => f[propsWithDefaults.value.config?.ROW_KEY ?? 'id'] as string | number,
+    ),
   );
   const handleResponse = (response: Recordable, pathConfig?: ResponsePathConfig<D>) =>
     pathConfig
@@ -393,7 +387,7 @@
     const showCountHeight = staticConfig.value?.showCount ? 22 : 0;
     renderHeight.value =
       toNumber(ph.replace('px', '')) -
-      propsWithDefaults.value.fitCanvasHeight -
+      props.fitHeight -
       (props.toolbarConfig ? 30 : 0) -
       formHeight -
       showCountHeight;
@@ -464,7 +458,7 @@
                 :key="`_col_${item.field || idx}`"
                 :form-data="queryFormData"
                 :item="item as PFormItemProps<Partial<F>>"
-                @reset="resetQueryFormData(propsWithDefaults.lazyReset)"
+                @reset="resetQueryFormData(props.lazyReset)"
               />
             </a-row>
           </a-form>
@@ -551,7 +545,7 @@
           ref="canvasTableRef"
           :columns="finalColumns"
           :config="{
-            ...config,
+            ...propsWithDefaults.config,
             HEIGHT: renderHeight,
           }"
           :data="tableData"

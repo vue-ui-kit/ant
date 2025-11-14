@@ -9,16 +9,11 @@
   import PFormCol from '@/components/PFormCol.vue';
   import { Form as AForm, Row as ARow } from 'ant-design-vue';
 
-  const props = defineProps<PFormProps<F> & { data: F }>();
+  const props = withDefaults(defineProps<PFormProps<F> & { data: F }>(), {
+    labelCol: () => getFormDefaults().labelCol ?? { span: 6 },
+    wrapperCol: () => getFormDefaults().wrapperCol ?? { span: 16 },
+  });
   const emit = defineEmits(['apply', 'reset']);
-
-  // 应用默认值
-  const formDefaults = getFormDefaults();
-  const propsWithDefaults = computed(() => ({
-    ...props,
-    labelCol: props.labelCol ?? formDefaults.labelCol ?? { span: 6 },
-    wrapperCol: props.wrapperCol ?? formDefaults.wrapperCol ?? { span: 16 },
-  }));
 
   const { items, data: formData } = toRefs(props);
 
@@ -57,9 +52,9 @@
   };
   // omit({labelCol:defaultLabelCol,...props},['items','data','model'])
   const fc = computed(() => ({
-    ...omit(propsWithDefaults.value, ['items', 'data', 'model', 'labelCol', 'wrapperCol']),
-    labelCol: propsWithDefaults.value.labelCol,
-    wrapperCol: propsWithDefaults.value.wrapperCol,
+    ...omit(props, ['items', 'data', 'model', 'labelCol', 'wrapperCol']),
+    labelCol: props.labelCol,
+    wrapperCol: props.wrapperCol,
   }));
   const validateField = (fields?: string | string[]) => {
     if (fields) {
