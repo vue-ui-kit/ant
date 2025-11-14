@@ -232,6 +232,19 @@
       }
     },
   });
+  const slots = defineSlots<{
+    rightExtra?: () => any;
+    [key: string]: any;
+  }>();
+  // 计算需要传递给 collapse-card 的插槽映射
+  const groupSlots = computed(() => {
+    return Object.keys(slots)
+      .filter((name) => name.startsWith('group-'))
+      .map((name) => ({
+        original: name,
+        target: name.replace('group-', ''),
+      }));
+  });
 </script>
 <template>
   <collapse-card
@@ -241,6 +254,9 @@
     :collapsible="collapsible"
     :default-collapsed="defaultCollapsed"
   >
+    <template v-for="item in groupSlots" :key="item.original" #[item.target]>
+      <slot :name="item.original" />
+    </template>
     <a-spin v-if="loading" class="w-full" />
     <a-tabs
       v-else
