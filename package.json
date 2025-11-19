@@ -66,5 +66,8 @@
       "prettier --write"
     ]
   },
+  "resolutions": {
+    "glob": "^12.0.0"
+  },
   "packageManager": "yarn@4.4.1"
 }
