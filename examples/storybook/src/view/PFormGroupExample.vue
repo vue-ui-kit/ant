@@ -19,7 +19,7 @@
   const groupFormSetting = computed<PFormGroupProps<(typeof groupFormData.value)[0]>>(() => ({
     title: '项目管理',
     showAdd: true,
-    tabLabel: '项目',
+    tabLabel: (data) => data.projectName || '项目',
     max: 115,
     editAble: true,
     collapsible: false,

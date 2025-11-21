@@ -73,6 +73,9 @@
       blockInstance.value[activeKey.value]?.$form?.validate();
     });
   };
+  const getTabLabel = (data: Partial<F>) => {
+    return typeof props.tabLabel === 'function' ? props.tabLabel(data) : props.tabLabel;
+  };
   watch(
     () => model.value,
     () => {
@@ -280,7 +283,7 @@
       <a-tab-pane
         v-for="(item, idx) in model"
         :key="idx"
-        :tab="`${tabLabel} ${keepSerial ? idx + 1 : (item.__index ?? 0) + 1}`"
+        :tab="`${getTabLabel(item)} ${keepSerial ? idx + 1 : (item.__index ?? 0) + 1}`"
         :force-render="fr"
       >
         <template #closeIcon>
