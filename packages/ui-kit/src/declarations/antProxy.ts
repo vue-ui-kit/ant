@@ -117,7 +117,14 @@ export interface GroupMenuItem<F extends Recordable = Recordable> {
 export interface PFormGroupProps<F extends Recordable = Recordable> {
   getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
   title?: string;
-  tabLabel?: string | ((data: Partial<F>) => string);
+  tabLabel?: string;
+  /**
+   * 获取完整标签页标签
+   * @param data 数据
+   * @param idx 实际索引
+   * @returns 标签页标签
+   */
+  getTabLabel?: (data: Partial<F>, idx: number) => string;
   editAble?: boolean;
   showAdd?: boolean;
   /* 是否启用折叠 */

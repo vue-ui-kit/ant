@@ -73,8 +73,11 @@
       blockInstance.value[activeKey.value]?.$form?.validate();
     });
   };
-  const getTabLabel = (data: Partial<F>) => {
-    return typeof props.tabLabel === 'function' ? props.tabLabel(data) : props.tabLabel;
+  const calculateTabLabel = (data: Partial<F>, idx: number) => {
+    return (
+      props.getTabLabel?.(data, idx) ??
+      `${props.tabLabel} ${props.keepSerial ? idx + 1 : (data.__index ?? 0) + 1}`
+    );
   };
   watch(
     () => model.value,
@@ -283,7 +286,7 @@
       <a-tab-pane
         v-for="(item, idx) in model"
         :key="idx"
-        :tab="`${getTabLabel(item)} ${keepSerial ? idx + 1 : (item.__index ?? 0) + 1}`"
+        :tab="calculateTabLabel(item, idx)"
         :force-render="fr"
       >
         <template #closeIcon>
