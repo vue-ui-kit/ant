@@ -35,6 +35,7 @@ interface BtnOptions extends ButtonProps {
   dropdowns?: BtnOptions[];
   clickEvt?: (p: RenderTableParams) => any;
   hiddenIf?: (p: RenderTableParams) => boolean;
+  getProps?: (p: RenderTableParams) => Partial<ButtonProps>;
 }
 export interface RenderWorkshop {
   renderItemContent?: (
@@ -234,8 +235,10 @@ const renderBtn = (
               'icon',
               'clickEvt',
               'dropdowns',
+              'getProps',
             ])}
             icon={btnOpt.icon ? <Icon icon={btnOpt.icon} /> : <Icon icon="DownOutlined" />}
+            {...(btnOpt.getProps?.(params) ?? {})}
           >
             {btnOpt.content || (btnOpt?.getContent?.(params) ?? '')}
           </Button>
@@ -259,9 +262,11 @@ const renderBtn = (
         'icon',
         'clickEvt',
         'dropdowns',
+        'getProps',
       ])}
       disabled={(!!btnOpt.dropdowns && btnOpt.dropdowns.length > 0) || btnOpt.disabled}
       icon={btnOpt.icon ? <Icon icon={btnOpt.icon} /> : null}
+      {...(btnOpt.getProps?.(params) ?? {})}
       onClick={() => {
         if (btnOpt?.clickEvt) {
           btnOpt.clickEvt(params);

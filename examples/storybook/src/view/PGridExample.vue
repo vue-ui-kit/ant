@@ -38,6 +38,23 @@
         width: 200,
         title: '分数',
       },
+      {
+        title: '操作',
+        width: 100,
+        cellRender: {
+          name: 'ButtonTree',
+          children: [
+            {
+              getContent: ({ row }: { row: Student }) =>
+                row.score && row.score > 60 ? '（已通过）' : '请家长',
+              getProps: ({ row }: { row: Student }) => ({
+                disabled: row.score && row.score > 60,
+                type: row.score && row.score > 60 ? 'success' : 'link',
+              }),
+            },
+          ],
+        },
+      },
     ],
     formConfig: {
       items: [
