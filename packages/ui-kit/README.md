@@ -182,7 +182,7 @@ module.exports = {
 node_modules/@vue-ui-kit/ant/
 ├── dist/
 │   ├── style.css      # 编译后的CSS
-│   └── style.scss     # SCSS源文件(已内联variables)
+│   └── style.scss     # SCSS源文件
 └── src/packages/styles/  # 源文件(开发时参考)
 ```
 

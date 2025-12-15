@@ -21,20 +21,13 @@ export default defineConfig({
       name: 'create-standalone-scss',
       writeBundle() {
         try {
-          // 读取variables和main scss文件
-          const variablesContent = readFileSync('src/packages/styles/variables.scss', 'utf-8');
+          // 读取main scss文件
           const mainScssContent = readFileSync('src/packages/styles/index.scss', 'utf-8');
 
-          // 将variables内容内联，替换@use语句
-          const combinedScssContent = mainScssContent.replace(
-            "@use 'variables';",
-            `// Variables inlined for npm distribution\n${variablesContent}`,
-          );
-
           // 写入到dist目录
-          writeFileSync('dist/style.scss', combinedScssContent);
+          writeFileSync('dist/style.scss', mainScssContent);
 
-          console.log('✅ Created standalone style.scss with inlined variables');
+          console.log('✅ Created standalone style.scss');
         } catch (err) {
           console.warn('Failed to create standalone scss file:', err);
         }

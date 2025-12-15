@@ -1,12 +1,13 @@
 <script setup lang="tsx">
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
   import {
     Typography,
     Space as ASpace,
     Divider as ADivider,
     Button as AButton,
+    Switch as ASwitch,
   } from 'ant-design-vue';
-
+  import { theme } from 'ant-design-vue';
   // 导入示例组件
   import PGridExample from './view/PGridExample.vue';
   import PFormExample from './view/PFormExample.vue';
@@ -22,12 +23,60 @@
   const currentView = ref<
     'grid' | 'form' | 'group' | 'canvasTable' | 'canvasGrid' | 'promisePicker' | 'familyTree'
   >('grid');
+
+  // 主题切换
+  const isDarkMode = ref(false);
+
+  const toggleTheme = (checked: boolean) => {
+    isDarkMode.value = checked;
+    if (checked) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  };
+
+  // 初始化时检查本地存储的主题
+  onMounted(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      isDarkMode.value = true;
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  });
+
+  // 监听主题变化并保存到本地存储
+  const handleThemeChange = (checked: boolean) => {
+    toggleTheme(checked);
+    localStorage.setItem('theme', checked ? 'dark' : 'light');
+  };
 </script>
 
 <template>
   <div class="w-full flex flex-col">
+    <a-config-provider
+      :theme="{
+        algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: {
+          // colorPrimary: '#fbd244',
+          colorDanger: '#f5222d',
+          colorSuccess: '#38b865',
+          colorWarning: '#eb5e12',
+        },
+      }"
+    >
+    </a-config-provider>
     <div class="mb-4">
-      <a-typography-title :level="2">Vue UI Kit 示例</a-typography-title>
+      <div class="flex justify-between items-center mb-4">
+        <a-typography-title :level="2" style="margin-bottom: 0">
+          Vue UI Kit 示例
+        </a-typography-title>
+        <div class="theme-switcher">
+          <span style="margin-right: 8px">🌞 日间</span>
+          <a-switch v-model:checked="isDarkMode" @change="handleThemeChange" />
+          <span style="margin-left: 8px">🌙 夜间</span>
+        </div>
+      </div>
       <a-space>
         <a-button
           :type="currentView === 'grid' ? 'primary' : 'default'"
@@ -116,5 +165,15 @@
 <style scoped>
   .demo-container {
     margin: 20px 0;
+  }
+
+  .theme-switcher {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .mb-4 {
+    margin-bottom: 16px;
   }
 </style>
