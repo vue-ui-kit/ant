@@ -22,6 +22,7 @@
         field: 'name',
         width: 200,
         title: '姓名',
+        fixed: 'left',
       },
       {
         field: 'enName',
@@ -40,8 +41,49 @@
         title: '分数',
       },
       {
+        field: 'id',
+        width: 200,
+        title: 'ID',
+      },
+      {
+        field: 'score',
+        width: 200,
+        title: '分数',
+      },
+      {
+        field: 'id',
+        width: 200,
+        title: 'ID',
+      },
+      {
+        field: 'score',
+        width: 200,
+        title: '分数',
+      },
+      {
+        field: 'id',
+        width: 200,
+        title: 'ID',
+      },
+      {
+        field: 'score',
+        width: 200,
+        title: '分数',
+      },
+      {
+        field: 'id',
+        width: 200,
+        title: 'ID',
+      },
+      {
+        field: 'score',
+        width: 200,
+        title: '分数',
+      },
+      {
         title: '操作',
         width: 100,
+        fixed: 'right',
         cellRender: {
           name: 'ButtonTree',
           children: [
