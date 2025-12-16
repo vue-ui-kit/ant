@@ -203,9 +203,15 @@
     background-color: var(--p-striped-bg-color, #f2f3f6);
     td.ant-table-cell-fix-left {
       background-color: var(--p-striped-bg-color, #e6e7ea);
+      &.ant-table-cell-row-hover {
+        background-color: var(--p-table-row-hover-bg-color, #e6e7ea);
+      }
     }
     td.ant-table-cell-fix-right {
       background-color: var(--p-striped-bg-color, #e6e7ea);
+      &.ant-table-cell-row-hover {
+        background-color: var(--p-table-row-hover-bg-color, #e6e7ea);
+      }
     }
   }
   .ant-table-wrapper .ant-table-thead > tr > th {
