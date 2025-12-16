@@ -189,7 +189,22 @@
       }
     }
   }
-
+  .ant-table-wrapper .ant-table {
+    background-color: var(--p-table-row-bg-color, #fff);
+  }
+  .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-row-hover {
+    background-color: var(--p-table-row-hover-bg-color, #e6e7ea);
+  }
+  .ant-table-wrapper .ant-table-pagination.ant-pagination {
+    margin: unset;
+    padding: 16px 0;
+  }
+  .ant-table-wrapper tr.p-grid-row-striped {
+    background-color: var(--p-striped-bg-color, #f2f3f6);
+  }
+  .ant-table-wrapper .ant-table-thead > tr > th {
+    background-color: var(--p-table-thead-bg-color, #f2f3f6);
+  }
   .ant-table-sticky-scroll {
     visibility: hidden;
   }
@@ -207,11 +222,30 @@
       top: -16px;
     }
   }
-
-  .ant-table-wrapper .ant-table-pagination.ant-pagination {
-    margin: unset;
-    padding: 16px 0;
+  .ant-table-wrapper .ant-pagination {
+    .ant-pagination-item {
+      border: 1px solid var(--p-pagination-border-color, #bbbdbf);
+      &:not(.ant-pagination-item-active) {
+        background-color: var(--p-pagination-bg-color, #fff);
+        & > a {
+          color: var(--p-pagination-color, #323335);
+        }
+        &:hover {
+          background-color: var(--p-pagination-hover-bg-color, #4d4d4d);
+          & > a {
+            color: var(--p-pagination-active-color, #fff);
+          }
+        }
+      }
+      &.ant-pagination-item-active {
+        background-color: var(--p-pagination-active-bg-color, #323335);
+        & > a {
+          color: var(--p-pagination-active-color, #fff);
+        }
+      }
+    }
   }
+
   .h-lack {
     .ant-table-wrapper .ant-table-pagination.ant-pagination {
       padding: unset;

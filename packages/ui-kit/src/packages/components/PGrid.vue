@@ -55,6 +55,7 @@
     align: () => getGridDefaults().align ?? 'left',
     lazyReset: () => getGridDefaults().lazyReset ?? false,
     fitHeight: () => getGridDefaults().fitHeight ?? 170,
+    striped: () => getGridDefaults().striped ?? false,
   });
 
   const {
@@ -607,6 +608,9 @@
           :key="renderTableKey + '_table'"
           :row-key="rowKey ?? 'id'"
           ref="tableEl"
+          :row-class-name="
+            striped ? (_record, index) => (index % 2 === 1 ? 'p-grid-row-striped' : '') : ''
+          "
           :columns="passDefaultColumnProps(columns ?? []).map((c) => cleanCol(c as ColumnProps))"
           :data-source="tableData"
           :loading="loading.table"

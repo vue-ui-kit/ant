@@ -13,6 +13,7 @@ export interface UIKitConfig {
     lazyReset?: boolean;
     fitHeight?: number;
     fitCanvasHeight?: number;
+    striped?: boolean;
   };
   canvasTable?: ConfigType;
 }
@@ -27,6 +28,7 @@ const defaultConfig: UIKitConfig = {
     align: 'left',
     lazyReset: false,
     fitHeight: 170,
+    striped: false,
   },
   canvasTable: {
     DISABLED: true,
@@ -73,6 +75,7 @@ export function getGridDefaults(): Partial<PGridProps> {
     align: currentConfig.grid?.align,
     lazyReset: currentConfig.grid?.lazyReset,
     fitHeight: currentConfig.grid?.fitHeight,
+    striped: currentConfig.grid?.striped,
   };
 }
 

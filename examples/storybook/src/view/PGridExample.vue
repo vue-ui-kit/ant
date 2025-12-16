@@ -16,6 +16,7 @@
   }
 
   const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
+    striped: true,
     columns: [
       {
         field: 'name',

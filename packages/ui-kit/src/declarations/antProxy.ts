@@ -216,6 +216,7 @@ export interface SelectConfig<D extends Recordable = Recordable> {
 export type PGridProps<D extends Recordable = Recordable, F extends Recordable = Recordable> = {
   selectConfig?: SelectConfig<D>;
   rowKey?: string;
+  striped?: boolean;
   manualFetch?: boolean;
   align?: 'left' | 'right' | 'center';
   formConfig?: PFormProps<F>;
