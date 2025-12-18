@@ -201,13 +201,7 @@
   }
   .ant-table-wrapper tr.p-grid-row-striped {
     background-color: var(--p-striped-bg-color, #f2f3f6);
-    td.ant-table-cell-fix-left {
-      background-color: var(--p-striped-bg-color, #e6e7ea);
-      &.ant-table-cell-row-hover {
-        background-color: var(--p-table-row-hover-bg-color, #e6e7ea);
-      }
-    }
-    td.ant-table-cell-fix-right {
+    > td.ant-table-cell {
       background-color: var(--p-striped-bg-color, #e6e7ea);
       &.ant-table-cell-row-hover {
         background-color: var(--p-table-row-hover-bg-color, #e6e7ea);
