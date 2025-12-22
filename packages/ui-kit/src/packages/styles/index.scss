@@ -191,6 +191,9 @@
   }
   .ant-table-wrapper .ant-table {
     background-color: var(--p-table-row-bg-color, #fff);
+    td.ant-table-cell {
+      background-color: var(--p-table-row-bg-color, #fff);
+    }
   }
   .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-row-hover {
     background-color: var(--p-table-row-hover-bg-color, #e6e7ea);
