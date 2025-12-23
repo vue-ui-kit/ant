@@ -32,6 +32,8 @@ const defaultConfig: UIKitConfig = {
   },
   canvasTable: {
     DISABLED: true,
+    ENABLE_FINDER: true,
+    AUTO_ROW_HEIGHT: true,
   },
 };
 

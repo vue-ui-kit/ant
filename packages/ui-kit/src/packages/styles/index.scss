@@ -232,6 +232,16 @@
     }
   }
   .ant-table-wrapper .ant-pagination {
+    gap: 8px;
+
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      border: 1px solid var(--p-pagination-border-color, #bbbdbf);
+    }
+    .ant-pagination-total-text {
+      margin-inline-end: 0;
+      padding-inline-end: 8px;
+    }
     .ant-pagination-item {
       border: 1px solid var(--p-pagination-border-color, #bbbdbf);
       &:not(.ant-pagination-item-active) {

@@ -12,6 +12,10 @@ export const setupUIKit = (app: App) => {
       labelCol: { span: 8 },
       wrapperCol: { span: 14 },
     },
+    canvasTable: {
+      ENABLE_FINDER: true,
+      AUTO_ROW_HEIGHT: true,
+    },
   });
 
   UIKit.addFormatter({ test: () => 'test' });

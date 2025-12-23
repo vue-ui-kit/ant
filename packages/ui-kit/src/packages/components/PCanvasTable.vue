@@ -310,7 +310,6 @@
               :key="`${cell.rowKey}_${cell.key}`"
               :style="{
                 ...cell.style,
-                height: cell.height ? `${cell.height - 2}px` : 'auto',
               }"
               v-bind="cell.domDataset"
             >

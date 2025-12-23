@@ -1924,7 +1924,7 @@ __metadata:
     "@vitejs/plugin-vue": "npm:^5.1.2"
     "@vitejs/plugin-vue-jsx": "npm:^4.0.1"
     ant-design-vue: "npm:^4.2.3"
-    e-virt-table: "npm:^1.3.10"
+    e-virt-table: "npm:^1.3.17"
     esbuild: "npm:^0.23.1"
     husky: "npm:^9.1.5"
     lint-staged: "npm:^15.2.9"
@@ -2901,12 +2901,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"e-virt-table@npm:^1.3.10":
-  version: 1.3.10
-  resolution: "e-virt-table@npm:1.3.10"
+"e-virt-table@npm:^1.3.17":
+  version: 1.3.17
+  resolution: "e-virt-table@npm:1.3.17"
   dependencies:
     "@floating-ui/dom": "npm:^1.6.11"
-  checksum: 10/bae57b8cf7e2d1f98c615bd3ab84b19aa2edad7b94b50c80251faa763ba81438a4c3f23a0654ae810feebd79de13e5d3900f7b0abc6eded37db8ed7ca0205fd4
+  checksum: 10/7c63086b96010062f505819de5b41d7fa154519128308afdef5dfb97f5f024f9de1d6bf11501ae8837cfa264401408abfe38717079ede6b94152e9ce3bb6c2f8
   languageName: node
   linkType: hard
 
