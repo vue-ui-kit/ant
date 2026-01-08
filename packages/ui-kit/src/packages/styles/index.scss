@@ -243,23 +243,24 @@
       padding-inline-end: 8px;
     }
     .ant-pagination-item {
-      border: 1px solid var(--p-pagination-border-color, #bbbdbf);
+      border: 1px solid var(--p-pagination-border-color, transparent);
       &:not(.ant-pagination-item-active) {
         background-color: var(--p-pagination-bg-color, #fff);
         & > a {
           color: var(--p-pagination-color, #323335);
         }
         &:hover {
-          background-color: var(--p-pagination-hover-bg-color, #4d4d4d);
+          background-color: var(--p-pagination-hover-bg-color, #0000000f);
           & > a {
-            color: var(--p-pagination-active-color, #fff);
+            color: var(--p-pagination-active-color, #000000e0);
           }
         }
       }
       &.ant-pagination-item-active {
-        background-color: var(--p-pagination-active-bg-color, #323335);
+        background-color: var(--p-pagination-active-bg-color, #fff);
+        border-color: var(--p-pagination-active-border-color, var(--p-primary-color, #4096ff));
         & > a {
-          color: var(--p-pagination-active-color, #fff);
+          color: var(--p-pagination-active-color, var(--p-primary-color, #4096ff));
         }
       }
     }

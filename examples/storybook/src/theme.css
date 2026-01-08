@@ -12,12 +12,12 @@
   --p-striped-bg-color: #f2f3f6;
   --p-table-row-hover-bg-color: #e6e7ea;
 
-  --p-pagination-bg-color: #fff;
-  --p-pagination-color:#323335;
-  --p-pagination-border-color: #bbbdbf;
-  --p-pagination-active-bg-color: #323335;
-  --p-pagination-active-color: #fff;
-  --p-pagination-hover-bg-color: #4D4D4D;
+  /*--p-pagination-bg-color: #fff;*/
+  /*--p-pagination-color:#323335;*/
+  /*--p-pagination-border-color: #bbbdbf;*/
+  /*--p-pagination-active-bg-color: #323335;*/
+  /*--p-pagination-active-color: #fff;*/
+  /*--p-pagination-hover-bg-color: #4D4D4D;*/
 }
 
 /* 夜间模式 */
@@ -34,12 +34,12 @@
   --p-striped-bg-color: #323335;
   --p-table-row-hover-bg-color: #4D4D4D;
   
-  --p-pagination-bg-color: #202020;
+  /*--p-pagination-bg-color: #202020;
   --p-pagination-color:#9b9fa3;
   --p-pagination-border-color: #9b9fa3;
   --p-pagination-active-bg-color: #323335;
   --p-pagination-active-color: #fff;
-  --p-pagination-hover-bg-color: #4D4D4D;
+  --p-pagination-hover-bg-color: #4D4D4D;*/
 }
 
 /* 应用主题到整个页面 */
