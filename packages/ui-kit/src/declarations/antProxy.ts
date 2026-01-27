@@ -158,12 +158,12 @@ export interface ColumnProps<D extends Recordable = Recordable>
 }
 
 export interface PButtonProps extends ButtonProps {
-  content?: string;
+  content?: string | (() => any);
   icon?: string;
 }
 
 export interface ToolbarButtonProps extends PButtonProps {
-  code: string;
+  code?: string;
   dropdowns?: ToolbarButtonProps[];
 }
 export interface ToolbarToolProps extends PButtonProps {

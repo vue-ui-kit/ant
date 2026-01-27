@@ -482,6 +482,16 @@
     }
     resetQueryFormData(props.manualFetch);
   });
+  const renderContent = (content: string | (() => any)) => {
+    if (isFunction(content)) {
+      return content();
+    } else {
+      return content;
+    }
+  };
+  const isStringContent = (content: any) => {
+    return isString(content);
+  };
   const passFields = ['align'];
   const passDefaultColumnProps = (columns: ColumnProps<D>[]) =>
     columns.map((c) => ({
@@ -537,8 +547,11 @@
               <a-dropdown v-if="btn.dropdowns && btn.dropdowns.length">
                 <template #overlay>
                   <a-menu @click="toolBtnMenuClick">
-                    <a-menu-item v-for="sub in btn.dropdowns" :key="sub.code"
-                      >{{ sub.content }}
+                    <a-menu-item v-for="sub in btn.dropdowns" :key="sub.code">
+                      <template v-if="sub.content && isStringContent(renderContent(sub.content))">
+                        {{ renderContent(sub.content) }}
+                      </template>
+                      <component v-else-if="sub.content" :is="renderContent(sub.content)" />
                     </a-menu-item>
                   </a-menu>
                 </template>
@@ -553,7 +566,10 @@
                   :block="btn.block"
                 >
                   <Icon v-if="btn.icon" :icon="btn.icon" />
-                  {{ btn.content }}
+                  <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                    {{ renderContent(btn.content) }}
+                  </template>
+                  <component v-else-if="btn.content" :is="renderContent(btn.content)" />
                   <DownOutlined />
                 </a-button>
               </a-dropdown>
@@ -570,7 +586,10 @@
                 @click="debounceToolBtnClick(btn.code)"
               >
                 <Icon v-if="btn.icon" :icon="btn.icon" />
-                {{ btn.content }}
+                <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                  {{ renderContent(btn.content) }}
+                </template>
+                <component v-else-if="btn.content" :is="renderContent(btn.content)" />
               </a-button>
               <div v-else></div>
             </template>
@@ -592,7 +611,10 @@
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
               <Icon v-if="tool.icon" :icon="tool.icon" />
-              {{ tool.content }}
+              <template v-if="tool.content && isStringContent(renderContent(tool.content))">
+                {{ renderContent(tool.content) }}
+              </template>
+              <component v-else-if="tool.content" :is="renderContent(tool.content)" />
             </a-button>
           </template>
         </span>
