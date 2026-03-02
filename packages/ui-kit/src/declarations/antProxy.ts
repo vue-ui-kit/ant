@@ -3,7 +3,6 @@ import { ButtonProps } from 'ant-design-vue/lib/button';
 import { ColProps } from 'ant-design-vue/lib/grid/Col';
 import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
-import { ButtonType } from 'ant-design-vue/lib/button/buttonTypes';
 import type { ConfigType, Column as EVirtColumn } from 'e-virt-table';
 import EVirtTable from 'e-virt-table';
 
@@ -157,9 +156,10 @@ export interface ColumnProps<D extends Recordable = Recordable>
   cellRender?: CellRender;
 }
 
-export interface PButtonProps extends ButtonProps {
+export interface PButtonProps extends Omit<ButtonProps, 'type'> {
   content?: string | (() => any);
   icon?: string;
+  type?: string;
 }
 
 export interface ToolbarButtonProps extends PButtonProps {

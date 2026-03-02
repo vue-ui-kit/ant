@@ -28,8 +28,9 @@ import TableInput from '@/renders/TableInput.vue';
 import Icon from '@/renders/Icon';
 import { computed, ref, Ref } from 'vue';
 
-interface BtnOptions extends ButtonProps {
+interface BtnOptions extends Omit<ButtonProps, 'type'> {
   content?: string;
+  type?: string;
   getContent?: (p: RenderTableParams) => string;
   dynamicClassName?: (p: RenderTableParams) => string;
   dropdowns?: BtnOptions[];
