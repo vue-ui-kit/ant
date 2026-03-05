@@ -10,6 +10,7 @@
   import { theme } from 'ant-design-vue';
   // 导入示例组件
   import PGridExample from './view/PGridExample.vue';
+  import PGridResponsive from './view/PGridResponsive.vue';
   import PFormExample from './view/PFormExample.vue';
   import PFormGroupExample from './view/PFormGroupExample.vue';
   import PCanvasTableExample from './view/PCanvasTableExample.vue';
@@ -21,7 +22,14 @@
 
   // 当前展示模式
   const currentView = ref<
-    'grid' | 'form' | 'group' | 'canvasTable' | 'canvasGrid' | 'promisePicker' | 'familyTree'
+    | 'grid'
+    | 'gridResponsive'
+    | 'form'
+    | 'group'
+    | 'canvasTable'
+    | 'canvasGrid'
+    | 'promisePicker'
+    | 'familyTree'
   >('grid');
 
   // 主题切换
@@ -85,6 +93,12 @@
           PGrid 示例
         </a-button>
         <a-button
+          :type="currentView === 'gridResponsive' ? 'primary' : 'default'"
+          @click="currentView = 'gridResponsive'"
+        >
+          PGrid 响应式示例
+        </a-button>
+        <a-button
           :type="currentView === 'form' ? 'primary' : 'default'"
           @click="currentView = 'form'"
         >
@@ -127,6 +141,11 @@
       <!-- PGrid 示例 -->
       <div v-if="currentView === 'grid'">
         <p-grid-example />
+      </div>
+
+      <!-- PGrid 响应式示例 -->
+      <div v-if="currentView === 'gridResponsive'">
+        <p-grid-responsive />
       </div>
 
       <!-- PForm 示例 -->

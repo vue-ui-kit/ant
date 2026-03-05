@@ -26,7 +26,6 @@
     isString,
     merge,
     omit,
-    toNumber,
   } from 'xe-utils';
   import { eachTree } from '@/utils/treeHelper';
   import { message as $message } from 'ant-design-vue';
@@ -86,6 +85,7 @@
   };
   const boxEl = ref<HTMLDivElement>();
   const pFormWrapper = ref<HTMLDivElement>();
+  const tableWrapperEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   const selectedRowKeys = ref<Array<string | number>>([]);
   const selectedCaches = ref<D[]>([]);
@@ -423,25 +423,32 @@
     },
     { deep: true },
   );
+  let resizeRaf: number | null = null;
   const resizeTable = () => {
-    const pNode = boxEl.value?.parentElement;
-    const ph = pNode ? window.getComputedStyle(pNode).height : '0px';
-    const formOriginHeight = pFormWrapper.value
-      ? window.getComputedStyle(pFormWrapper.value).height
-      : '0px';
-    const formHeight = formOriginHeight.includes('px')
-      ? toNumber(formOriginHeight.replace('px', ''))
-      : 0;
-    const showCountHeight = selectConfig.value?.showCount ? 22 : 0;
-    renderHeight.value =
-      props.renderY ??
-      toNumber(ph.replace('px', '')) -
-        props.fitHeight -
-        (props.toolbarConfig ? 30 : 0) -
-        formHeight -
-        showCountHeight;
-    enoughSpacing.value = toNumber(ph.replace('px', '')) > 600;
+    if (resizeRaf) cancelAnimationFrame(resizeRaf);
+    resizeRaf = requestAnimationFrame(() => {
+      resizeRaf = null;
+      if (!tableWrapperEl.value) return;
+      const rect = tableWrapperEl.value.getBoundingClientRect();
+      renderHeight.value =
+        props.renderY ?? Math.max(window.innerHeight - rect.top - props.fitHeight, 100);
+      enoughSpacing.value = window.innerHeight > 600;
+    });
   };
+
+  // 监听表单区域高度变化（响应式布局换行/收起时自动重算）
+  let formWrapperResizeObserver: ResizeObserver | null = null;
+  watch(
+    pFormWrapper,
+    (el) => {
+      formWrapperResizeObserver?.disconnect();
+      formWrapperResizeObserver = null;
+      if (!el) return;
+      formWrapperResizeObserver = new ResizeObserver(() => resizeTable());
+      formWrapperResizeObserver.observe(el);
+    },
+    { immediate: true },
+  );
   defineExpose({
     commitProxy: {
       query: debounceFetchData,
@@ -461,16 +468,16 @@
   });
 
   let observer: MutationObserver;
+  let boxElResizeObserver: ResizeObserver | null = null;
   onMounted(() => {
     resizeTable();
     window.addEventListener('resize', resizeTable);
-    // 还需要在组件根节点由不可见转为可见时重新计算高度（display:none等样式控制时）
+    // 组件根节点由不可见转为可见时重新计算（display:none 切换场景）
     observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
           const el = mutation.target as HTMLElement;
-          const style = window.getComputedStyle(el);
-          if (style.display !== 'none') {
+          if (window.getComputedStyle(el).display !== 'none') {
             resizeTable();
           }
         }
@@ -479,6 +486,14 @@
 
     if (boxEl.value) {
       observer.observe(boxEl.value, { attributes: true, attributeFilter: ['style'] });
+      // 往上观察多级祖先：父容器可能是内容撑开的，真正因外部兄弟变化而 resize
+      // 的元素可能在更高层（如 flex 容器）。观察多层确保能感知到
+      boxElResizeObserver = new ResizeObserver(() => resizeTable());
+      let ancestor: Element | null = boxEl.value.parentElement;
+      for (let i = 0; i < 5 && ancestor && ancestor !== document.body; i++) {
+        boxElResizeObserver.observe(ancestor);
+        ancestor = ancestor.parentElement;
+      }
     }
     resetQueryFormData(props.manualFetch);
   });
@@ -504,8 +519,11 @@
       ...c,
     }));
   onBeforeUnmount(() => {
+    if (resizeRaf) cancelAnimationFrame(resizeRaf);
     window.removeEventListener('resize', resizeTable);
     observer.disconnect();
+    formWrapperResizeObserver?.disconnect();
+    boxElResizeObserver?.disconnect();
   });
 </script>
 <template>
@@ -619,7 +637,10 @@
           </template>
         </span>
       </div>
-      <div :class="`p-pane flex-1 ${enoughSpacing ? 'h-0' : ''} p-${scrollMode ?? 'inner'}-scroll`">
+      <div
+        ref="tableWrapperEl"
+        :class="`p-pane flex-1 ${enoughSpacing ? 'h-0' : ''} p-${scrollMode ?? 'inner'}-scroll`"
+      >
         <div
           v-if="selectConfig?.multiple && selectConfig.showCount"
           class="w-full text-slate-5 pl-4"
