@@ -310,6 +310,7 @@
           ref="blockInstance"
           :key="idx"
           :source="item"
+          :name="name ? `${name}_${idx}` : undefined"
           :get-form-setting="getFormSetting"
           @focus.capture="debounceHandleBlockFocus(idx)"
           @click.capture="debounceHandleBlockFocus(idx)"

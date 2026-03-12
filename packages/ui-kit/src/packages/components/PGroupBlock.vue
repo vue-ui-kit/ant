@@ -13,5 +13,5 @@
   });
 </script>
 <template>
-  <p-form ref="formEl" v-bind="formSetting" :data="source!" />
+  <p-form :name="name" ref="formEl" v-bind="formSetting" :data="source!" />
 </template>

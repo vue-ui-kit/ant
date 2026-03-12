@@ -75,7 +75,14 @@
     v-if="items.some((s: PFormItemProps<F>) => (s.field && s.itemRender) || s.slots?.default)"
     class="p-pane p-wrapper"
   >
-    <a-form :key="renderFormKey" ref="formEl" :model="formData" v-bind="fc" @submit="handleSubmit">
+    <a-form
+      :name="name"
+      :key="renderFormKey"
+      ref="formEl"
+      :model="formData"
+      v-bind="fc"
+      @submit="handleSubmit"
+    >
       <a-row :gutter="[6, 12]">
         <p-form-col
           v-for="(item, idx) in items"

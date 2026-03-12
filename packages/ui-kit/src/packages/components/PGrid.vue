@@ -537,6 +537,7 @@
       >
         <a-spin :spinning="loading.form">
           <a-form
+            :name="formConfig?.name"
             :key="renderFormKey"
             ref="formEl"
             :model="queryFormData"

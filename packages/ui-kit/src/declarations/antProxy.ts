@@ -75,11 +75,13 @@ export interface PFormItemProps<F extends Recordable = Recordable> {
 }
 
 export interface PFormProps<F extends Recordable = Recordable> extends FormProps {
+  name?: string;
   items: PFormItemProps<F>[];
   customReset?: () => void;
 }
 
 export interface PBlockProps<F extends Recordable = Recordable> {
+  name?: string;
   getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
   source: Partial<F>;
 }
@@ -114,6 +116,7 @@ export interface GroupMenuItem<F extends Recordable = Recordable> {
 }
 
 export interface PFormGroupProps<F extends Recordable = Recordable> {
+  name?: string;
   getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
   title?: string;
   tabLabel?: string;
