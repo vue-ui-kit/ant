@@ -4,9 +4,11 @@
   import RenderAntItem from '@/components/RenderAntItem';
   import RenderItemSlots from '@/components/RenderItemSlots';
   import { InfoCircleOutlined } from '@ant-design/icons-vue';
+  import { Tooltip as ATooltip } from 'ant-design-vue';
   import { v4 as uuid_v4 } from 'uuid';
-  import { ref } from 'vue';
+  import { ref, computed, h } from 'vue';
   import { isEqual, debounce, isFunction, omit } from 'xe-utils';
+  import { getTooltipRenderer } from '@/utils/config';
 
   const props = defineProps<{
     item: PFormItemProps<T>;
@@ -36,6 +38,31 @@
     renderFormKey.value = uuid_v4();
   };
   const debounceRefreshCol = debounce(refreshCol, 100);
+
+  // 将 tooltipConfig 统一渲染为函数式组件，支持全局 renderTooltip 替换
+  const tooltipNode = computed<(() => any) | null>(() => {
+    if (!props.item.tooltipConfig) return null;
+    const config = props.item.tooltipConfig;
+    const renderTooltip = getTooltipRenderer();
+    const defaultSlot = () => h(InfoCircleOutlined, { class: 'cursor-pointer py-4 px-2' });
+    const content: string | (() => any) = isFunction(config.title)
+      ? config.title
+      : String(config.title ?? '');
+
+    if (renderTooltip) {
+      return () => renderTooltip(defaultSlot, content);
+    }
+
+    // 默认使用 a-tooltip
+    return () =>
+      isFunction(config.title)
+        ? h(ATooltip, omit(config, ['title']) as any, {
+            default: defaultSlot,
+            title: () => h('div', { innerHTML: config.title!() }),
+          })
+        : h(ATooltip, config as any, { default: defaultSlot });
+  });
+
   watchPreviousDeep(
     () => props.item,
     (cur, old) => {
@@ -96,19 +123,8 @@
         @trigger="handleTrigger"
       />
       <span v-else />
-      <template v-if="item.tooltipConfig" #tooltip>
-        <a-tooltip
-          v-if="isFunction(item.tooltipConfig.title)"
-          v-bind="omit(item.tooltipConfig, ['title'])"
-        >
-          <info-circle-outlined class="cursor-pointer py-4 px-2" />
-          <template #title>
-            <div v-html="item.tooltipConfig.title()" />
-          </template>
-        </a-tooltip>
-        <a-tooltip v-else v-bind="item.tooltipConfig">
-          <info-circle-outlined class="cursor-pointer py-4 px-2" />
-        </a-tooltip>
+      <template v-if="tooltipNode" #tooltip>
+        <component :is="tooltipNode" />
       </template>
     </a-form-item>
   </a-col>

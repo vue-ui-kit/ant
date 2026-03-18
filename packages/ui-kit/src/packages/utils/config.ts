@@ -1,6 +1,7 @@
 import { PFormProps, PGridProps } from '#/antProxy';
 import { ConfigType } from 'e-virt-table';
 import { clone } from 'xe-utils';
+import type { VNode } from 'vue';
 
 // 全局配置接口
 export interface UIKitConfig {
@@ -16,6 +17,12 @@ export interface UIKitConfig {
     striped?: boolean;
   };
   canvasTable?: ConfigType;
+  /**
+   * 自定义 tooltip 渲染函数，替换全局所有 a-tooltip。
+   * @param defaultSlot 原 tooltip 触发元素（图标等）
+   * @param content tooltip 内容，字符串或返回 VNode 的函数
+   */
+  renderTooltip?: (defaultSlot: () => VNode, content: string | (() => VNode)) => VNode;
 }
 
 // 默认配置
@@ -55,7 +62,13 @@ export function setUIKitConfig(config: Partial<UIKitConfig>): void {
       ...currentConfig.canvasTable,
       ...config.canvasTable,
     },
+    renderTooltip: config.renderTooltip ?? currentConfig.renderTooltip,
   };
+}
+
+// 获取自定义 tooltip 渲染函数
+export function getTooltipRenderer(): UIKitConfig['renderTooltip'] {
+  return currentConfig.renderTooltip;
 }
 
 // 获取配置

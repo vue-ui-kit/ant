@@ -34,6 +34,9 @@
           title: '项目名称',
           span: 24,
           rule: [{ required: true, message: '请输入项目名称', trigger: 'blur' }],
+          tooltipConfig: {
+            title: '请填写完整的项目名称，将显示在报表中',
+          },
           itemRender: {
             name: '$input',
             props: {
@@ -71,6 +74,10 @@
           field: 'budget',
           title: '预算',
           span: 12,
+          tooltipConfig: {
+            title: () =>
+              `当前项目预算上限为 ￥${(data.budget ?? 0) > 0 ? data.budget?.toLocaleString() : '未设置'}，请合理规划`,
+          },
           itemRender: {
             name: '$number',
             props: {

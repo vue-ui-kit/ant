@@ -1,5 +1,8 @@
 import UIKit from '@vue-ui-kit/ant';
-import type { App } from 'vue';
+import type { App, VNode } from 'vue';
+import { h } from 'vue';
+import { Tooltip as ATooltip } from 'ant-design-vue';
+
 export const setupUIKit = (app: App) => {
   // 测试setup功能
   UIKit.setup({
@@ -16,6 +19,16 @@ export const setupUIKit = (app: App) => {
       ENABLE_FINDER: true,
       AUTO_ROW_HEIGHT: true,
     },
+    // 自定义蓝色 tooltip，模拟替换全局 a-tooltip
+    renderTooltip: (defaultSlot: () => VNode, content: string | (() => VNode)) =>
+      h(
+        ATooltip,
+        { color: '#1677ff', overlayInnerStyle: { borderRadius: '6px' } },
+        {
+          default: defaultSlot,
+          title: typeof content === 'string' ? () => content : content,
+        },
+      ),
   });
 
   UIKit.addFormatter({ test: () => 'test' });

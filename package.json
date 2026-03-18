@@ -2,16 +2,12 @@
   "name": "ui-kit",
   "homepage": "https://github.com/vue-ui-kit/ant",
   "type": "module",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Vue3 UI Kit based on Ant Design",
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
   "scripts": {
-    "pkg": "yarn workspace @vue-ui-kit/ant install",
-    "dev": "yarn workspace storybook dev",
-    "build": "yarn workspace @vue-ui-kit/ant build",
+    "pkg": "pnpm --filter @vue-ui-kit/ant install",
+    "dev": "pnpm --filter storybook dev",
+    "build": "pnpm --filter @vue-ui-kit/ant build",
     "publish:lib": "cd packages/ui-kit && npm publish --access=public && cd ../..",
     "prepare": "husky",
     "lint:lint-staged": "lint-staged",
@@ -48,8 +44,8 @@
       "oxlint --fix",
       "prettier --write"
     ],
-    "{!(package)*.json,*.code-snippets,.!(browserslist)*rc}": [
-      "prettier --write--parser json"
+    "{!(package)*.json,*.code-snippets,.!(browserslist|npm)*rc}": [
+      "prettier --write --parser json"
     ],
     "package.json": [
       "prettier --write"
@@ -66,10 +62,12 @@
       "prettier --write"
     ]
   },
-  "resolutions": {
-    "glob": "^12.0.0",
-    "tar": ">7.5.4",
-    "@isaacs/brace-expansion": ">5.0.0"
+  "pnpm": {
+    "overrides": {
+      "glob": "^12.0.0",
+      "tar": ">7.5.4",
+      "@isaacs/brace-expansion": ">5.0.0"
+    }
   },
-  "packageManager": "yarn@4.4.1"
+  "packageManager": "pnpm@10.2.0"
 }

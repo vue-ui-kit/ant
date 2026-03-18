@@ -8,7 +8,13 @@ import PGroupBlock from '@/components/PGroupBlock.vue';
 import PromisePicker from '@/components/PromisePicker.vue';
 import { addFormatter } from '@/utils/AFormatters';
 import { addRender } from '@/store/renderStore';
-import { setUIKitConfig, getUIKitConfig, resetUIKitConfig, UIKitConfig } from '@/utils/config';
+import {
+  setUIKitConfig,
+  getUIKitConfig,
+  resetUIKitConfig,
+  getTooltipRenderer,
+  UIKitConfig,
+} from '@/utils/config';
 
 // 创建setup方法
 function setup(config?: Partial<UIKitConfig>) {
@@ -37,7 +43,14 @@ export * from '#/antProxy';
 export * from '@/utils/core';
 
 // 导出配置方法
-export { setup, setUIKitConfig, getUIKitConfig, resetUIKitConfig, type UIKitConfig };
+export {
+  setup,
+  setUIKitConfig,
+  getUIKitConfig,
+  resetUIKitConfig,
+  getTooltipRenderer,
+  type UIKitConfig,
+};
 
 // 直接导出组件，使用户可以直接导入使用
 export {
