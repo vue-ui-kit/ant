@@ -6,7 +6,7 @@ export default defineComponent(
   <D extends Recordable = Recordable>(props: {
     cellRender: CellRender;
     renderTableParams: RenderTableParams<D>;
-    defaultHandler: {
+    defaultHandler?: {
       [key: string]: (...args: any[]) => any;
     };
   }) => {
