@@ -1,4 +1,4 @@
-import { createApp } from 'vue';
+import { createApp, type Plugin } from 'vue';
 import './style.css';
 import './theme.css';
 import App from './App.vue';
@@ -19,4 +19,4 @@ import { setupUIKit } from './Mock/setup';
 const app = createApp(App);
 setupUIKit(app);
 
-app.use(Antd).mount('#app');
+app.use(Antd as Plugin).mount('#app');

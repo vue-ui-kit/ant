@@ -53,10 +53,11 @@
     }
   });
 
-  // 监听主题变化并保存到本地存储
-  const handleThemeChange = (checked: boolean) => {
-    toggleTheme(checked);
-    localStorage.setItem('theme', checked ? 'dark' : 'light');
+  // 监听主题变化并保存到本地存储（与 a-switch @change 签名一致）
+  const handleThemeChange = (checked: boolean | string | number, _e: Event) => {
+    const on = typeof checked === 'boolean' ? checked : checked === 'true' || checked === 1;
+    toggleTheme(on);
+    localStorage.setItem('theme', on ? 'dark' : 'light');
   };
 </script>
 

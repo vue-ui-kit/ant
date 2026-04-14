@@ -45,23 +45,12 @@ export default defineConfig({
     lib: {
       entry: {
         index: 'src/index.ts',
-        style: 'src/packages/styles/index.scss',
       },
-      fileName: (format, entryName) => {
-        if (entryName === 'style') {
-          // 这里不返回文件名，让vite自动处理
-          return `${format}/index.js`;
-        }
-        return `${format}/index.js`;
-      },
+      fileName: (format) => `${format}/index.js`,
       formats: ['es', 'cjs'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['vue', 'ant-design-vue', '@ant-design/icons-vue'],
-      input: {
-        index: 'src/index.ts',
-        style: 'src/packages/styles/index.scss',
-      },
       output: {
         globals: {
           vue: 'Vue',
