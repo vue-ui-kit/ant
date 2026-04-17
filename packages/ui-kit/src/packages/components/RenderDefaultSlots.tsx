@@ -1,5 +1,5 @@
 import { defineComponent } from 'vue';
-import { ColumnProps } from '#/antProxy';
+import type { ColumnProps } from '#/antProxy';
 import { renderAntFormat } from '@/utils/AFormatters';
 import RenderAntCell from '@/components/RenderAntCell';
 
@@ -7,7 +7,11 @@ export default defineComponent(
   <D extends Recordable = Recordable>(props: {
     tableData: D[];
     row: D;
-    column: ColumnProps<D>;
+    /**
+     * `PGrid` / `columns` 仍为 `ColumnProps<D>[]`；此处不能写 `ColumnProps<D>`：
+     * 模板里 `a-table` 的 `record` 无泛型上下文，会被推断为 `Record<string, any>`，与 `formatter` 里 `row: D` 逆变冲突（TS2322）。
+     */
+    column: ColumnProps<any>;
     rowIndex: number;
     defaultHandler?: {
       [key: string]: (...args: any[]) => any;

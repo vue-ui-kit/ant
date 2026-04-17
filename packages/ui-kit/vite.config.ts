@@ -13,7 +13,20 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
-    dts(),
+    dts({
+      /**
+       * 保留 `PGridProps` / `ColumnProps<D>` 等与 Ant、e-virt-table 的强类型继承时，vue-tsc 对 `.vue` 单文件 emit 仍可能打印 TS2742（pnpm 下的物理路径），属已知噪音；
+       * 随后 api-extractor 会把声明 rollup 进 `dist/index.d.ts`，并 bundled 下列包，避免对外 d.ts 引用 `.pnpm/...`。
+       */
+      rollupTypes: true,
+      insertTypesEntry: true,
+      bundledPackages: [
+        'ant-design-vue',
+        'vue-types',
+        'scroll-into-view-if-needed',
+        'e-virt-table',
+      ],
+    }),
     // 自定义插件来创建完整的scss文件
     {
       name: 'create-standalone-scss',

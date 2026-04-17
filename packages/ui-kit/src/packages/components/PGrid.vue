@@ -377,9 +377,9 @@
     return lazy ? Promise.resolve() : debounceFetchData();
   };
   const defaultTableConfig = {
-    size: 'small',
+    size: 'small' as const,
     sticky: true,
-    transformCellText: ({ text }) => {
+    transformCellText: ({ text }: { text: any }) => {
       return isArray(text) && text.length === 0 ? '-' : text;
     },
   };

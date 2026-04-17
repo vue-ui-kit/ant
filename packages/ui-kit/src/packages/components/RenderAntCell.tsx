@@ -17,7 +17,7 @@ export default defineComponent(
         renderStore.renders[cellRender!.name]?.renderDefault?.(
           cellRender!,
           { data, row, field, rowIndex },
-          props.defaultHandler,
+          props.defaultHandler ?? {},
         ) ?? null
       );
     };

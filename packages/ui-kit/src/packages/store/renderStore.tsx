@@ -30,7 +30,7 @@ import { computed, ref, Ref } from 'vue';
 
 interface BtnOptions extends Omit<ButtonProps, 'type'> {
   content?: string;
-  type?: string;
+  type?: ButtonProps['type'];
   getContent?: (p: RenderTableParams) => string;
   dynamicClassName?: (p: RenderTableParams) => string;
   dropdowns?: BtnOptions[];

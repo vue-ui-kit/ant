@@ -164,7 +164,8 @@ export interface ColumnProps<D extends Recordable = Recordable> extends Omit<
 export interface PButtonProps extends Omit<ButtonProps, 'type'> {
   content?: string | (() => any);
   icon?: string;
-  type?: string;
+  /** 与 `a-button` 一致，便于模板类型检查 */
+  type?: ButtonProps['type'];
 }
 
 export interface ToolbarButtonProps extends PButtonProps {
