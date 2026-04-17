@@ -62,6 +62,7 @@
     fitHeight: () => getGridDefaults().fitHeight ?? 30,
     striped: () => getGridDefaults().striped ?? false,
     autoBoxSize: false,
+    fitContent: false,
   });
 
   const {
@@ -484,6 +485,13 @@
         renderHeight.value = props.renderY as number;
         return;
       }
+      // 内容撑开模式（弹窗等）：scroll.y 作为上限，内容不足时 a-table-body 按自然高度展示。
+      if (props.fitContent) {
+        const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+        const reserve = props.fitHeight ?? 30;
+        renderHeight.value = Math.max(Math.floor(vh * 0.6) - reserve, 160);
+        return;
+      }
       const wrapperH = tableWrapperEl.value.clientHeight;
       const footerH = tableFooterEl.value?.offsetHeight ?? 0;
       const tableHeaderEl = resolveTableHeaderEl(tableWrapperEl.value);
@@ -605,8 +613,12 @@
   <div
     ref="boxEl"
     :class="[
-      'p-wrapper flex flex-col gap-8px overflow-y-auto',
-      autoBoxSize ? 'min-h-0 min-w-0 flex-1 w-full' : 'h-full',
+      'p-wrapper flex flex-col gap-8px',
+      fitContent
+        ? 'w-full h-auto'
+        : autoBoxSize
+          ? 'overflow-y-auto min-h-0 min-w-0 flex-1 w-full'
+          : 'overflow-y-auto h-full',
     ]"
     v-bind="attrs"
   >
@@ -722,9 +734,17 @@
       </div>
       <div
         ref="tableWrapperEl"
-        :class="`p-pane flex-1 h-0 min-h-0 flex flex-col p-${scrollMode ?? 'inner'}-scroll`"
+        :class="
+          fitContent
+            ? 'p-pane'
+            : `p-pane flex-1 h-0 min-h-0 flex flex-col p-${scrollMode ?? 'inner'}-scroll`
+        "
       >
-        <div class="p-grid-table-body flex-1 min-h-0 overflow-hidden">
+        <div
+          :class="
+            fitContent ? 'p-grid-table-body' : 'p-grid-table-body flex-1 min-h-0 overflow-hidden'
+          "
+        >
           <a-table
             :key="renderTableKey + '_table'"
             :row-key="rowKey ?? 'id'"

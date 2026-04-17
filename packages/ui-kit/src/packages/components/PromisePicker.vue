@@ -4,15 +4,14 @@
   name="PromisePicker"
   generic="D extends Recordable = Recordable, F extends Recordable = Recordable"
 >
-  import { reactive, ref, computed, onMounted, nextTick } from 'vue';
-  import { PGridInstance, PromisePickerProps } from '#/antProxy';
+  import { PGridInstance, PGridProps, PromisePickerProps } from '#/antProxy';
   import PGrid from '@/components/PGrid.vue';
   import { $warning } from '@/hooks/useMessage';
   import { Button as AButton, Modal as AModal } from 'ant-design-vue';
+  import { computed, reactive, ref } from 'vue';
 
   const gridEl = ref<PGridInstance<D>>();
 
-  const rendered = ref(false);
   const props = withDefaults(defineProps<PromisePickerProps<D, F>>(), {
     title: '数据选择',
     width: '70%',
@@ -21,6 +20,24 @@
     beforePick: () => Promise.resolve(),
   });
   const isMultiple = computed(() => props.gridSetting.selectConfig?.multiple);
+  /**
+   * 合并内置的 `fitContent: true`：
+   * - 弹窗容器由内容撑开，外层不写死高度；
+   * - 数据少时按内容自然高显示，避免出现大面积空白；
+   * - 数据多时由外层 `max-height` 限制总高度，表格内部 `scroll.y` 作为上限滚动。
+   * 用户在 `gridSetting` 中若显式传入 `fitContent`/`renderY` 可覆盖。
+   */
+  const mergedGridSetting = computed<PGridProps<D, F>>(() => ({
+    fitContent: true,
+    ...props.gridSetting,
+  }));
+  const pickerBodyStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
+    maxHeight: 'min(80dvh, calc(100dvh - 200px))',
+    overflow: 'hidden',
+  } as const;
   let resolvePromise: (
     value: { row: D; field?: string } | PromiseLike<{ row: D; field?: string }>,
   ) => void;
@@ -61,27 +78,18 @@
       });
     }
   };
-  onMounted(() => {});
   defineExpose({
     pick: () =>
       new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
         resolvePromise = resolve;
         rejectPromise = reject;
-        rendered.value = false;
         visible.modal = true;
-        nextTick(() => {
-          rendered.value = true;
-        });
       }),
     pickMultiple: () =>
       new Promise<{ row: D; field?: string } | D[]>((resolve, reject) => {
         multipleResolver = resolve;
         rejectPromise = reject;
-        rendered.value = false;
         visible.modal = true;
-        nextTick(() => {
-          rendered.value = true;
-        });
       }),
     grid: gridEl,
     hide: () => {
@@ -99,8 +107,8 @@
     @cancel="handleCancel"
     :body-style="bodyStyle"
   >
-    <div :style="{ minHeight: rendered ? 'unset' : '642px' }">
-      <p-grid v-bind="gridSetting" ref="gridEl" @pick="selectRow" />
+    <div :style="pickerBodyStyle">
+      <p-grid v-bind="mergedGridSetting" ref="gridEl" @pick="selectRow" />
     </div>
     <template v-if="isMultiple" #footer>
       <div class="w-full text-right p-2">

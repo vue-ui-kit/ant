@@ -58,8 +58,15 @@ function findResizeAncestor(start: Element | null): Element {
 }
 
 /**
- * 宽/高先按「视口内从元素左上角到右/下边缘」计算，再与**直接父元素**布局框取较小值，
- * 避免嵌套在侧栏 + flex 列等窄容器里仍按整屏宽度赋值，从而撑出页面级横向滚动条。
+ * 宽/高先按「视口内从元素左上角到右/下边缘」计算。
+ *
+ * 宽度会再与**直接父元素**布局框取较小值，避免嵌套在侧栏 + flex 列等窄容器里仍按整屏宽度赋值，
+ * 从而撑出页面级横向滚动条。
+ *
+ * 高度不做 parent 截断：autoBoxSize 的语义就是「一直撑到视口底」。若对 parent 取 min，
+ * 遇到「父容器没有明确高度、靠子元素内容撑开」的常见布局（外层未写死高度，p-grid 根节点
+ * 自身决定可视高度），会形成循环依赖（子依赖父、父又靠子撑开），导致高度被截成极小值，
+ * 反映到 PGrid 上就是表体下方出现大面积空白。
  */
 export function applyViewportRestSize(el: HTMLElement, offset: AutoViewportBoxOffset): void {
   const rect = el.getBoundingClientRect();
@@ -67,16 +74,13 @@ export function applyViewportRestSize(el: HTMLElement, offset: AutoViewportBoxOf
   const vh = window.innerHeight;
 
   let targetW = Math.max(0, vw - rect.left - offset.right);
-  let targetH = Math.max(0, vh - rect.top - offset.bottom);
+  const targetH = Math.max(0, vh - rect.top - offset.bottom);
 
   const parent = el.parentElement;
   if (parent) {
     const pr = parent.getBoundingClientRect();
     if (pr.width > 0) {
       targetW = Math.min(targetW, pr.width);
-    }
-    if (pr.height > 0) {
-      targetH = Math.min(targetH, pr.height);
     }
   }
 

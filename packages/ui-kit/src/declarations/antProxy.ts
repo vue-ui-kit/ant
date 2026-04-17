@@ -256,6 +256,15 @@ export type PGridProps<D extends Recordable = Recordable, F extends Recordable =
    * 虚拟列表 Y区计算高度
    */
   renderY?: number;
+  /**
+   * 适应「外层高度由内容撑开」的布局（典型如弹窗 `PromisePicker`）。
+   *
+   * 开启后：
+   * - 根容器/表体宿主不再 `flex:1` 强行撑满（避免父无固定高度时塌陷到 0）；
+   * - `a-table` 的纵向 `scroll.y` 作为「最多滚动到多少」的上限，由 `renderY` 显式指定；
+   *   若不传 `renderY`，使用基于视口的默认值。内容少时不会出现行区域下方的大片空白。
+   */
+  fitContent?: boolean;
 };
 
 export interface RenderOptions {
