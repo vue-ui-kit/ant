@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { createLogger, defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import dts from 'vite-plugin-dts';
@@ -9,7 +9,28 @@ function pathResolve(dir: string) {
   return resolve(process.cwd(), '.', dir);
 }
 
+/** vite-plugin-dts 在 vue SFC 上会报 TS2742（pnpm 物理路径）；rollup 后对外 d.ts 已可移植，此处过滤该条日志避免误当作构建失败。 */
+function createUiKitLogger() {
+  const base = createLogger('info', { allowClearScreen: false });
+  return {
+    ...base,
+    error(msg: unknown, options?: unknown) {
+      const text =
+        typeof msg === 'string'
+          ? msg
+          : msg instanceof Error
+            ? msg.message
+            : msg && typeof msg === 'object' && 'message' in msg
+              ? String((msg as { message: unknown }).message)
+              : String(msg);
+      if (text.includes('TS2742')) return;
+      (base.error as (m: unknown, o?: unknown) => void)(msg, options);
+    },
+  };
+}
+
 export default defineConfig({
+  customLogger: createUiKitLogger(),
   plugins: [
     vue(),
     vueJsx(),
