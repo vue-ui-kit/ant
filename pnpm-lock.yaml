@@ -136,9 +136,6 @@ importers:
       vite-plugin-dts:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@24.12.0)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.8(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.98.0)(yaml@2.8.2))
-      vite-tsconfig-paths:
-        specifier: ^5.1.4
-        version: 5.1.4(typescript@5.9.3)(vite@8.0.8(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.98.0)(yaml@2.8.2))
       vue:
         specifier: ^3.4.38
         version: 3.5.30(typescript@5.9.3)
@@ -4341,10 +4338,6 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  tsconfck@3.1.6(typescript@5.9.3):
-    optionalDependencies:
-      typescript: 5.9.3
-
   tslib@2.8.1:
     optional: true
 
@@ -4399,17 +4392,6 @@ snapshots:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.8.3)
-    optionalDependencies:
-      vite: 8.0.8(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.98.0)(yaml@2.8.2)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
-  vite-tsconfig-paths@5.1.4(typescript@5.9.3)(vite@8.0.8(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.98.0)(yaml@2.8.2)):
-    dependencies:
-      debug: 4.4.3
-      globrex: 0.1.2
-      tsconfck: 3.1.6(typescript@5.9.3)
     optionalDependencies:
       vite: 8.0.8(@types/node@24.12.0)(esbuild@0.28.0)(jiti@2.6.1)(sass@1.98.0)(yaml@2.8.2)
     transitivePeerDependencies:

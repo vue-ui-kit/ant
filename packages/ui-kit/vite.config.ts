@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
 import { resolve } from 'node:path';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -12,7 +11,6 @@ function pathResolve(dir: string) {
 
 export default defineConfig({
   plugins: [
-    tsconfigPaths(),
     vue(),
     vueJsx(),
     dts(),
@@ -39,6 +37,8 @@ export default defineConfig({
       '@': pathResolve('src/packages') + '/',
       '#': pathResolve('src/declarations') + '/',
     },
+    /** Vite 8+ 内置 tsconfig paths，替代 vite-tsconfig-paths */
+    tsconfigPaths: true,
   },
   build: {
     outDir: 'dist',
@@ -52,6 +52,8 @@ export default defineConfig({
     rolldownOptions: {
       external: ['vue', 'ant-design-vue', '@ant-design/icons-vue'],
       output: {
+        /** 与 default + named 混出并存时消除 Rolldown MIXED_EXPORTS 提示 */
+        exports: 'named',
         globals: {
           vue: 'Vue',
         },
