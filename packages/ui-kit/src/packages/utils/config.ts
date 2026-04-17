@@ -1,4 +1,5 @@
 import { PFormProps, PGridProps } from '#/antProxy';
+import type { AutoViewportBoxOffsetInput } from '@/utils/autoViewportBox';
 import { ConfigType } from 'e-virt-table';
 import { clone } from 'xe-utils';
 import type { VNode } from 'vue';
@@ -15,6 +16,8 @@ export interface UIKitConfig {
     fitHeight?: number;
     fitCanvasHeight?: number;
     striped?: boolean;
+    /** `PGrid` 开启 `autoBoxSize` 且未传 `autoBoxSizeOffset` 时的视口边距，与 props 类型一致 */
+    autoBoxSizeOffset?: AutoViewportBoxOffsetInput;
   };
   canvasTable?: ConfigType;
   /**
@@ -91,6 +94,7 @@ export function getGridDefaults(): Partial<PGridProps> {
     lazyReset: currentConfig.grid?.lazyReset,
     fitHeight: currentConfig.grid?.fitHeight,
     striped: currentConfig.grid?.striped,
+    autoBoxSizeOffset: currentConfig.grid?.autoBoxSizeOffset,
   };
 }
 

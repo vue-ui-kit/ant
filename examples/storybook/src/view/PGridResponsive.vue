@@ -20,6 +20,8 @@
   const gridContainer = ref<HTMLElement | null>(null);
   const { itemSpan, getLabelCol, getTailSpan } = usePFormResponsive(gridContainer);
   const gridSetting = computed<PGridProps<Student, { keyword?: string } & IPage>>(() => ({
+    /** 本页外层未写死高度，由根节点按视口撑满（与 v-rest 同源逻辑，见 ui-kit autoViewportBox） */
+    autoBoxSize: true,
     striped: true,
     columns: [
       {

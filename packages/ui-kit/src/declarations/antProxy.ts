@@ -231,6 +231,16 @@ export type PGridProps<D extends Recordable = Recordable, F extends Recordable =
   proxyConfig?: ProxyConfig<D, F>;
   tableConfig?: TableProps<D>;
   scrollMode?: 'outer' | 'inner';
+  /**
+   * 为 true 时根容器按视口从左上角铺满（与 v-rest 同源），用于外层未声明高度、靠内部撑开的布局。
+   * 偏移见 `autoBoxSizeOffset`。
+   */
+  autoBoxSize?: boolean;
+  /**
+   * `autoBoxSize` 时距视口右侧/底部的预留像素；数字或 `"12px"` 同时作用于两侧；对象可分别指定 `right` / `bottom`。
+   * 未传时使用 `setUIKitConfig({ grid: { autoBoxSizeOffset } })` 的全局值。
+   */
+  autoBoxSizeOffset?: number | string | { right?: number; bottom?: number };
   // 重置后不自动提交
   lazyReset?: boolean;
   /**

@@ -40,6 +40,7 @@ export default {
 
 // 导出所有类型
 export * from '#/antProxy';
+export * from '@/utils/autoViewportBox';
 export * from '@/utils/core';
 
 // 导出配置方法

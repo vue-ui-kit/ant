@@ -11,6 +11,12 @@
   import { $confirm } from '@/hooks/useMessage';
   import Icon from '@/renders/Icon';
   import { getGridDefaults } from '@/utils/config';
+  import {
+    createAutoViewportBoxController,
+    parseAutoViewportBoxOffset,
+    type AutoViewportBoxController,
+    type AutoViewportBoxOffsetInput,
+  } from '@/utils/autoViewportBox';
   import { cleanCol, defaultLabelCol } from '@/utils/core';
   import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
@@ -55,6 +61,7 @@
     lazyReset: () => getGridDefaults().lazyReset ?? false,
     fitHeight: () => getGridDefaults().fitHeight ?? 30,
     striped: () => getGridDefaults().striped ?? false,
+    autoBoxSize: false,
   });
 
   const {
@@ -67,6 +74,16 @@
     selectConfig,
     scrollMode,
   } = toRefs(props);
+
+  /** 局部 `autoBoxSizeOffset` 优先，否则用 `getGridDefaults().autoBoxSizeOffset`（`setUIKitConfig`） */
+  const resolvedAutoBoxSizeOffset = computed<AutoViewportBoxOffsetInput>(() => {
+    const local = props.autoBoxSizeOffset;
+    if (local !== undefined && local !== null) {
+      return local;
+    }
+    return getGridDefaults().autoBoxSizeOffset as AutoViewportBoxOffsetInput;
+  });
+
   const loading = reactive({
     table: false,
     toolbar: false,
@@ -412,6 +429,42 @@
     () => nextTick(() => resizeTable()),
     { flush: 'post' },
   );
+
+  let autoViewportBoxCtrl: AutoViewportBoxController | null = null;
+  const clearAutoViewportBox = () => {
+    autoViewportBoxCtrl?.destroy();
+    autoViewportBoxCtrl = null;
+  };
+  const syncAutoViewportBox = () => {
+    clearAutoViewportBox();
+    if (!props.autoBoxSize || !boxEl.value) return;
+    autoViewportBoxCtrl = createAutoViewportBoxController(
+      () => boxEl.value ?? undefined,
+      () => parseAutoViewportBoxOffset(resolvedAutoBoxSizeOffset.value),
+      {
+        onLayout: () => {
+          nextTick(() => resizeTable());
+        },
+      },
+    );
+    autoViewportBoxCtrl.attach();
+  };
+
+  watch(
+    () => props.autoBoxSize,
+    (on) => {
+      if (!on) clearAutoViewportBox();
+      else nextTick(() => syncAutoViewportBox());
+    },
+  );
+  watch(
+    resolvedAutoBoxSizeOffset,
+    () => {
+      if (props.autoBoxSize) autoViewportBoxCtrl?.update();
+    },
+    { deep: true },
+  );
+
   let resizeRaf: number | null = null;
 
   const resolveTableHeaderEl = (wrapper: HTMLElement): HTMLElement | null => {
@@ -511,7 +564,10 @@
       tableFooterResizeObserver.observe(tableFooterEl.value);
     }
     resetQueryFormData(props.manualFetch);
-    nextTick(() => resizeTable());
+    nextTick(() => {
+      if (props.autoBoxSize) syncAutoViewportBox();
+      resizeTable();
+    });
   });
   const renderContent = (content: string | (() => any)) => {
     if (isFunction(content)) {
@@ -535,6 +591,7 @@
       ...c,
     }));
   onBeforeUnmount(() => {
+    clearAutoViewportBox();
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
     window.removeEventListener('resize', resizeTable);
     observer.disconnect();
@@ -545,7 +602,14 @@
   });
 </script>
 <template>
-  <div ref="boxEl" class="h-full p-wrapper flex flex-col gap-8px overflow-y-auto" v-bind="attrs">
+  <div
+    ref="boxEl"
+    :class="[
+      'p-wrapper flex flex-col gap-8px overflow-y-auto',
+      autoBoxSize ? 'min-h-0 min-w-0 flex-1 w-full' : 'h-full',
+    ]"
+    v-bind="attrs"
+  >
     <div v-if="mode === 'bad'">请检查配置</div>
     <template v-else>
       <div

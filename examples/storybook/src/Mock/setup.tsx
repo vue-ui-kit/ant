@@ -10,6 +10,7 @@ export const setupUIKit = (app: App) => {
       align: 'center',
       fitHeight: 32,
       lazyReset: true,
+      autoBoxSizeOffset: { right: 16, bottom: 16 },
     },
     form: {
       labelCol: { span: 8 },
