@@ -1,14 +1,14 @@
 import UIKit from '@vue-ui-kit/ant';
+import { Tooltip as ATooltip } from 'ant-design-vue';
 import type { App, VNode } from 'vue';
 import { h } from 'vue';
-import { Tooltip as ATooltip } from 'ant-design-vue';
 
 export const setupUIKit = (app: App) => {
   // 测试setup功能
   UIKit.setup({
     grid: {
       align: 'center',
-      fitHeight: 180,
+      fitHeight: 32,
       lazyReset: true,
     },
     form: {

@@ -1,9 +1,9 @@
 <script setup lang="tsx">
+  import { HeartOutlined, StarOutlined } from '@ant-design/icons-vue';
+  import { PGridProps } from '@vue-ui-kit/ant';
   import { computed, h, ref } from 'vue';
-  import { Student } from '../Mock/apis/type';
   import { queryStudents } from '../Mock/apis/school';
-  import { PGridProps, labelColDict } from '@vue-ui-kit/ant';
-  import { StarOutlined, HeartOutlined } from '@ant-design/icons-vue';
+  import { Student } from '../Mock/apis/type';
   import { usePFormResponsive } from '../utils/responsive';
   interface IPage {
     /**
@@ -218,6 +218,7 @@
     },
     selectConfig: {
       multiple: true,
+      showCount: true,
     },
     toolbarConfig: {
       buttons: [

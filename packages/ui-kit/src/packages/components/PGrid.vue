@@ -5,16 +5,36 @@
   setup
 >
   import { ColumnProps, PFormItemProps, PGridProps, ResponsePathConfig } from '#/antProxy';
+  import PFormCol from '@/components/PFormCol.vue';
+  import RenderDefaultSlots from '@/components/RenderDefaultSlots';
+  import RenderTitleSlots from '@/components/RenderTitleSlots';
+  import { $confirm } from '@/hooks/useMessage';
+  import Icon from '@/renders/Icon';
+  import { getGridDefaults } from '@/utils/config';
+  import { cleanCol, defaultLabelCol } from '@/utils/core';
+  import { isGoodValue } from '@/utils/is';
+  import { eachTree } from '@/utils/treeHelper';
+  import { DownOutlined } from '@ant-design/icons-vue';
   import {
-    computed,
-    useAttrs,
-    ref,
+    message as $message,
+    Button as AButton,
+    Form as AForm,
+    Row as ARow,
+    Spin as ASpin,
+    Table as ATable,
+  } from 'ant-design-vue';
+  import { v4 as uuid_v4 } from 'uuid';
+  import {
     Ref,
-    reactive,
-    onMounted,
-    watch,
-    toRefs,
+    computed,
+    nextTick,
     onBeforeUnmount,
+    onMounted,
+    reactive,
+    ref,
+    toRefs,
+    useAttrs,
+    watch,
   } from 'vue';
   import {
     debounce,
@@ -27,33 +47,13 @@
     merge,
     omit,
   } from 'xe-utils';
-  import { eachTree } from '@/utils/treeHelper';
-  import { message as $message } from 'ant-design-vue';
-  import RenderTitleSlots from '@/components/RenderTitleSlots';
-  import RenderDefaultSlots from '@/components/RenderDefaultSlots';
-  import { v4 as uuid_v4 } from 'uuid';
-  import { isGoodValue } from '@/utils/is';
-  import PFormCol from '@/components/PFormCol.vue';
-  import { cleanCol, defaultLabelCol } from '@/utils/core';
-  import { getGridDefaults } from '@/utils/config';
-  import Icon from '@/renders/Icon';
-  import { $confirm } from '@/hooks/useMessage';
-  import {
-    Table as ATable,
-    Button as AButton,
-    Form as AForm,
-    Row as ARow,
-    Spin as ASpin,
-  } from 'ant-design-vue';
-  import { TablePaginationConfig } from 'ant-design-vue/es/table/interface';
-  import { DownOutlined } from '@ant-design/icons-vue';
 
   const props = withDefaults(defineProps<PGridProps<D, F>>(), {
     rowKey: 'id',
     scrollMode: 'inner',
     align: () => getGridDefaults().align ?? 'left',
     lazyReset: () => getGridDefaults().lazyReset ?? false,
-    fitHeight: () => getGridDefaults().fitHeight ?? 170,
+    fitHeight: () => getGridDefaults().fitHeight ?? 30,
     striped: () => getGridDefaults().striped ?? false,
   });
 
@@ -86,6 +86,7 @@
   const boxEl = ref<HTMLDivElement>();
   const pFormWrapper = ref<HTMLDivElement>();
   const tableWrapperEl = ref<HTMLDivElement>();
+  const tableFooterEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   const selectedRowKeys = ref<Array<string | number>>([]);
   const selectedCaches = ref<D[]>([]);
@@ -184,6 +185,8 @@
         : 'list'
       : 'bad',
   );
+  /** 底部展示「已选」统计（与 multiple 无关，仅看 showCount） */
+  const showSelectionCount = computed(() => !!selectConfig.value?.showCount);
   const attrs = useAttrs();
   const emit = defineEmits<{
     (
@@ -286,7 +289,6 @@
       : {
           list: response,
         };
-  const enoughSpacing = ref(true);
   const reload = () => {
     selectedCaches.value = [];
     selectedRowKeys.value = [];
@@ -298,15 +300,9 @@
     selectedRowKeys.value = [];
     return fetchData();
   };
-  /**
-   * @description
-   * @param p
-   * @param _filters todo filters
-   * @param _sorter todo sorter
-   */
-  const handleTableChange = (p: TablePaginationConfig, _filters, _sorter) => {
-    pagination.page = p.current!;
-    pagination.size = p.pageSize!;
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    pagination.page = page;
+    pagination.size = pageSize;
     return fetchData();
   };
 
@@ -363,18 +359,6 @@
     pagination.page = 1;
     return lazy ? Promise.resolve() : debounceFetchData();
   };
-  const pg = computed(() =>
-    mode.value === 'pagination'
-      ? {
-          current: pagination.page,
-          total: totalCount.value,
-          pageSize: pagination.size,
-          responsive: false,
-          showSizeChanger: true,
-          showTotal: (total: number) => `共${total}条数据`,
-        }
-      : false,
-  );
   const defaultTableConfig = {
     size: 'small',
     sticky: true,
@@ -423,16 +407,37 @@
     },
     { deep: true },
   );
+  watch(
+    () => [renderTableKey.value, dataSeed.value, mode.value, showSelectionCount.value],
+    () => nextTick(() => resizeTable()),
+    { flush: 'post' },
+  );
   let resizeRaf: number | null = null;
+
+  const resolveTableHeaderEl = (wrapper: HTMLElement): HTMLElement | null => {
+    const root = wrapper.querySelector('.ant-table-wrapper');
+    if (!root) return null;
+    const byHeader = root.querySelector('.ant-table-header') as HTMLElement | null;
+    if (byHeader) return byHeader;
+    return root.querySelector('.ant-table-thead') as HTMLElement | null;
+  };
+
   const resizeTable = () => {
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = null;
       if (!tableWrapperEl.value) return;
-      const rect = tableWrapperEl.value.getBoundingClientRect();
-      renderHeight.value =
-        props.renderY ?? Math.max(window.innerHeight - rect.top - props.fitHeight, 100);
-      enoughSpacing.value = window.innerHeight > 600;
+      if (isGoodValue(props.renderY)) {
+        renderHeight.value = props.renderY as number;
+        return;
+      }
+      const wrapperH = tableWrapperEl.value.clientHeight;
+      const footerH = tableFooterEl.value?.offsetHeight ?? 0;
+      const tableHeaderEl = resolveTableHeaderEl(tableWrapperEl.value);
+      const headerH = tableHeaderEl?.getBoundingClientRect().height ?? 0;
+      const reserve = props.fitHeight ?? 30;
+      const y = Math.max(wrapperH - footerH - headerH - reserve, 100);
+      renderHeight.value = y;
     });
   };
 
@@ -469,6 +474,8 @@
 
   let observer: MutationObserver;
   let boxElResizeObserver: ResizeObserver | null = null;
+  let tableWrapperResizeObserver: ResizeObserver | null = null;
+  let tableFooterResizeObserver: ResizeObserver | null = null;
   onMounted(() => {
     resizeTable();
     window.addEventListener('resize', resizeTable);
@@ -495,7 +502,16 @@
         ancestor = ancestor.parentElement;
       }
     }
+    tableWrapperResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableWrapperEl.value) {
+      tableWrapperResizeObserver.observe(tableWrapperEl.value);
+    }
+    tableFooterResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableFooterEl.value) {
+      tableFooterResizeObserver.observe(tableFooterEl.value);
+    }
     resetQueryFormData(props.manualFetch);
+    nextTick(() => resizeTable());
   });
   const renderContent = (content: string | (() => any)) => {
     if (isFunction(content)) {
@@ -524,6 +540,8 @@
     observer.disconnect();
     formWrapperResizeObserver?.disconnect();
     boxElResizeObserver?.disconnect();
+    tableWrapperResizeObserver?.disconnect();
+    tableFooterResizeObserver?.disconnect();
   });
 </script>
 <template>
@@ -640,51 +658,72 @@
       </div>
       <div
         ref="tableWrapperEl"
-        :class="`p-pane flex-1 ${enoughSpacing ? 'h-0' : ''} p-${scrollMode ?? 'inner'}-scroll`"
+        :class="`p-pane flex-1 h-0 min-h-0 flex flex-col p-${scrollMode ?? 'inner'}-scroll`"
       >
-        <div
-          v-if="selectConfig?.multiple && selectConfig.showCount"
-          class="w-full text-slate-5 pl-4"
-        >
-          已选：{{ selectedRowKeys.length }}
+        <div class="p-grid-table-body flex-1 min-h-0 overflow-hidden">
+          <a-table
+            :key="renderTableKey + '_table'"
+            :row-key="rowKey ?? 'id'"
+            ref="tableEl"
+            :row-class-name="
+              striped ? (_record, index) => (index % 2 === 1 ? 'p-grid-row-striped' : '') : ''
+            "
+            :columns="passDefaultColumnProps(columns ?? []).map((c) => cleanCol(c as ColumnProps))"
+            :data-source="tableData"
+            :loading="loading.table"
+            :pagination="false"
+            v-bind="tc"
+            :scroll="{
+              x: 'max-content',
+              y: renderHeight,
+            }"
+          >
+            <template v-if="slotTitleColumns.length > 0" #headerCell="{ column }">
+              <render-title-slots
+                v-if="slotTitleColumns.some((s) => column.key && s.field === column.key)"
+                :key="renderTableKey + '_title_' + dataSeed + '_slot_' + column.key"
+                :column="slotTitleColumns.find((f) => column.key && f.field === column.key)!"
+              />
+            </template>
+            <template v-if="slotDefaultColumns.length > 0" #bodyCell="{ column, record, index }">
+              <render-default-slots
+                v-if="slotDefaultColumns.some((s) => column.key && s.field === column.key)"
+                :key="renderTableKey + '_cell_' + dataSeed + '_slot_' + column.key"
+                :column="slotDefaultColumns.find((f) => column.key && f.field === column.key)!"
+                :default-handler="{ pick: pickRow, setLoadings }"
+                :row="record"
+                :row-index="index"
+                :table-data="tableData as Recordable[]"
+              />
+            </template>
+          </a-table>
         </div>
-        <a-table
-          :key="renderTableKey + '_table'"
-          :row-key="rowKey ?? 'id'"
-          ref="tableEl"
-          :row-class-name="
-            striped ? (_record, index) => (index % 2 === 1 ? 'p-grid-row-striped' : '') : ''
-          "
-          :columns="passDefaultColumnProps(columns ?? []).map((c) => cleanCol(c as ColumnProps))"
-          :data-source="tableData"
-          :loading="loading.table"
-          :pagination="pg"
-          v-bind="tc"
-          :scroll="{
-            x: 'max-content',
-            y: renderHeight,
-          }"
-          @change="handleTableChange"
-        >
-          <template v-if="slotTitleColumns.length > 0" #headerCell="{ column }">
-            <render-title-slots
-              v-if="slotTitleColumns.some((s) => column.key && s.field === column.key)"
-              :key="renderTableKey + '_title_' + dataSeed + '_slot_' + column.key"
-              :column="slotTitleColumns.find((f) => column.key && f.field === column.key)!"
+        <div ref="tableFooterEl" class="flex-shrink-0">
+          <div
+            v-if="mode !== 'pagination' && showSelectionCount"
+            class="w-full pt-8px px-16px text-slate-5"
+          >
+            已选：{{ selectedRowKeys.length }}
+          </div>
+          <div
+            v-else-if="mode === 'pagination'"
+            class="flex w-full items-center gap-12px pt-8px px-16px"
+          >
+            <div class="flex-1 min-w-0 text-slate-5 flex items-center">
+              <template v-if="showSelectionCount"> 已选：{{ selectedRowKeys.length }} </template>
+            </div>
+            <a-pagination
+              size="small"
+              :responsive="false"
+              :show-size-changer="true"
+              :show-total="(total: number) => `共${total}条数据`"
+              :current="pagination.page"
+              :page-size="pagination.size"
+              :total="totalCount"
+              @change="handlePaginationChange"
             />
-          </template>
-          <template v-if="slotDefaultColumns.length > 0" #bodyCell="{ column, record, index }">
-            <render-default-slots
-              v-if="slotDefaultColumns.some((s) => column.key && s.field === column.key)"
-              :key="renderTableKey + '_cell_' + dataSeed + '_slot_' + column.key"
-              :column="slotDefaultColumns.find((f) => column.key && f.field === column.key)!"
-              :default-handler="{ pick: pickRow, setLoadings }"
-              :row="record"
-              :row-index="index"
-              :table-data="tableData as Recordable[]"
-            />
-          </template>
-        </a-table>
+          </div>
+        </div>
       </div>
     </template>
   </div>

@@ -1,9 +1,9 @@
 <script setup lang="tsx">
-  import { computed, h } from 'vue';
-  import { Student } from '../Mock/apis/type';
-  import { queryStudents } from '../Mock/apis/school';
+  import { HeartOutlined, StarOutlined } from '@ant-design/icons-vue';
   import { PGridProps, labelColDict } from '@vue-ui-kit/ant';
-  import { StarOutlined, HeartOutlined } from '@ant-design/icons-vue';
+  import { computed, h } from 'vue';
+  import { queryStudents } from '../Mock/apis/school';
+  import { Student } from '../Mock/apis/type';
 
   interface IPage {
     /**
@@ -120,6 +120,7 @@
     },
     selectConfig: {
       multiple: true,
+      showCount: true,
     },
     toolbarConfig: {
       buttons: [

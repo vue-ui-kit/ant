@@ -59,7 +59,7 @@ setup({
   grid: {
     align: 'center', // Set default table alignment
     lazyReset: true, // Don't auto-submit after reset
-    fitHeight: 200, // Set adaptive height
+    fitHeight: 30, // Set adaptive height
   },
 });
 
@@ -909,7 +909,7 @@ const kitConfig: UIKitConfig = {
   grid: {
     align: 'center',
     lazyReset: true,
-    fitHeight: 200,
+    fitHeight: 30,
   },
 };
 ```
@@ -1216,7 +1216,7 @@ import UIKit, { PForm, PGrid, setup } from '@vue-ui-kit/ant';
   setup({
     grid: {
       align: 'center',
-      fitHeight: 180,
+      fitHeight: 30,
     },
     form: {
       labelCol: labelColDict[4],

@@ -144,8 +144,10 @@ export interface PFormGroupProps<F extends Recordable = Recordable> {
   menuHandler?: GroupMenuItemHandler<F>;
 }
 
-export interface ColumnProps<D extends Recordable = Recordable>
-  extends Omit<TableColumnType, 'slots'> {
+export interface ColumnProps<D extends Recordable = Recordable> extends Omit<
+  TableColumnType,
+  'slots'
+> {
   field?: string;
   children?: ColumnProps<D>[];
   formatter?:
@@ -232,7 +234,7 @@ export type PGridProps<D extends Recordable = Recordable, F extends Recordable =
   // 重置后不自动提交
   lazyReset?: boolean;
   /**
-   * 适应展示区到页面顶部的高度，通常和容器最上的y值有关（正比）
+   * 表格纵向滚动区额外预留像素：在 `tableWrapper` 高度内扣减表头、底栏后，再从 body 可滚动高度中减去本值，避免末行与滚动条贴边或被裁切。可通过 `setUIKitConfig({ grid: { fitHeight } })` 或组件 `fitHeight` 按项目微调；库内全局默认见 `config`。
    */
   fitHeight?: number;
   /**
@@ -299,8 +301,10 @@ export interface RenderTableParams<D extends Recordable = Recordable> {
   field?: string;
   title?: string;
 }
-export interface CanvasColumnProps<T extends Recordable = Recordable>
-  extends Omit<EVirtColumn, 'children' | 'formatter' | 'key'> {
+export interface CanvasColumnProps<T extends Recordable = Recordable> extends Omit<
+  EVirtColumn,
+  'children' | 'formatter' | 'key'
+> {
   key?: string;
   field?: string;
   children?: CanvasColumnProps<T>[];

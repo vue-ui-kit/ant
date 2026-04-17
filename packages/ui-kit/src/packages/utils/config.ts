@@ -34,7 +34,7 @@ const defaultConfig: UIKitConfig = {
   grid: {
     align: 'left',
     lazyReset: false,
-    fitHeight: 170,
+    fitHeight: 30,
     striped: false,
   },
   canvasTable: {
