@@ -10,13 +10,13 @@
   import RenderTitleSlots from '@/components/RenderTitleSlots';
   import { $confirm } from '@/hooks/useMessage';
   import Icon from '@/renders/Icon';
-  import { getGridDefaults } from '@/utils/config';
   import {
     createAutoViewportBoxController,
     parseAutoViewportBoxOffset,
     type AutoViewportBoxController,
     type AutoViewportBoxOffsetInput,
   } from '@/utils/autoViewportBox';
+  import { getGridDefaults } from '@/utils/config';
   import { cleanCol, defaultLabelCol } from '@/utils/core';
   import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
@@ -678,12 +678,14 @@
                   :ghost="btn.ghost"
                   :block="btn.block"
                 >
-                  <Icon v-if="btn.icon" :icon="btn.icon" />
-                  <template v-if="btn.content && isStringContent(renderContent(btn.content))">
-                    {{ renderContent(btn.content) }}
-                  </template>
-                  <component v-else-if="btn.content" :is="renderContent(btn.content)" />
-                  <DownOutlined />
+                  <div class="flex items-center gap-4px">
+                    <Icon v-if="btn.icon" :icon="btn.icon" />
+                    <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                      {{ renderContent(btn.content) }}
+                    </template>
+                    <component v-else-if="btn.content" :is="renderContent(btn.content)" />
+                    <DownOutlined />
+                  </div>
                 </a-button>
               </a-dropdown>
               <a-button
@@ -698,11 +700,13 @@
                 :block="btn.block"
                 @click="debounceToolBtnClick(btn.code)"
               >
-                <Icon v-if="btn.icon" :icon="btn.icon" />
-                <template v-if="btn.content && isStringContent(renderContent(btn.content))">
-                  {{ renderContent(btn.content) }}
-                </template>
-                <component v-else-if="btn.content" :is="renderContent(btn.content)" />
+                <div class="flex items-center gap-4px">
+                  <Icon v-if="btn.icon" :icon="btn.icon" />
+                  <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                    {{ renderContent(btn.content) }}
+                  </template>
+                  <component v-else-if="btn.content" :is="renderContent(btn.content)" />
+                </div>
               </a-button>
               <div v-else></div>
             </template>
@@ -723,11 +727,13 @@
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
-              <Icon v-if="tool.icon" :icon="tool.icon" />
-              <template v-if="tool.content && isStringContent(renderContent(tool.content))">
-                {{ renderContent(tool.content) }}
-              </template>
-              <component v-else-if="tool.content" :is="renderContent(tool.content)" />
+              <div class="flex items-center gap-4px">
+                <Icon v-if="tool.icon" :icon="tool.icon" />
+                <template v-if="tool.content && isStringContent(renderContent(tool.content))">
+                  {{ renderContent(tool.content) }}
+                </template>
+                <component v-else-if="tool.content" :is="renderContent(tool.content)" />
+              </div>
             </a-button>
           </template>
         </span>

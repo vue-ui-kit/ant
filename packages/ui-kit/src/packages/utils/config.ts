@@ -26,6 +26,12 @@ export interface UIKitConfig {
    * @param content tooltip 内容，字符串或返回 VNode 的函数
    */
   renderTooltip?: (defaultSlot: () => VNode, content: string | (() => VNode)) => VNode;
+  /**
+   * 自定义图标：按 `icon` 名字渲染；返回值为真时优先于 `@ant-design/icons-vue` 同名组件。
+   */
+  icon?: {
+    render?: (name: string) => unknown;
+  };
 }
 
 // 默认配置
@@ -45,6 +51,7 @@ const defaultConfig: UIKitConfig = {
     ENABLE_FINDER: true,
     AUTO_ROW_HEIGHT: true,
   },
+  icon: {},
 };
 
 // 当前配置（可被修改）
@@ -66,6 +73,10 @@ export function setUIKitConfig(config: Partial<UIKitConfig>): void {
       ...config.canvasTable,
     },
     renderTooltip: config.renderTooltip ?? currentConfig.renderTooltip,
+    icon: {
+      ...currentConfig.icon,
+      ...config.icon,
+    },
   };
 }
 

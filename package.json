@@ -2,7 +2,7 @@
   "name": "ui-kit",
   "homepage": "https://github.com/vue-ui-kit/ant",
   "type": "module",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "Vue3 UI Kit based on Ant Design",
   "scripts": {
     "pkg": "pnpm --filter @vue-ui-kit/ant install",

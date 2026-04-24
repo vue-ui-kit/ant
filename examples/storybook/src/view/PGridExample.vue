@@ -172,6 +172,12 @@
           icon: 'ReloadOutlined',
         },
         {
+          code: 'customSvgIcon',
+          content: '自定义 SVG',
+          // 在 Mock/setup.tsx 中 `UIKit.setup({ icon: { render } })` 注册，青色方块 + 白十字，与 ant 线框图标区分
+          icon: 'SampleStorybookSvg',
+        },
+        {
           code: 'dynamicTool',
           // tools 也支持函数返回内容
           content: () => h('span', { style: { fontWeight: 'bold' } }, '动态工具'),
@@ -212,6 +218,9 @@
         break;
       case 'refresh':
         console.log('刷新工具', records);
+        break;
+      case 'customSvgIcon':
+        console.log('自定义 SVG 工具', records);
         break;
       case 'dynamicTool':
         console.log('动态工具', records);

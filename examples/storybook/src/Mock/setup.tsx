@@ -30,6 +30,38 @@ export const setupUIKit = (app: App) => {
           title: typeof content === 'string' ? () => content : content,
         },
       ),
+    // PGrid 等处的 Icon 渲染：优先返回带颜色的 VNode，未命中时回退 @ant-design/icons-vue
+    icon: {
+      render: (name: string) => {
+        if (name === 'SampleStorybookSvg') {
+          return h(
+            'span',
+            { style: { display: 'inline-flex', alignItems: 'center', lineHeight: 0 } },
+            h(
+              'svg',
+              {
+                xmlns: 'http://www.w3.org/2000/svg',
+                viewBox: '0 0 16 16',
+                width: '1em',
+                height: '1em',
+                fill: 'none',
+                'aria-hidden': 'true',
+              },
+              [
+                h('rect', { width: '16', height: '16', rx: '3', fill: '#13c2c2' }),
+                h('path', {
+                  d: 'M4 8h8M8 4v8',
+                  stroke: '#fff',
+                  'stroke-width': '1.5',
+                  'stroke-linecap': 'round',
+                }),
+              ],
+            ),
+          );
+        }
+        return null;
+      },
+    },
   });
 
   UIKit.addFormatter({ test: () => 'test' });
