@@ -62,7 +62,7 @@
 </script>
 
 <template>
-  <div class="w-full flex flex-col">
+  <div class="w-full flex flex-col h-full">
     <a-config-provider
       :theme="{
         algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
@@ -140,42 +140,42 @@
     <a-divider />
     <div class="flex-1 h-0 overflow-y-auto">
       <!-- PGrid 示例 -->
-      <div v-if="currentView === 'grid'">
+      <div v-if="currentView === 'grid'" style="height: 100%">
         <p-grid-example />
       </div>
 
       <!-- PGrid 响应式示例 -->
-      <div v-if="currentView === 'gridResponsive'">
+      <div v-if="currentView === 'gridResponsive'" style="height: 100%">
         <p-grid-responsive />
       </div>
 
       <!-- PForm 示例 -->
-      <div v-if="currentView === 'form'">
+      <div v-if="currentView === 'form'" style="height: 100%">
         <p-form-example />
       </div>
 
       <!-- PFormGroup 示例 -->
-      <div v-if="currentView === 'group'">
+      <div v-if="currentView === 'group'" style="height: 100%">
         <p-form-group-example />
       </div>
 
       <!-- PCanvasTable 示例 -->
-      <div v-if="currentView === 'canvasTable'">
+      <div v-if="currentView === 'canvasTable'" style="height: 100%">
         <p-canvas-table-example />
       </div>
 
       <!-- PCanvasGrid 示例 -->
-      <div v-if="currentView === 'canvasGrid'">
+      <div v-if="currentView === 'canvasGrid'" style="height: 100%">
         <p-canvas-grid-example />
       </div>
 
       <!-- PromisePicker 示例 -->
-      <div v-if="currentView === 'promisePicker'">
+      <div v-if="currentView === 'promisePicker'" style="height: 100%">
         <promise-picker-example />
       </div>
 
       <!-- 族谱树示例 -->
-      <div v-if="currentView === 'familyTree'">
+      <div v-if="currentView === 'familyTree'" style="height: 100%">
         <family-tree-example />
       </div>
     </div>

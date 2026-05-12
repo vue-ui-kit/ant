@@ -230,7 +230,7 @@
 </script>
 
 <template>
-  <div>
+  <div style="height: 100%; display: flex; flex-direction: column">
     <a-typography-title :level="3">PGrid - 增强数据表格</a-typography-title>
     <p>集成了查询表单、分页、工具栏等功能的数据表格组件</p>
     <a-alert
@@ -240,7 +240,7 @@
       show-icon
       style="margin-bottom: 16px"
     />
-    <div style="height: 600px">
+    <div style="flex: 1; min-height: 0">
       <p-grid
         v-bind="gridSetting"
         @toolbar-button-click="handleToolbarBtn"
