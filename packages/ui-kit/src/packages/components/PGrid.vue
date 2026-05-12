@@ -5,6 +5,9 @@
   setup
 >
   import { ColumnProps, PFormItemProps, PGridProps, ResponsePathConfig } from '#/antProxy';
+  // 锚定 ant-design-vue 间接依赖的类型路径，避免 vue-tsc 推断默认导出时引用 .pnpm 物理路径触发 TS2742
+  import type {} from 'scroll-into-view-if-needed';
+  import type {} from 'vue-types';
   import PFormCol from '@/components/PFormCol.vue';
   import RenderDefaultSlots from '@/components/RenderDefaultSlots';
   import RenderTitleSlots from '@/components/RenderTitleSlots';
