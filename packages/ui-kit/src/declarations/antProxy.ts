@@ -389,6 +389,16 @@ export interface PCanvasGridProps<
    * 适应展示区到页面顶部的高度，通常和容器最上的y值有关（正比）
    */
   fitHeight?: number;
+  /**
+   * 开启后组件根节点按视口从其左上角铺满宽高，与 PGrid 的 autoBoxSize 行为一致。
+   * 外层未声明固定高度、需组件自身占满可视区域时使用。
+   */
+  autoBoxSize?: boolean;
+  /**
+   * `autoBoxSize` 时距视口右侧/底部的预留像素；数字或 `"12px"` 同时作用于两侧；对象可分别指定 `right` / `bottom`。
+   * 未传时使用 `setUIKitConfig({ grid: { autoBoxSizeOffset } })` 的全局值。
+   */
+  autoBoxSizeOffset?: number | string | { right?: number; bottom?: number };
 }
 export interface PGridInstance<
   D extends Recordable = Recordable,

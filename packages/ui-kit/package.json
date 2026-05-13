@@ -61,8 +61,8 @@
   },
   "devDependencies": {
     "@ant-design/icons-vue": ">=7.0.0",
-    "@commitlint/cli": "^19.4.1",
-    "@commitlint/config-conventional": "^19.4.1",
+    "@commitlint/cli": "^21.0.0",
+    "@commitlint/config-conventional": "^21.0.0",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^6.0.5",
     "@vitejs/plugin-vue-jsx": "^5.1.5",

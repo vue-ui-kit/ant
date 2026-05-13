@@ -12,6 +12,7 @@
     Ref,
     reactive,
     onMounted,
+    nextTick,
     toRefs,
     onBeforeUnmount,
     watch,
@@ -39,10 +40,17 @@
   } from 'ant-design-vue';
   import { DownOutlined } from '@ant-design/icons-vue';
   import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
+  import {
+    createAutoViewportBoxController,
+    parseAutoViewportBoxOffset,
+    type AutoViewportBoxController,
+    type AutoViewportBoxOffsetInput,
+  } from '@/utils/autoViewportBox';
   import { eachTree } from '@/utils/treeHelper';
   const props = withDefaults(defineProps<PCanvasGridProps<D, F>>(), {
     lazyReset: () => getGridDefaults().lazyReset ?? false,
-    fitHeight: () => getGridDefaults().fitCanvasHeight ?? 100,
+    fitHeight: () => getGridDefaults().fitCanvasHeight ?? 0,
+    autoBoxSize: false,
   });
   const attrs = useAttrs();
   const emit = defineEmits<{
@@ -61,6 +69,15 @@
   const { formConfig, pageConfig, columns, toolbarConfig, proxyConfig, config, staticConfig } =
     toRefs(props);
   const canvasTableDefaults = getCanvasTableDefaults();
+
+  /** 局部 `autoBoxSizeOffset` 优先，否则用 `getGridDefaults().autoBoxSizeOffset`（`setUIKitConfig`） */
+  const resolvedAutoBoxSizeOffset = computed<AutoViewportBoxOffsetInput>(() => {
+    const local = props.autoBoxSizeOffset;
+    if (local !== undefined && local !== null) {
+      return local;
+    }
+    return getGridDefaults().autoBoxSizeOffset as AutoViewportBoxOffsetInput;
+  });
   const renderFormKey = ref(uuid_v4());
   const queryFormData = ref<Partial<F>>({}) as Ref<Partial<F>>;
 
@@ -110,6 +127,7 @@
   const boxEl = ref<HTMLDivElement>();
   const pFormWrapper = ref<HTMLDivElement>();
   const tableWrapperEl = ref<HTMLDivElement>();
+  const tableFooterEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   /* 分页时缓存的跨页选择数据,风险：数据可能会更新导致串页，读取计算的时候要去重 */
   const pageSelections = ref<{
@@ -376,14 +394,60 @@
     pageSelections.value = {};
     return resetQueryFormData();
   };
+
+  const renderContent = (content: string | (() => any)) => {
+    if (isFunction(content)) {
+      return content();
+    }
+    return content;
+  };
+  const isStringContent = (content: any) => isString(content);
+
+  let autoViewportBoxCtrl: AutoViewportBoxController | null = null;
+  const clearAutoViewportBox = () => {
+    autoViewportBoxCtrl?.destroy();
+    autoViewportBoxCtrl = null;
+  };
+  const syncAutoViewportBox = () => {
+    clearAutoViewportBox();
+    if (!props.autoBoxSize || !boxEl.value) return;
+    autoViewportBoxCtrl = createAutoViewportBoxController(
+      () => boxEl.value ?? undefined,
+      () => parseAutoViewportBoxOffset(resolvedAutoBoxSizeOffset.value),
+      {
+        onLayout: () => {
+          nextTick(() => resizeTable());
+        },
+      },
+    );
+    autoViewportBoxCtrl.attach();
+  };
+
+  watch(
+    () => props.autoBoxSize,
+    (on) => {
+      if (!on) clearAutoViewportBox();
+      else nextTick(() => syncAutoViewportBox());
+    },
+  );
+  watch(
+    resolvedAutoBoxSizeOffset,
+    () => {
+      if (props.autoBoxSize) autoViewportBoxCtrl?.update();
+    },
+    { deep: true },
+  );
+
   let resizeRaf: number | null = null;
   const resizeTable = () => {
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = null;
       if (!tableWrapperEl.value) return;
-      const rect = tableWrapperEl.value.getBoundingClientRect();
-      renderHeight.value = Math.max(window.innerHeight - rect.top - props.fitHeight, 100);
+      const wrapperH = tableWrapperEl.value.clientHeight;
+      const footerH = tableFooterEl.value?.offsetHeight ?? 0;
+      const reserve = props.fitHeight ?? 0;
+      renderHeight.value = Math.max(wrapperH - footerH - reserve, 100);
     });
   };
 
@@ -401,8 +465,13 @@
     { immediate: true },
   );
 
+  // 分页/已选区域高度变化时重算
+  watch(mode, () => nextTick(() => resizeTable()));
+
   let observer: MutationObserver;
   let boxElResizeObserver: ResizeObserver | null = null;
+  let tableWrapperResizeObserver: ResizeObserver | null = null;
+  let tableFooterResizeObserver: ResizeObserver | null = null;
   onMounted(() => {
     resizeTable();
     window.addEventListener('resize', resizeTable);
@@ -428,7 +497,19 @@
         ancestor = ancestor.parentElement;
       }
     }
+    tableWrapperResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableWrapperEl.value) {
+      tableWrapperResizeObserver.observe(tableWrapperEl.value);
+    }
+    tableFooterResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableFooterEl.value) {
+      tableFooterResizeObserver.observe(tableFooterEl.value);
+    }
     resetQueryFormData(props.manualFetch);
+    nextTick(() => {
+      if (props.autoBoxSize) syncAutoViewportBox();
+      resizeTable();
+    });
   });
   onBeforeUnmount(() => {
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
@@ -436,6 +517,9 @@
     observer.disconnect();
     formWrapperResizeObserver?.disconnect();
     boxElResizeObserver?.disconnect();
+    tableWrapperResizeObserver?.disconnect();
+    tableFooterResizeObserver?.disconnect();
+    clearAutoViewportBox();
   });
   defineExpose({
     commitProxy: {
@@ -456,7 +540,14 @@
   });
 </script>
 <template>
-  <div ref="boxEl" class="h-full p-wrapper flex flex-col gap-8px overflow-y-auto" v-bind="attrs">
+  <div
+    ref="boxEl"
+    :class="[
+      'p-wrapper flex flex-col gap-8px overflow-y-auto',
+      autoBoxSize ? 'min-h-0 min-w-0 flex-1 w-full' : 'h-full',
+    ]"
+    v-bind="attrs"
+  >
     <div v-if="mode === 'bad'">请检查配置</div>
     <template v-else>
       <div
@@ -509,9 +600,14 @@
                   :ghost="btn.ghost"
                   :block="btn.block"
                 >
-                  <Icon v-if="btn.icon" :icon="btn.icon" />
-                  {{ btn.content }}
-                  <DownOutlined />
+                  <div class="flex items-center gap-4px">
+                    <Icon v-if="btn.icon" :icon="btn.icon" />
+                    <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                      {{ renderContent(btn.content) }}
+                    </template>
+                    <component v-else-if="btn.content" :is="renderContent(btn.content)" />
+                    <DownOutlined />
+                  </div>
                 </a-button>
               </a-dropdown>
               <a-button
@@ -526,8 +622,13 @@
                 :block="btn.block"
                 @click="debounceToolBtnClick(btn.code)"
               >
-                <Icon v-if="btn.icon" :icon="btn.icon" />
-                {{ btn.content }}
+                <div class="flex items-center gap-4px">
+                  <Icon v-if="btn.icon" :icon="btn.icon" />
+                  <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                    {{ renderContent(btn.content) }}
+                  </template>
+                  <component v-else-if="btn.content" :is="renderContent(btn.content)" />
+                </div>
               </a-button>
               <div v-else></div>
             </template>
@@ -548,43 +649,52 @@
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
-              <Icon v-if="tool.icon" :icon="tool.icon" />
-              {{ tool.content }}
+              <div class="flex items-center gap-4px">
+                <Icon v-if="tool.icon" :icon="tool.icon" />
+                <template v-if="tool.content && isStringContent(renderContent(tool.content))">
+                  {{ renderContent(tool.content) }}
+                </template>
+                <component v-else-if="tool.content" :is="renderContent(tool.content)" />
+              </div>
             </a-button>
           </template>
         </span>
       </div>
-      <div ref="tableWrapperEl" :class="`p-pane flex-1 h-0 p-inner-scroll`">
-        <div
-          v-if="staticConfig?.selectable && staticConfig.showCount"
-          class="w-full text-slate-5 pl-4"
-        >
-          已选：{{ selectedRowKeys.length }}
+      <div ref="tableWrapperEl" class="p-pane flex-1 h-0 min-h-0 flex flex-col p-inner-scroll">
+        <div class="flex-1 min-h-0 overflow-hidden">
+          <p-canvas-table
+            ref="canvasTableRef"
+            :columns="finalColumns"
+            :config="{
+              ...propsWithDefaults.config,
+              HEIGHT: renderHeight,
+            }"
+            :data="tableData"
+            :loading="loading.table"
+            @selection-change="handleSelectionChange"
+          >
+            <template v-for="(_, name) in $slots" #[name]="slotProps">
+              <slot :name="name" v-bind="slotProps"></slot>
+            </template>
+          </p-canvas-table>
         </div>
-        <p-canvas-table
-          ref="canvasTableRef"
-          :columns="finalColumns"
-          :config="{
-            ...propsWithDefaults.config,
-            HEIGHT: renderHeight,
-          }"
-          :data="tableData"
-          :loading="loading.table"
-          @selection-change="handleSelectionChange"
-        >
-          <template v-for="(_, name) in $slots" #[name]="slotProps">
-            <slot :name="name" v-bind="slotProps"></slot>
-          </template>
-        </p-canvas-table>
-        <a-pagination
-          class="p-canvas-pagination"
-          v-if="mode === 'pagination'"
-          size="small"
-          :current="pagination.page"
-          :page-size="pagination.size"
-          :total="totalCount"
-          @change="handleTableChange"
-        />
+        <div ref="tableFooterEl" class="flex-shrink-0">
+          <div
+            v-if="staticConfig?.selectable && staticConfig.showCount"
+            class="w-full text-slate-5 pl-4"
+          >
+            已选：{{ selectedRowKeys.length }}
+          </div>
+          <a-pagination
+            class="p-canvas-pagination"
+            v-if="mode === 'pagination'"
+            size="small"
+            :current="pagination.page"
+            :page-size="pagination.size"
+            :total="totalCount"
+            @change="handleTableChange"
+          />
+        </div>
       </div>
     </template>
   </div>
