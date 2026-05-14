@@ -127,6 +127,7 @@
   const boxEl = ref<HTMLDivElement>();
   const pFormWrapper = ref<HTMLDivElement>();
   const tableWrapperEl = ref<HTMLDivElement>();
+  const tableBodyEl = ref<HTMLDivElement>();
   const tableFooterEl = ref<HTMLDivElement>();
   const renderHeight = ref(500);
   /* 分页时缓存的跨页选择数据,风险：数据可能会更新导致串页，读取计算的时候要去重 */
@@ -443,11 +444,10 @@
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = null;
-      if (!tableWrapperEl.value) return;
-      const wrapperH = tableWrapperEl.value.clientHeight;
-      const footerH = tableFooterEl.value?.offsetHeight ?? 0;
+      if (!tableBodyEl.value) return;
+      const bodyH = tableBodyEl.value.clientHeight;
       const reserve = props.fitHeight ?? 0;
-      renderHeight.value = Math.max(wrapperH - footerH - reserve, 100);
+      renderHeight.value = Math.max(bodyH - reserve, 100);
     });
   };
 
@@ -470,8 +470,7 @@
 
   let observer: MutationObserver;
   let boxElResizeObserver: ResizeObserver | null = null;
-  let tableWrapperResizeObserver: ResizeObserver | null = null;
-  let tableFooterResizeObserver: ResizeObserver | null = null;
+  let tableBodyResizeObserver: ResizeObserver | null = null;
   onMounted(() => {
     resizeTable();
     window.addEventListener('resize', resizeTable);
@@ -497,13 +496,10 @@
         ancestor = ancestor.parentElement;
       }
     }
-    tableWrapperResizeObserver = new ResizeObserver(() => resizeTable());
-    if (tableWrapperEl.value) {
-      tableWrapperResizeObserver.observe(tableWrapperEl.value);
-    }
-    tableFooterResizeObserver = new ResizeObserver(() => resizeTable());
-    if (tableFooterEl.value) {
-      tableFooterResizeObserver.observe(tableFooterEl.value);
+    // 直接观察实际承载 canvas 的内层盒子，避免 padding/footer 干扰
+    tableBodyResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableBodyEl.value) {
+      tableBodyResizeObserver.observe(tableBodyEl.value);
     }
     resetQueryFormData(props.manualFetch);
     nextTick(() => {
@@ -517,8 +513,7 @@
     observer.disconnect();
     formWrapperResizeObserver?.disconnect();
     boxElResizeObserver?.disconnect();
-    tableWrapperResizeObserver?.disconnect();
-    tableFooterResizeObserver?.disconnect();
+    tableBodyResizeObserver?.disconnect();
     clearAutoViewportBox();
   });
   defineExpose({
@@ -661,7 +656,7 @@
         </span>
       </div>
       <div ref="tableWrapperEl" class="p-pane flex-1 h-0 min-h-0 flex flex-col p-inner-scroll">
-        <div class="flex-1 min-h-0 overflow-hidden">
+        <div ref="tableBodyEl" class="flex-1 min-h-0 overflow-hidden">
           <p-canvas-table
             ref="canvasTableRef"
             :columns="finalColumns"
