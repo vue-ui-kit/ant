@@ -1,4 +1,5 @@
 import { App } from 'vue';
+import type { Component } from 'vue';
 import PForm from '@/components/PForm.vue';
 import PGrid from '@/components/PGrid.vue';
 import PCanvasTable from '@/components/PCanvasTable.vue';
@@ -6,6 +7,7 @@ import PCanvasGrid from '@/components/PCanvasGrid.vue';
 import PFormGroup from '@/components/PFormGroup.vue';
 import PGroupBlock from '@/components/PGroupBlock.vue';
 import PromisePicker from '@/components/PromisePicker.vue';
+import PDescription from '@/components/PDescription.vue';
 import { addFormatter } from '@/utils/AFormatters';
 import { addRender } from '@/store/renderStore';
 import {
@@ -29,9 +31,10 @@ export default {
     app.component('PGrid', PGrid);
     app.component('PCanvasTable', PCanvasTable);
     app.component('PCanvasGrid', PCanvasGrid);
-    app.component('PFormGroup', PFormGroup);
+    app.component('PFormGroup', PFormGroup as unknown as Component);
     app.component('PGroupBlock', PGroupBlock);
     app.component('PromisePicker', PromisePicker);
+    app.component('PDescription', PDescription);
   },
   addFormatter,
   addRender,
@@ -62,6 +65,7 @@ export {
   PFormGroup,
   PGroupBlock,
   PromisePicker,
+  PDescription,
   addFormatter,
   addRender,
 };

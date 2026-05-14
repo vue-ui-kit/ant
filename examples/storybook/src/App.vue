@@ -17,6 +17,7 @@
   import PCanvasGridExample from './view/PCanvasGridExample.vue';
   import PromisePickerExample from './view/PromisePickerExample.vue';
   import FamilyTreeExample from './view/FamilyTreeExample.vue';
+  import PDescriptionExample from './view/PDescriptionExample.vue';
 
   const { Title } = Typography;
 
@@ -30,6 +31,7 @@
     | 'canvasGrid'
     | 'promisePicker'
     | 'familyTree'
+    | 'description'
   >('grid');
 
   // 主题切换
@@ -135,6 +137,12 @@
         >
           族谱树示例
         </a-button>
+        <a-button
+          :type="currentView === 'description' ? 'primary' : 'default'"
+          @click="currentView = 'description'"
+        >
+          PDescription 示例
+        </a-button>
       </a-space>
     </div>
     <a-divider />
@@ -177,6 +185,11 @@
       <!-- 族谱树示例 -->
       <div v-if="currentView === 'familyTree'" style="height: 100%">
         <family-tree-example />
+      </div>
+
+      <!-- PDescription 示例 -->
+      <div v-if="currentView === 'description'" style="height: 100%">
+        <p-description-example />
       </div>
     </div>
   </div>

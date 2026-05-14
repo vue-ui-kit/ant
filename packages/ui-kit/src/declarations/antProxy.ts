@@ -80,6 +80,38 @@ export interface PFormProps<F extends Recordable = Recordable> extends FormProps
   customReset?: () => void;
 }
 
+export interface PDescriptionItemProps<D extends Recordable = Recordable> {
+  field?: string;
+  label?: string;
+  span?: number;
+  labelStyle?: Recordable;
+  contentStyle?: Recordable;
+  /** 只读展示渲染器，派发到 renderStore.renderDefault */
+  readonlyRender?: ItemRender;
+  slots?: {
+    label?: () => any;
+    default?: ({ data, field }: { data: D; field?: string }) => any;
+  };
+}
+
+export interface PDescriptionProps<D extends Recordable = Recordable> {
+  /** 数据源 */
+  data: D;
+  items: PDescriptionItemProps<D>[];
+  /** 透传 a-descriptions */
+  title?: string;
+  extra?: string;
+  bordered?: boolean;
+  size?: 'default' | 'small' | 'middle';
+  column?: number | Partial<Record<'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>;
+  layout?: 'horizontal' | 'vertical';
+  colon?: boolean;
+  labelStyle?: Recordable;
+  contentStyle?: Recordable;
+  /** 缺省占位，row[field] 为空时展示 */
+  emptyText?: string;
+}
+
 export interface PBlockProps<F extends Recordable = Recordable> {
   name?: string;
   getFormSetting: (data: Partial<F>) => PFormProps<Partial<F>>;
@@ -312,6 +344,12 @@ export interface RenderOptions {
 export interface RenderFormParams<F extends Recordable = Recordable> {
   data: F;
   field?: string;
+}
+
+export interface RenderReadonlyParams<D extends Recordable = Recordable> {
+  data: D;
+  field?: string;
+  title?: string;
 }
 
 export interface RenderTableParams<D extends Recordable = Recordable> {

@@ -1,4 +1,9 @@
-import { RenderFormParams, RenderOptions, RenderTableParams } from '#/antProxy';
+import {
+  RenderFormParams,
+  RenderOptions,
+  RenderReadonlyParams,
+  RenderTableParams,
+} from '#/antProxy';
 import {
   Button,
   Dropdown,
@@ -47,6 +52,11 @@ export interface RenderWorkshop {
   renderDefault?: (
     options: RenderOptions,
     params: RenderTableParams,
+    defaultHandler: Recordable,
+  ) => any;
+  renderReadonly?: (
+    options: RenderOptions,
+    params: RenderReadonlyParams,
     defaultHandler: Recordable,
   ) => any;
   renderEdit?: (
@@ -189,6 +199,21 @@ const renderBasic = (name: string) => {
         />
       ) : (
         <DynamicComponent is={name} {...props} />
+      );
+    },
+    renderReadonly(
+      { props = {}, attrs = {} }: RenderOptions,
+      { data, field }: RenderReadonlyParams,
+    ) {
+      return field ? (
+        <DynamicComponent
+          is={name}
+          v-model:value={data[field]}
+          {...attrs}
+          {...merge({}, antDefaultProps[name], { disabled: true }, props)}
+        />
+      ) : (
+        <DynamicComponent is={name} {...merge({}, { disabled: true }, props)} />
       );
     },
     renderEdit(
@@ -516,6 +541,15 @@ const renders: RenderFactory = {
         />
       ) : null;
     },
+    renderReadonly({ props = {}, options }: RenderOptions, { data, field }: RenderReadonlyParams) {
+      return valued(field) ? (
+        <RadioGroup
+          v-model:value={data[field!]}
+          {...merge({}, { disabled: true }, props)}
+          options={props.options ?? options ?? []}
+        />
+      ) : null;
+    },
   },
   $autoComplete: {
     renderItemContent(
@@ -559,6 +593,11 @@ const renders: RenderFactory = {
         />
       ) : null;
     },
+    renderReadonly({ props = {} }: RenderOptions, { data, field }: RenderReadonlyParams) {
+      return valued(field) ? (
+        <Switch v-model:checked={data[field!]} {...merge({}, { disabled: true }, props)} />
+      ) : null;
+    },
   },
   $checkbox: {
     renderItemContent(
@@ -584,6 +623,15 @@ const renders: RenderFactory = {
         <CheckboxGroup
           v-model:value={row[field!]}
           {...props}
+          options={props.options ?? options ?? []}
+        />
+      ) : null;
+    },
+    renderReadonly({ props = {}, options }: RenderOptions, { data, field }: RenderReadonlyParams) {
+      return valued(field) ? (
+        <CheckboxGroup
+          v-model:value={data[field!]}
+          {...merge({}, { disabled: true }, props)}
           options={props.options ?? options ?? []}
         />
       ) : null;
@@ -690,7 +738,7 @@ const renders: RenderFactory = {
 };
 export const addRender = (
   name: string,
-  { renderItemContent, renderDefault, renderEdit }: RenderWorkshop,
+  { renderItemContent, renderDefault, renderReadonly, renderEdit }: RenderWorkshop,
 ) => {
   if (renders.hasOwnProperty(name)) {
     console.warn(`render ${name} already exists, you are trying to override it`);
@@ -698,6 +746,7 @@ export const addRender = (
   renders[name] = {
     renderItemContent,
     renderDefault,
+    renderReadonly,
     renderEdit,
   };
 };
