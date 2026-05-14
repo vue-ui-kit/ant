@@ -42,7 +42,10 @@ export default defineConfig({
       rollupTypes: true,
       insertTypesEntry: true,
       bundledPackages: [
-        'ant-design-vue',
+        // ant-design-vue 故意不 bundle:
+        //   api-extractor 在内联时会把 ATable 等实例类型展开成 `ColumnsType<any>` 之类，
+        //   而 `ColumnsType` 未从 ant-design-vue 主入口 re-export → 找不到符号 → build 失败。
+        //   保留 `import('ant-design-vue').xxx` 形式，由消费者本地装的 ant-design-vue 解析类型链。
         'vue-types',
         'scroll-into-view-if-needed',
         'e-virt-table',
@@ -62,6 +65,40 @@ export default defineConfig({
           console.log('✅ Created standalone style.scss');
         } catch (err) {
           console.warn('Failed to create standalone scss file:', err);
+        }
+      },
+    },
+    // 修补 vue-tsc 在 ATable 实例类型展开时写错的 ant-design-vue 导入路径
+    // 主入口未 re-export `ColumnsType` 等内部类型，需指回真正定义点
+    {
+      name: 'patch-dist-dts-imports',
+      closeBundle() {
+        try {
+          const dtsPath = resolve('dist/index.d.ts');
+          let content = readFileSync(dtsPath, 'utf-8');
+          const fixes: Array<[RegExp, string]> = [
+            [
+              /^import \{ ColumnsType \} from 'ant-design-vue';$/m,
+              "import { ColumnsType } from 'ant-design-vue/es/table';",
+            ],
+            [
+              /^import \{ ColumnType as ColumnType_2 \} from 'ant-design-vue';$/m,
+              "import { ColumnType as ColumnType_2 } from 'ant-design-vue/es/table';",
+            ],
+          ];
+          let changed = false;
+          for (const [re, to] of fixes) {
+            if (re.test(content)) {
+              content = content.replace(re, to);
+              changed = true;
+            }
+          }
+          if (changed) {
+            writeFileSync(dtsPath, content);
+            console.log('✅ Patched dist/index.d.ts ant-design-vue subpath imports');
+          }
+        } catch (err) {
+          console.warn('patch-dist-dts-imports failed:', err);
         }
       },
     },
