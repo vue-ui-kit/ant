@@ -73,8 +73,8 @@ importers:
   packages/ui-kit:
     dependencies:
       e-virt-table:
-        specifier: ^1.3.25
-        version: 1.3.25
+        specifier: ^1.4.1
+        version: 1.4.1
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
@@ -139,6 +139,9 @@ importers:
       vue:
         specifier: ^3.5.33
         version: 3.5.33(typescript@5.9.3)
+      vue-tsc:
+        specifier: 3.3.5
+        version: 3.3.5(typescript@5.9.3)
       vue-types:
         specifier: ^3.0.2
         version: 3.0.2(vue@3.5.33(typescript@5.9.3))
@@ -1055,6 +1058,9 @@ packages:
   '@vue/language-core@3.2.6':
     resolution: {integrity: sha512-xYYYX3/aVup576tP/23sEUpgiEnujrENaoNRbaozC1/MA9I6EGFQRJb4xrt/MmUCAGlxTKL2RmT8JLTPqagCkg==}
 
+  '@vue/language-core@3.3.5':
+    resolution: {integrity: sha512-UkKu5nhX89fg4VhlG/FOeI10G3cj/7radKT/cy9BT4Q9qJmJlSTAc/dP63Xqs29aypN4f39xUV6PsLNk/dcD6g==}
+
   '@vue/reactivity@3.5.33':
     resolution: {integrity: sha512-p8UfIqyIhb0rYGlSgSBV+lPhF2iUSBcRy7enhTmPqKWadHy9kcOFYF1AejYBP9P+avnd3OBbD49DU4pLWX/94A==}
 
@@ -1108,6 +1114,9 @@ packages:
 
   alien-signals@3.1.2:
     resolution: {integrity: sha512-d9dYqZTS90WLiU0I5c6DHj/HcKkF8ZyGN3G5x8wSbslulz70KOxaqCT0hQCo9KOyhVqzqGojvNdJXoTumZOtcw==}
+
+  alien-signals@3.2.1:
+    resolution: {integrity: sha512-I8FjmltrfnDFoZedi5CG8DghVYNhzb/Ijluz7tCSJH0xpd0484Kowhbb1XDYOxfJpU1p5wnM2X54dA+IfGyD1g==}
 
   ansi-escapes@7.3.0:
     resolution: {integrity: sha512-BvU8nYgGQBxcmMuEeUEmNTvrMVjJNSH7RgW24vXexN4Ven6qCvy4TntnvlnwnMLTVlcRQQdbRY8NKnaIoeWDNg==}
@@ -1324,8 +1333,8 @@ packages:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
     engines: {node: '>=8'}
 
-  e-virt-table@1.3.25:
-    resolution: {integrity: sha512-/J4r0InD4Zfpt0IyLOBxUMWjH7I4FuTymEiTyh/sMN6bGrLSe2nq7jg1cyEr1BkV+8Hex7IIN/WqVl2ayTWbXA==}
+  e-virt-table@1.4.1:
+    resolution: {integrity: sha512-GIusRR4IMZrQyxYyO7DUqHAOCiyXHyJlwVOcJtLL7AKCSbFoTsBbZ7/dAKjs/spMIgZIS4DxVnMXYz93/hksNw==}
 
   electron-to-chromium@1.5.313:
     resolution: {integrity: sha512-QBMrTWEf00GXZmJyx2lbYD45jpI3TUFnNIzJ5BBc8piGUDwMPa1GV6HJWTZVvY/eiN3fSopl7NRbgGp9sZ9LTA==}
@@ -2137,6 +2146,12 @@ packages:
 
   vue-tsc@3.2.6:
     resolution: {integrity: sha512-gYW/kWI0XrwGzd0PKc7tVB/qpdeAkIZLNZb10/InizkQjHjnT8weZ/vBarZoj4kHKbUTZT/bAVgoOr8x4NsQ/Q==}
+    hasBin: true
+    peerDependencies:
+      typescript: '>=5.0.0'
+
+  vue-tsc@3.3.5:
+    resolution: {integrity: sha512-Rzh/G2MmNlMSAMTiQEjDrsb4dgB/jbtEM47rVN2NtidF1dfb/q4w4QvpQBtW5+y3y5H27Hjh7deVwk+YB02fNg==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -3108,6 +3123,16 @@ snapshots:
       path-browserify: 1.0.1
       picomatch: 4.0.4
 
+  '@vue/language-core@3.3.5':
+    dependencies:
+      '@volar/language-core': 2.4.28
+      '@vue/compiler-dom': 3.5.33
+      '@vue/shared': 3.5.33
+      alien-signals: 3.2.1
+      muggle-string: 0.4.1
+      path-browserify: 1.0.1
+      picomatch: 4.0.4
+
   '@vue/reactivity@3.5.33':
     dependencies:
       '@vue/shared': 3.5.33
@@ -3164,6 +3189,8 @@ snapshots:
   alien-signals@0.4.14: {}
 
   alien-signals@3.1.2: {}
+
+  alien-signals@3.2.1: {}
 
   ansi-escapes@7.3.0:
     dependencies:
@@ -3389,7 +3416,7 @@ snapshots:
     dependencies:
       is-obj: 2.0.0
 
-  e-virt-table@1.3.25:
+  e-virt-table@1.4.1:
     dependencies:
       '@floating-ui/dom': 1.7.6
 
@@ -4117,6 +4144,12 @@ snapshots:
       '@volar/typescript': 2.4.28
       '@vue/language-core': 3.2.6
       typescript: 5.8.3
+
+  vue-tsc@3.3.5(typescript@5.9.3):
+    dependencies:
+      '@volar/typescript': 2.4.28
+      '@vue/language-core': 3.3.5
+      typescript: 5.9.3
 
   vue-types@3.0.2(vue@3.5.33(typescript@5.8.3)):
     dependencies:

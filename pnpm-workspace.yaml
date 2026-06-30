@@ -5,3 +5,5 @@ allowBuilds:
   '@parcel/watcher': true
   core-js: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - e-virt-table@1.4.1

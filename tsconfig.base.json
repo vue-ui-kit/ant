@@ -11,6 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "module": "ES2020",
     "moduleResolution": "Node",
+    "ignoreDeprecations": "5.0",
     "moduleDetection": "force",
     "resolveJsonModule": true,
     "isolatedModules": true,
