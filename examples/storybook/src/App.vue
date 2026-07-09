@@ -37,21 +37,27 @@
   // 主题切换
   const isDarkMode = ref(false);
 
-  const toggleTheme = (checked: boolean) => {
-    isDarkMode.value = checked;
-    if (checked) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+  const applyTheme = (dark: boolean) => {
+    isDarkMode.value = dark;
+    const root = document.documentElement;
+    if (dark) {
+      root.setAttribute('data-theme', 'dark');
+      root.classList.add('dark'); // e-virt-table ENABLE_AUTO_THEME 监听 class
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      root.removeAttribute('data-theme');
+      root.classList.remove('dark');
     }
+  };
+
+  const toggleTheme = (checked: boolean) => {
+    applyTheme(checked);
   };
 
   // 初始化时检查本地存储的主题
   onMounted(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
-      isDarkMode.value = true;
-      document.documentElement.setAttribute('data-theme', 'dark');
+      applyTheme(true);
     }
   });
 

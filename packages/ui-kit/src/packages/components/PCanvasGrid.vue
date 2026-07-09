@@ -4,20 +4,6 @@
   generic="D extends Recordable = Recordable, F extends Recordable = Recordable"
   name="PCanvasGrid"
 >
-  import PCanvasTable from './PCanvasTable.vue';
-  import {
-    computed,
-    useAttrs,
-    ref,
-    Ref,
-    reactive,
-    onMounted,
-    nextTick,
-    toRefs,
-    onBeforeUnmount,
-    watch,
-  } from 'vue';
-  import { debounce, get, isBoolean, isFunction, isObject, isString, omit, uniq } from 'xe-utils';
   import {
     CanvasColumnProps,
     PCanvasGridProps,
@@ -25,28 +11,42 @@
     PFormItemProps,
     ResponsePathConfig,
   } from '#/antProxy';
-  import { v4 as uuid_v4 } from 'uuid';
-  import { isGoodValue } from '@/utils/is';
   import PFormCol from '@/components/PFormCol.vue';
-  import { defaultLabelCol } from '@/utils/core';
-  import Icon from '@/renders/Icon';
   import { $confirm, $error, $success, $warning } from '@/hooks/useMessage';
-  import {
-    Button as AButton,
-    Form as AForm,
-    Row as ARow,
-    Spin as ASpin,
-    Pagination as APagination,
-  } from 'ant-design-vue';
-  import { DownOutlined } from '@ant-design/icons-vue';
-  import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
+  import Icon from '@/renders/Icon';
   import {
     createAutoViewportBoxController,
     parseAutoViewportBoxOffset,
     type AutoViewportBoxController,
     type AutoViewportBoxOffsetInput,
   } from '@/utils/autoViewportBox';
+  import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
+  import { defaultLabelCol } from '@/utils/core';
+  import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
+  import { DownOutlined } from '@ant-design/icons-vue';
+  import {
+    Button as AButton,
+    Form as AForm,
+    Pagination as APagination,
+    Row as ARow,
+    Spin as ASpin,
+  } from 'ant-design-vue';
+  import { v4 as uuid_v4 } from 'uuid';
+  import {
+    Ref,
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    reactive,
+    ref,
+    toRefs,
+    useAttrs,
+    watch,
+  } from 'vue';
+  import { debounce, get, isBoolean, isFunction, isObject, isString, omit, uniq } from 'xe-utils';
+  import PCanvasTable from './PCanvasTable.vue';
   const props = withDefaults(defineProps<PCanvasGridProps<D, F>>(), {
     lazyReset: () => getGridDefaults().lazyReset ?? false,
     fitHeight: () => getGridDefaults().fitCanvasHeight ?? 0,
@@ -655,7 +655,7 @@
           </template>
         </span>
       </div>
-      <div ref="tableWrapperEl" class="p-pane flex-1 h-0 min-h-0 flex flex-col p-inner-scroll">
+      <div ref="tableWrapperEl" class="flex-1 h-0 min-h-0 flex flex-col p-inner-scroll">
         <div ref="tableBodyEl" class="flex-1 min-h-0 overflow-hidden">
           <p-canvas-table
             ref="canvasTableRef"
