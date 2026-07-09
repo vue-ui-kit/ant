@@ -1,0 +1,57 @@
+/**
+ * EVirtTable（PCanvasGrid / PCanvasTable）主题变量
+ * - 与 PGrid 共用 --p-* 语义变量，保证 Canvas 表格与 DOM 表格同色
+ * - 无对应 --p-* 的项使用 storybook theme.css 默认值
+ * - e-virt-table 初始化时通过 Config.updateCssVar() 读取 --evt-*
+ */
+:root {
+  --evt-border-color: var(--p-border-color, #d9d9d9);
+  --evt-header-bg-color: var(--p-table-thead-bg-color, #f2f3f6);
+  --evt-body-bg-color: var(--p-table-row-bg-color, #fff);
+  --evt-stripe-color: var(--p-striped-bg-color, #f2f3f6);
+  --evt-highlight-hover-row-color: var(--p-table-row-hover-bg-color, #e6e7ea);
+  --evt-select-border-color: var(--p-primary-color, #4096ff);
+  --evt-sort-icon-color: var(--p-primary-color, #4096ff);
+  --evt-required-color: var(--p-danger-color, #f5222d);
+  --evt-error-tip-color: var(--p-danger-color, #f5222d);
+  --evt-error-tip-icon-color: var(--p-danger-color, #f5222d);
+  --evt-readonly-color: var(--p-table-row-bg-color, #fff);
+  --evt-scroller-track-color: var(--p-table-row-bg-color, #fff);
+
+  /* Canvas 专用（白天 = storybook 默认值） */
+  --evt-header-text-color: #1d2129;
+  --evt-body-text-color: #4e5969;
+  --evt-footer-text-color: #4e5969;
+  --evt-readonly-text-color: #4e5969;
+  --evt-scroller-color: #dee0e3;
+  --evt-scroller-focus-color: #bbbec4;
+  --evt-edit-bg-color: #fcf6ed;
+  --evt-footer-bg-color: #fafafa;
+  --evt-autofill-point-border-color: #fff;
+  --evt-editor-bg-color: #fff;
+  --evt-editor-text-color: #333;
+  --evt-context-menu-bg-color: #fff;
+  --evt-context-menu-text-color: #333;
+  --evt-context-menu-item-hover-bg-color: #f5f5f5;
+}
+
+/* 夜间：背景随 --p-* 传递，仅覆盖 Canvas 专用色 */
+html[theme-mode='dark'],
+:root[data-theme='dark'],
+:root.dark {
+  --evt-header-text-color: #a3a6ad;
+  --evt-body-text-color: #cfd3dc;
+  --evt-footer-text-color: #cfd3dc;
+  --evt-readonly-text-color: #a3a6ad;
+  --evt-scroller-color: #414243;
+  --evt-scroller-track-color: #141414;
+  --evt-scroller-focus-color: #a3a6ad;
+  --evt-edit-bg-color: #141414;
+  --evt-footer-bg-color: #262727;
+  --evt-autofill-point-border-color: #a3a6ad;
+  --evt-editor-bg-color: #434343;
+  --evt-editor-text-color: #cfd3dc;
+  --evt-context-menu-bg-color: #141414;
+  --evt-context-menu-text-color: #cfd3dc;
+  --evt-context-menu-item-hover-bg-color: #414243;
+}

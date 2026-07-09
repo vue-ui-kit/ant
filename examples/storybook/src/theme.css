@@ -12,43 +12,7 @@
   --p-striped-bg-color: #f2f3f6;
   --p-table-row-hover-bg-color: #e6e7ea;
 
-  /*--p-pagination-bg-color: #fff;*/
-  /*--p-pagination-color:#323335;*/
-  /*--p-pagination-border-color: #bbbdbf;*/
-  /*--p-pagination-active-bg-color: #323335;*/
-  /*--p-pagination-active-color: #fff;*/
-  /*--p-pagination-hover-bg-color: #4D4D4D;*/
-
-  /* EVirtTable：复用已有主题变量 */
-  --evt-border-color: var(--p-border-color);
-  --evt-header-bg-color: var(--p-table-thead-bg-color);
-  --evt-body-bg-color: var(--p-table-row-bg-color);
-  --evt-stripe-color: var(--p-striped-bg-color);
-  --evt-highlight-hover-row-color: var(--p-table-row-hover-bg-color);
-  --evt-select-border-color: var(--p-primary-color);
-  --evt-checkbox-color: var(--p-primary-color);
-  --evt-sort-icon-color: var(--p-primary-color);
-  --evt-required-color: var(--p-danger-color);
-  --evt-error-tip-color: var(--p-danger-color);
-  --evt-error-tip-icon-color: var(--p-danger-color);
-  --evt-readonly-color: var(--p-table-row-bg-color);
-  --evt-scroller-track-color: var(--p-table-row-bg-color);
-
-  /* EVirtTable：专用变量（白天 = 库默认值） */
-  --evt-header-text-color: #1d2129;
-  --evt-body-text-color: #4e5969;
-  --evt-footer-text-color: #4e5969;
-  --evt-readonly-text-color: #4e5969;
-  --evt-scroller-color: #dee0e3;
-  --evt-scroller-focus-color: #bbbec4;
-  --evt-edit-bg-color: #fcf6ed;
-  --evt-footer-bg-color: #fafafa;
-  --evt-autofill-point-border-color: #fff;
-  --evt-editor-bg-color: #fff;
-  --evt-editor-text-color: #333;
-  --evt-context-menu-bg-color: #fff;
-  --evt-context-menu-text-color: #333;
-  --evt-context-menu-item-hover-bg-color: #f5f5f5;
+  /* Canvas --evt-* 桥接见 @vue-ui-kit/ant canvas-theme.scss */
 }
 
 /* 夜间模式 */
@@ -65,30 +29,6 @@
   --p-table-row-bg-color: #202020;
   --p-striped-bg-color: #323335;
   --p-table-row-hover-bg-color: #4d4d4d;
-
-  /*--p-pagination-bg-color: #202020;
-  --p-pagination-color:#9b9fa3;
-  --p-pagination-border-color: #9b9fa3;
-  --p-pagination-active-bg-color: #323335;
-  --p-pagination-active-color: #fff;
-  --p-pagination-hover-bg-color: #4D4D4D;*/
-
-  /* EVirtTable：专用变量（夜间 = 官方/示例暗色） */
-  --evt-header-text-color: #a3a6ad;
-  --evt-body-text-color: #cfd3dc;
-  --evt-footer-text-color: #cfd3dc;
-  --evt-readonly-text-color: #a3a6ad;
-  --evt-scroller-color: #414243;
-  --evt-scroller-track-color: #141414;
-  --evt-scroller-focus-color: #a3a6ad;
-  --evt-edit-bg-color: #141414;
-  --evt-footer-bg-color: #262727;
-  --evt-autofill-point-border-color: #a3a6ad;
-  --evt-editor-bg-color: #434343;
-  --evt-editor-text-color: #cfd3dc;
-  --evt-context-menu-bg-color: #141414;
-  --evt-context-menu-text-color: #cfd3dc;
-  --evt-context-menu-item-hover-bg-color: #414243;
 }
 
 /* 应用主题到整个页面 */

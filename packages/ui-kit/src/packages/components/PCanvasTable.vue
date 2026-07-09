@@ -12,7 +12,7 @@
     OverlayerContainer,
     FormatterMethod,
   } from 'e-virt-table';
-  import { ref, onMounted, computed, useAttrs, watch } from 'vue';
+  import { ref, onMounted, onUnmounted, computed, useAttrs, watch } from 'vue';
   import { EventCallback } from 'e-virt-table/dist/lib/EventBus';
   import { isArray, isEqual, isFunction, isString, omit } from 'xe-utils';
   import renderStore from '@/store/renderStore';
@@ -20,8 +20,14 @@
   import type { CanvasColumnProps, CanvasTableProps, FormatterFunc, CellRender } from '#/antProxy';
   import { v4 as uuidv4 } from 'uuid';
   import { antFormatters } from '@/utils/AFormatters';
+  import {
+    bindCanvasTableThemeSync,
+    syncCanvasThemeCssVars,
+    type CanvasTableThemeHandle,
+  } from '@/utils/canvasTableTheme';
   import { getCanvasTableDefaults } from '@/utils/config';
   import { watchPreviousDeep } from '@/utils/core';
+  import '../styles/canvas-theme.scss';
 
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
@@ -45,6 +51,7 @@
     },
   }));
   let eVirtTable: EVirtTable | null = null;
+  let themeSyncHandle: CanvasTableThemeHandle | null = null;
   const attrs = useAttrs();
   const eVirtTableRef = ref(null);
   const eVirtTableEditorRef = ref(null);
@@ -150,6 +157,7 @@
     if (!eVirtTableRef.value) {
       return;
     }
+    syncCanvasThemeCssVars();
     eVirtTable = new EVirtTable(eVirtTableRef.value, {
       config: propsWithDefaults.value.config,
       columns: props.columns.map((col) => parseToEVirtColumn(col)),
@@ -190,6 +198,13 @@
       emit('selectionChange', selection);
     });
     emit('ready', eVirtTable);
+    themeSyncHandle = bindCanvasTableThemeSync({
+      getTable: () => eVirtTable,
+      getConfig: () => propsWithDefaults.value.config,
+    });
+  });
+  onUnmounted(() => {
+    themeSyncHandle?.disconnect();
   });
   function saveCellValue(value) {
     if (!eVirtTable || !editorCell.value) {
