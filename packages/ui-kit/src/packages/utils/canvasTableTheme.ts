@@ -17,6 +17,17 @@ const P_TO_EVT_BRIDGE: ReadonlyArray<readonly [evt: string, p: string, fallback:
   ['--evt-scroller-track-color', '--p-table-row-bg-color', '#fff'],
 ];
 
+/**
+ * 消费方在 CSS 中声明的 --evt-checkbox-*（如 variables.scss 映射 --checked-color 等）。
+ * 同步到 inline 以覆盖 e-virt-table 运行时注入的默认值。
+ */
+const EVT_CHECKBOX_FROM_CSS: readonly string[] = [
+  '--evt-checkbox-color',
+  '--evt-checkbox-uncheck-color',
+  '--evt-checkbox-disabled-color',
+  '--evt-checkbox-check-disabled-color',
+];
+
 /** Canvas 专用色（无 --p-* 对应项，storybook 默认值） */
 const LIGHT_EVT_DEDICATED: Readonly<Record<string, string>> = {
   '--evt-header-text-color': '#1d2129',
@@ -69,6 +80,12 @@ export function syncCanvasThemeCssVars(el: HTMLElement = document.documentElemen
   for (const [evt, p, fallback] of P_TO_EVT_BRIDGE) {
     const value = computed.getPropertyValue(p).trim() || fallback;
     el.style.setProperty(evt, value);
+  }
+  for (const evt of EVT_CHECKBOX_FROM_CSS) {
+    const value = computed.getPropertyValue(evt).trim();
+    if (value) {
+      el.style.setProperty(evt, value);
+    }
   }
   const dedicated = isDarkThemeRoot(el) ? DARK_EVT_DEDICATED : LIGHT_EVT_DEDICATED;
   for (const [evt, value] of Object.entries(dedicated)) {
