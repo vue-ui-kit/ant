@@ -18,39 +18,38 @@ const P_TO_EVT_BRIDGE: ReadonlyArray<readonly [evt: string, p: string, fallback:
 ];
 
 /**
- * 消费方在 CSS 中声明的 --evt-checkbox-*（如 variables.scss 映射 --checked-color 等）。
- * 同步到 inline 以覆盖 e-virt-table 运行时注入的默认值。
+ * 消费方在 CSS 中声明的 --evt-*（如 variables.scss 映射项目色）。
+ * 同步到 inline 以覆盖 e-virt-table 运行时注入 / 下方 dedicated 默认值。
+ * 文字色勿写入 LIGHT/DARK_EVT_DEDICATED，否则会盖掉项目映射。
  */
-const EVT_CHECKBOX_FROM_CSS: readonly string[] = [
+const EVT_OVERRIDE_FROM_CSS: readonly string[] = [
   '--evt-checkbox-color',
   '--evt-checkbox-uncheck-color',
   '--evt-checkbox-disabled-color',
   '--evt-checkbox-check-disabled-color',
+  '--evt-header-text-color',
+  '--evt-body-text-color',
+  '--evt-footer-text-color',
+  '--evt-readonly-text-color',
+  '--evt-editor-text-color',
+  '--evt-context-menu-text-color',
+  '--evt-header-font',
+  '--evt-body-font',
 ];
 
-/** Canvas 专用色（无 --p-* 对应项，storybook 默认值） */
+/** Canvas 专用色（无 --p-* 对应项；文字色见 canvas-theme.scss / 消费方覆盖） */
 const LIGHT_EVT_DEDICATED: Readonly<Record<string, string>> = {
-  '--evt-header-text-color': '#1d2129',
-  '--evt-body-text-color': '#4e5969',
-  '--evt-footer-text-color': '#4e5969',
-  '--evt-readonly-text-color': '#4e5969',
   '--evt-scroller-color': '#dee0e3',
   '--evt-scroller-focus-color': '#bbbec4',
   '--evt-edit-bg-color': '#fcf6ed',
   '--evt-footer-bg-color': '#fafafa',
   '--evt-autofill-point-border-color': '#fff',
   '--evt-editor-bg-color': '#fff',
-  '--evt-editor-text-color': '#333',
   '--evt-context-menu-bg-color': '#fff',
-  '--evt-context-menu-text-color': '#333',
   '--evt-context-menu-item-hover-bg-color': '#f5f5f5',
 };
 
 const DARK_EVT_DEDICATED: Readonly<Record<string, string>> = {
-  '--evt-header-text-color': '#a3a6ad',
-  '--evt-body-text-color': '#cfd3dc',
-  '--evt-footer-text-color': '#cfd3dc',
-  '--evt-readonly-text-color': '#a3a6ad',
   '--evt-scroller-color': '#414243',
   '--evt-scroller-track-color': '#141414',
   '--evt-scroller-focus-color': '#a3a6ad',
@@ -58,9 +57,7 @@ const DARK_EVT_DEDICATED: Readonly<Record<string, string>> = {
   '--evt-footer-bg-color': '#262727',
   '--evt-autofill-point-border-color': '#a3a6ad',
   '--evt-editor-bg-color': '#434343',
-  '--evt-editor-text-color': '#cfd3dc',
   '--evt-context-menu-bg-color': '#141414',
-  '--evt-context-menu-text-color': '#cfd3dc',
   '--evt-context-menu-item-hover-bg-color': '#414243',
 };
 
@@ -81,15 +78,17 @@ export function syncCanvasThemeCssVars(el: HTMLElement = document.documentElemen
     const value = computed.getPropertyValue(p).trim() || fallback;
     el.style.setProperty(evt, value);
   }
-  for (const evt of EVT_CHECKBOX_FROM_CSS) {
-    const value = computed.getPropertyValue(evt).trim();
-    if (value) {
-      el.style.setProperty(evt, value);
-    }
-  }
   const dedicated = isDarkThemeRoot(el) ? DARK_EVT_DEDICATED : LIGHT_EVT_DEDICATED;
   for (const [evt, value] of Object.entries(dedicated)) {
     el.style.setProperty(evt, value);
+  }
+  // 放在 dedicated 之后：消费方 CSS（如 --primary-text-color）优先
+  for (const evt of EVT_OVERRIDE_FROM_CSS) {
+    // 折叠换行/多空格：ctx.font 对含换行的 font 串可能解析失败
+    const value = computed.getPropertyValue(evt).trim().replace(/\s+/g, ' ');
+    if (value) {
+      el.style.setProperty(evt, value);
+    }
   }
 }
 

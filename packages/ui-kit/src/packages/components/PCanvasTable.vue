@@ -46,8 +46,9 @@
     config: {
       AUTO_ROW_HEIGHT: true,
       DISABLED: true, // 内部写死的默认配置
-      ...canvasTableDefaults, // 全局配置
-      ...props.config, // 用户传入的配置
+      BORDER_RADIUS: 4,
+      ...canvasTableDefaults, // 全局配置（含 setUIKitConfig）
+      ...props.config, // 用户传入的配置，可覆盖默认
     },
   }));
   let eVirtTable: EVirtTable | null = null;
@@ -62,6 +63,16 @@
   const overlayerView = ref<OverlayerContainer>();
   const cacheEditorSlotColumns: Record<string, CanvasColumnProps<T>> = {};
   const cacheEditorRenders: Record<string, CellRender> = {};
+
+  /** e-virt-table CSS 写死 stage border-radius:8px，需按 config.BORDER_RADIUS 覆盖 */
+  const applyBorderRadius = (config = propsWithDefaults.value.config) => {
+    const radius = config?.BORDER_RADIUS ?? 4;
+    const root = eVirtTableRef.value as HTMLElement | null;
+    const stage = root?.querySelector?.('.e-virt-table-stage') as HTMLElement | null;
+    if (stage) {
+      stage.style.borderRadius = `${radius}px`;
+    }
+  };
   // 编辑器样式
   const editorStyle = computed(() => {
     const cell = editorCell.value;
@@ -180,7 +191,6 @@
     });
     eVirtTable.on('overlayerChange', (overlayer: OverlayerContainer) => {
       overlayerView.value = overlayer;
-      console.log('overlayerChange', overlayer);
     });
     eVirtTable.on('startEdit', (cell) => {
       editorCell.value = cell;
@@ -198,6 +208,7 @@
       emit('selectionChange', selection);
     });
     emit('ready', eVirtTable);
+    applyBorderRadius();
     themeSyncHandle = bindCanvasTableThemeSync({
       getTable: () => eVirtTable,
       getConfig: () => propsWithDefaults.value.config,
@@ -236,6 +247,7 @@
     () => propsWithDefaults.value.config,
     (newValue) => {
       eVirtTable?.loadConfig(newValue);
+      applyBorderRadius(newValue);
     },
     { deep: true },
   );

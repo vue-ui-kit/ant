@@ -50,6 +50,7 @@ const defaultConfig: UIKitConfig = {
     DISABLED: true,
     ENABLE_FINDER: true,
     AUTO_ROW_HEIGHT: true,
+    BORDER_RADIUS: 4,
   },
   icon: {},
 };

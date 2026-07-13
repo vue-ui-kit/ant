@@ -1,10 +1,14 @@
-import type { Rule } from 'ant-design-vue/lib/form';
-import { ButtonProps } from 'ant-design-vue/lib/button';
-import { ColProps } from 'ant-design-vue/lib/grid/Col';
-import { FormProps } from 'ant-design-vue/lib/form/Form';
 import { TableColumnType, TableProps, TooltipProps } from 'ant-design-vue';
-import type { ConfigType, Column as EVirtColumn } from 'e-virt-table';
+import { ButtonProps } from 'ant-design-vue/lib/button';
+import type { Rule } from 'ant-design-vue/lib/form';
+import { FormProps } from 'ant-design-vue/lib/form/Form';
+import { ColProps } from 'ant-design-vue/lib/grid/Col';
+import type { BorderConfigValue, ConfigType, Column as EVirtColumn } from 'e-virt-table';
 import EVirtTable from 'e-virt-table';
+
+export type { BorderConfigValue, BorderStyle } from 'e-virt-table';
+/** 与 e-virt-table `scrollbarMode` 对齐：`outer` 外部预留，`inner` 内部悬停显示 */
+export type ScrollbarMode = 'outer' | 'inner';
 
 export interface CellFuncArg<D extends Recordable = Recordable> {
   row: D;
@@ -421,6 +425,27 @@ export interface PCanvasGridProps<
   pageConfig?: PageConfig;
   proxyConfig?: ProxyConfig<D, F>;
   config?: ConfigType;
+  /**
+   * 表格边框样式，映射 e-virt-table `BORDER`。
+   * - `true` / `'default'`：完整单元格边框
+   * - `'outer'`：仅外边框
+   * - `'inner'` / `false`：仅内部横线
+   * - `'none'`：无边框
+   * 显式传入时优先于 `config.BORDER`。
+   */
+  border?: BorderConfigValue;
+  /**
+   * 滚动条模式，映射 e-virt-table `scrollbarMode`。
+   * - `'outer'`：外部预留滚动条轨道（默认）
+   * - `'inner'`：覆盖在内容上，悬停表格内部后显示
+   * 显式传入时优先于 `config.scrollbarMode`。
+   */
+  scrollbarMode?: ScrollbarMode;
+  /**
+   * 内部滚动条（`scrollbarMode: 'inner'`）悬停后显示延迟（ms），映射 `SCROLLBAR_SHOW_DELAY`。
+   * 显式传入时优先于 `config.SCROLLBAR_SHOW_DELAY`。
+   */
+  scrollbarShowDelay?: number;
   // 重置后不自动提交
   lazyReset?: boolean;
   /**

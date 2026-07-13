@@ -405,16 +405,6 @@
 }
 /* #endregion */
 
-/* #region EVirtTable */
-.canvas-cell {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: start;
-  padding: 0 8px;
-}
-/* #endregion */
-
 @each $align in right center {
   /**/
   .p-content-align-#{$align}.ant-form-item .ant-form-item-control-input-content {

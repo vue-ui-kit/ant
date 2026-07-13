@@ -82,11 +82,17 @@
   const queryFormData = ref<Partial<F>>({}) as Ref<Partial<F>>;
 
   // 只处理 config 的合并，其他属性通过 withDefaults 处理
+  // border / scrollbarMode / scrollbarShowDelay 为提升到组件的配置，显式传入时覆盖 config 同名字段
   const propsWithDefaults = computed(() => ({
     ...props,
     config: {
       ...canvasTableDefaults,
       ...props.config,
+      ...(props.border !== undefined ? { BORDER: props.border } : {}),
+      ...(props.scrollbarMode !== undefined ? { scrollbarMode: props.scrollbarMode } : {}),
+      ...(props.scrollbarShowDelay !== undefined
+        ? { SCROLLBAR_SHOW_DELAY: props.scrollbarShowDelay }
+        : {}),
     },
   }));
   const mode = computed<'list' | 'pagination' | 'bad'>(() =>
@@ -107,6 +113,10 @@
           showTotal: (total: number) => `共${total}条数据`,
         }
       : false,
+  );
+  // 必须用 .value：模板里 pageConfig?.pageSizes 会因可选链绕过 Ref 解包，读到 undefined
+  const pageSizeOptions = computed(() =>
+    (pageConfig.value?.pageSizes ?? [10, 20, 50, 100]).map(String),
   );
 
   const fc = computed(() => omit({ labelCol: defaultLabelCol, ...formConfig.value }, ['items']));
@@ -686,6 +696,10 @@
             size="small"
             :current="pagination.page"
             :page-size="pagination.size"
+            :page-size-options="pageSizeOptions"
+            :show-size-changer="pageConfig?.showSizeChanger ?? true"
+            :show-quick-jumper="pageConfig?.showQuickJumper"
+            :show-total="(total: number) => `共${total}条数据`"
             :total="totalCount"
             @change="handleTableChange"
           />

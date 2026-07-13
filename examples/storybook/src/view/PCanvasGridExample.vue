@@ -200,6 +200,9 @@
       ENABLE_AUTOFILL: true,
       AUTO_ROW_HEIGHT: true,
     },
+    // 边框 / 内部悬停滚动条（亦可写在 config.BORDER / config.scrollbarMode）
+    border: 'default',
+    scrollbarMode: 'inner',
   }));
 
   // ── autoBoxSize 模式：自动贴底 ──
