@@ -32,6 +32,10 @@
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
     (e: 'selectionChange', value: T[]): void;
+    (
+      e: 'sortChange',
+      value: Map<string, { direction: 'asc' | 'desc' | 'none'; timestamp: number }>,
+    ): void;
     (e: 'ready', value: EVirtTable): void;
   }>();
 
@@ -207,6 +211,9 @@
       selectedRecords.value = selection;
       emit('selectionChange', selection);
     });
+    eVirtTable.on('sortChange', (sortState) => {
+      emit('sortChange', sortState);
+    });
     emit('ready', eVirtTable);
     applyBorderRadius();
     themeSyncHandle = bindCanvasTableThemeSync({
@@ -268,7 +275,9 @@
     { immediate: true },
   );
   defineExpose({
-    $table: eVirtTable,
+    get $table() {
+      return eVirtTable;
+    },
     selectedRecords: computed(() => selectedRecords.value),
     reloadData: () => {
       eVirtTable?.loadData(props.data);

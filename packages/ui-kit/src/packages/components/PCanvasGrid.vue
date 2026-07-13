@@ -64,7 +64,17 @@
     ): void;
     (event: 'pick', data: { row: D; field: string }): void;
     (event: 'resetQuery'): void;
+    (
+      event: 'sortChange',
+      value: Map<string, { direction: 'asc' | 'desc' | 'none'; timestamp: number }>,
+    ): void;
   }>();
+
+  const handleSortChange = (
+    sortState: Map<string, { direction: 'asc' | 'desc' | 'none'; timestamp: number }>,
+  ) => {
+    emit('sortChange', sortState);
+  };
 
   const { formConfig, pageConfig, columns, toolbarConfig, proxyConfig, config, staticConfig } =
     toRefs(props);
@@ -677,6 +687,7 @@
             :data="tableData"
             :loading="loading.table"
             @selection-change="handleSelectionChange"
+            @sort-change="handleSortChange"
           >
             <template v-for="(_, name) in $slots" #[name]="slotProps">
               <slot :name="name" v-bind="slotProps"></slot>
