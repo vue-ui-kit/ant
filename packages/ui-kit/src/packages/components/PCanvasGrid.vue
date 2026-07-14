@@ -126,7 +126,7 @@
   );
   // 必须用 .value：模板里 pageConfig?.pageSizes 会因可选链绕过 Ref 解包，读到 undefined
   const pageSizeOptions = computed(() =>
-    (pageConfig.value?.pageSizes ?? [10, 20, 50, 100]).map(String),
+    (pageConfig.value?.pageSizes ?? [10, 20, 50, 100, 200]).map(String),
   );
 
   const fc = computed(() => omit({ labelCol: defaultLabelCol, ...formConfig.value }, ['items']));
@@ -299,10 +299,19 @@
     pagination.size = pageSize;
     return fetchData();
   };
+  /** 清空跨页缓存 + e-virt 勾选 UI（仅清 pageSelections 会导致「看起来还勾着但 selectedKeys 已空」） */
+  const clearSelection = () => {
+    pageSelections.value = {};
+    canvasTableRef.value?.clearSelection?.();
+  };
   const resetPage = () => {
     pagination.page = 1;
-    pageSelections.value = {};
-    return fetchData();
+    clearSelection();
+    return fetchData().then((rows) => {
+      // loadData 后勾选态可能残留，再清一次
+      clearSelection();
+      return rows;
+    });
   };
   const debounceFetchData = debounce(fetchData, 160);
   const passQuery = (params: Partial<F>, lazy?: boolean) => {
@@ -412,7 +421,7 @@
     }
   };
   const reload = () => {
-    pageSelections.value = {};
+    clearSelection();
     return resetQueryFormData();
   };
 
@@ -548,6 +557,7 @@
     selectedRowKeys,
     setBtnLoading,
     selectedRecords,
+    clearSelection,
     $form: computed(() => formEl.value),
     getFormData: () => queryFormData.value,
     setLoadings,

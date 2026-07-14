@@ -73,8 +73,8 @@ importers:
   packages/ui-kit:
     dependencies:
       e-virt-table:
-        specifier: 1.4.3
-        version: 1.4.3
+        specifier: 1.4.5
+        version: 1.4.5
       uuid:
         specifier: ^11.1.1
         version: 11.1.1
@@ -1368,8 +1368,8 @@ packages:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
     engines: {node: '>=8'}
 
-  e-virt-table@1.4.3:
-    resolution: {integrity: sha512-IXsg/WxTz5oY8+5YJ/eRxTsYeZDzIpdBbeLO72cB7Ri6OR8FZl0sGja7czml5C90Igswq8fHKw8HePmIIE0cvw==}
+  e-virt-table@1.4.5:
+    resolution: {integrity: sha512-lF+T0kZsjIy3Dzzaky4BsULDV1XbOD0vDgymX31LsiK72aSSXfQC8sCtpXTyBXEVNEOUAa9yfBkbu8tEd7QsCA==}
 
   electron-to-chromium@1.5.380:
     resolution: {integrity: sha512-W6d5AbuEoRayO447cqrg6lKJIlscgRnnxOZl/08kfV71BQDoEBC7Wwis68z87LjyK6f4kWyTaubuDbhHKrZkbA==}
@@ -3446,7 +3446,7 @@ snapshots:
     dependencies:
       is-obj: 2.0.0
 
-  e-virt-table@1.4.3:
+  e-virt-table@1.4.5:
     dependencies:
       '@floating-ui/dom': 1.7.6
 

@@ -512,5 +512,6 @@ export interface PFormGroupInstance {
 export interface PCanvasTableInstance<T extends Recordable = Recordable> {
   $table: InstanceType<typeof EVirtTable>;
   selectedRecords: T[];
+  clearSelection: () => void;
   setLoading: (value: boolean) => void;
 }

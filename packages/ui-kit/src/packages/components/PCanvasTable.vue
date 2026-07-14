@@ -147,7 +147,7 @@
       cacheEditorRenders[column.field! || column.key!] = column.editRender;
     }
     return {
-      ...omit(column, ['formatter']),
+      ...omit(column, ['formatter', 'formatterSelectorValue']),
       key: column.key || column.field || uuidv4(),
       formatter: isString(column.formatter)
         ? transferFormatter(getFormatter(column.formatter as string))
@@ -156,6 +156,10 @@
           : isFunction(column.formatter)
             ? transferFormatter(column.formatter as FormatterFunc)
             : undefined,
+      // e-virt-table 1.4.5+：框选复制取值；函数直接透传（签名为 CellParams）
+      formatterSelectorValue: isFunction(column.formatterSelectorValue)
+        ? column.formatterSelectorValue
+        : undefined,
       editorType:
         column.editorType ??
         (column.slots?.edit && (column.field || column.key) && isFunction(column.slots?.edit)
@@ -274,11 +278,16 @@
     },
     { immediate: true },
   );
+  const clearSelection = () => {
+    eVirtTable?.clearSelection();
+    selectedRecords.value = [];
+  };
   defineExpose({
     get $table() {
       return eVirtTable;
     },
     selectedRecords: computed(() => selectedRecords.value),
+    clearSelection,
     reloadData: () => {
       eVirtTable?.loadData(props.data);
     },
