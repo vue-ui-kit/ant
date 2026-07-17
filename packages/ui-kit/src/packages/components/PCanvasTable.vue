@@ -25,6 +25,7 @@
     syncCanvasThemeCssVars,
     type CanvasTableThemeHandle,
   } from '@/utils/canvasTableTheme';
+  import { patchCanvasTransparentFillSeams } from '@/utils/canvasTablePaint';
   import { getCanvasTableDefaults } from '@/utils/config';
   import { watchPreviousDeep } from '@/utils/core';
   import '../styles/canvas-theme.scss';
@@ -186,6 +187,7 @@
       overlayerElement: eVirtTableOverlayerRef.value || undefined,
       editorElement: eVirtTableEditorRef.value || undefined,
     });
+    patchCanvasTransparentFillSeams(eVirtTable);
     // 动态绑定事件
     Object.keys(attrs).forEach((key) => {
       const func = attrs[key];
