@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "2.5.15",
+  "version": "2.5.23",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -47,7 +47,7 @@
     "email": "adoin@qq.com"
   },
   "dependencies": {
-    "e-virt-table": "1.4.5",
+    "e-virt-table": "1.4.6",
     "uuid": "^11.1.1",
     "xe-utils": "^3.7.6"
   },

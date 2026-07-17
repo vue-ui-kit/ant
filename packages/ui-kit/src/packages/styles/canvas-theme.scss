@@ -4,7 +4,8 @@
  * - 无对应 --p-* 的项使用 storybook theme.css 默认值
  * - e-virt-table 初始化时通过 Config.updateCssVar() 读取 --evt-*
  */
-:root {
+/* Higher specificity than e-virt-table@1.4.x runtime-injected :root defaults. */
+:root:root {
   --evt-border-color: var(--p-border-color, #d9d9d9);
   --evt-header-bg-color: var(--p-table-thead-bg-color, #f2f3f6);
   --evt-body-bg-color: var(--p-table-row-bg-color, #fff);

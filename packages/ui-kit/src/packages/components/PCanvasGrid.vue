@@ -43,6 +43,7 @@
     ref,
     toRefs,
     useAttrs,
+    useSlots,
     watch,
   } from 'vue';
   import { debounce, get, isBoolean, isFunction, isObject, isString, omit, uniq } from 'xe-utils';
@@ -53,6 +54,14 @@
     autoBoxSize: false,
   });
   const attrs = useAttrs();
+  const slots = useSlots();
+  /**
+   * 透传给 PCanvasTable 的插槽。
+   * 约定：以 `__` 开头的为 PCanvasGrid 保留插槽（如 `__pagerLeft`），不透传，避免与列 field 重名。
+   */
+  const tableSlotNames = computed(() =>
+    Object.keys(slots).filter((name) => !name.startsWith('__')),
+  );
   const emit = defineEmits<{
     (
       event: 'toolbarButtonClick',
@@ -699,31 +708,42 @@
             @selection-change="handleSelectionChange"
             @sort-change="handleSortChange"
           >
-            <template v-for="(_, name) in $slots" #[name]="slotProps">
-              <slot :name="name" v-bind="slotProps"></slot>
+            <template v-for="name in tableSlotNames" #[name]="slotProps">
+              <slot :name="name" v-bind="slotProps || {}"></slot>
             </template>
           </p-canvas-table>
         </div>
         <div ref="tableFooterEl" class="flex-shrink-0">
           <div
-            v-if="staticConfig?.selectable && staticConfig.showCount"
-            class="w-full text-slate-5 pl-4"
+            v-if="mode !== 'pagination' && staticConfig?.selectable && staticConfig.showCount"
+            class="w-full text-slate-5 pt-8px px-16px"
           >
             已选：{{ selectedRowKeys.length }}
           </div>
-          <a-pagination
-            class="p-canvas-pagination"
-            v-if="mode === 'pagination'"
-            size="small"
-            :current="pagination.page"
-            :page-size="pagination.size"
-            :page-size-options="pageSizeOptions"
-            :show-size-changer="pageConfig?.showSizeChanger ?? true"
-            :show-quick-jumper="pageConfig?.showQuickJumper"
-            :show-total="(total: number) => `共${total}条数据`"
-            :total="totalCount"
-            @change="handleTableChange"
-          />
+          <div
+            v-else-if="mode === 'pagination'"
+            class="p-canvas-grid-footer flex w-full items-center gap-12px"
+          >
+            <div class="flex-1 min-w-0 flex items-center text-slate-5">
+              <slot name="__pagerLeft">
+                <template v-if="staticConfig?.selectable && staticConfig.showCount">
+                  已选：{{ selectedRowKeys.length }}
+                </template>
+              </slot>
+            </div>
+            <a-pagination
+              class="p-canvas-pagination"
+              size="small"
+              :current="pagination.page"
+              :page-size="pagination.size"
+              :page-size-options="pageSizeOptions"
+              :show-size-changer="pageConfig?.showSizeChanger ?? true"
+              :show-quick-jumper="pageConfig?.showQuickJumper"
+              :show-total="(total: number) => `共${total}条数据`"
+              :total="totalCount"
+              @change="handleTableChange"
+            />
+          </div>
         </div>
       </div>
     </template>

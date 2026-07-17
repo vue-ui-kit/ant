@@ -1,95 +1,14 @@
 import type EVirtTable from 'e-virt-table';
 import type { ConfigType } from 'e-virt-table';
 
-/** --p-* → --evt-* 桥接（与 canvas-theme.scss / storybook theme.css 对齐） */
-const P_TO_EVT_BRIDGE: ReadonlyArray<readonly [evt: string, p: string, fallback: string]> = [
-  ['--evt-border-color', '--p-border-color', '#d9d9d9'],
-  ['--evt-header-bg-color', '--p-table-thead-bg-color', '#f2f3f6'],
-  ['--evt-body-bg-color', '--p-table-row-bg-color', '#fff'],
-  ['--evt-stripe-color', '--p-striped-bg-color', '#f2f3f6'],
-  ['--evt-highlight-hover-row-color', '--p-table-row-hover-bg-color', '#e6e7ea'],
-  ['--evt-select-border-color', '--p-primary-color', '#4096ff'],
-  ['--evt-sort-icon-color', '--p-primary-color', '#4096ff'],
-  ['--evt-required-color', '--p-danger-color', '#f5222d'],
-  ['--evt-error-tip-color', '--p-danger-color', '#f5222d'],
-  ['--evt-error-tip-icon-color', '--p-danger-color', '#f5222d'],
-  ['--evt-readonly-color', '--p-table-row-bg-color', '#fff'],
-  ['--evt-scroller-track-color', '--p-table-row-bg-color', '#fff'],
-];
-
 /**
- * 消费方在 CSS 中声明的 --evt-*（如 variables.scss 映射项目色）。
- * 同步到 inline 以覆盖 e-virt-table 运行时注入 / 下方 dedicated 默认值。
- * 文字色勿写入 LIGHT/DARK_EVT_DEDICATED，否则会盖掉项目映射。
- */
-const EVT_OVERRIDE_FROM_CSS: readonly string[] = [
-  '--evt-checkbox-color',
-  '--evt-checkbox-uncheck-color',
-  '--evt-checkbox-disabled-color',
-  '--evt-checkbox-check-disabled-color',
-  '--evt-header-text-color',
-  '--evt-body-text-color',
-  '--evt-footer-text-color',
-  '--evt-readonly-text-color',
-  '--evt-editor-text-color',
-  '--evt-context-menu-text-color',
-  '--evt-header-font',
-  '--evt-body-font',
-];
-
-/** Canvas 专用色（无 --p-* 对应项；文字色见 canvas-theme.scss / 消费方覆盖） */
-const LIGHT_EVT_DEDICATED: Readonly<Record<string, string>> = {
-  '--evt-scroller-color': '#dee0e3',
-  '--evt-scroller-focus-color': '#bbbec4',
-  '--evt-edit-bg-color': '#fcf6ed',
-  '--evt-footer-bg-color': '#fafafa',
-  '--evt-autofill-point-border-color': '#fff',
-  '--evt-editor-bg-color': '#fff',
-  '--evt-context-menu-bg-color': '#fff',
-  '--evt-context-menu-item-hover-bg-color': '#f5f5f5',
-};
-
-const DARK_EVT_DEDICATED: Readonly<Record<string, string>> = {
-  '--evt-scroller-color': '#414243',
-  '--evt-scroller-track-color': '#141414',
-  '--evt-scroller-focus-color': '#a3a6ad',
-  '--evt-edit-bg-color': '#141414',
-  '--evt-footer-bg-color': '#262727',
-  '--evt-autofill-point-border-color': '#a3a6ad',
-  '--evt-editor-bg-color': '#434343',
-  '--evt-context-menu-bg-color': '#141414',
-  '--evt-context-menu-item-hover-bg-color': '#414243',
-};
-
-export function isDarkThemeRoot(el: HTMLElement = document.documentElement): boolean {
-  return (
-    el.getAttribute('theme-mode') === 'dark' ||
-    el.getAttribute('data-theme') === 'dark' ||
-    el.classList.contains('dark')
-  );
-}
-
-/**
- * 将 --p-* 解析值写入 --evt-*，覆盖 e-virt-table 运行时注入的浅色默认值。
+ * 默认值和 --p-* 映射由 canvas-theme.scss 处理。
+ * e-virt-table 会自动把所有 *_COLOR / *_FONT 配置映射为 --evt-* 并读取，
+ * 因此这里不再写入 inline 变量，也不需要维护变量白名单。
  */
 export function syncCanvasThemeCssVars(el: HTMLElement = document.documentElement): void {
-  const computed = getComputedStyle(el);
-  for (const [evt, p, fallback] of P_TO_EVT_BRIDGE) {
-    const value = computed.getPropertyValue(p).trim() || fallback;
-    el.style.setProperty(evt, value);
-  }
-  const dedicated = isDarkThemeRoot(el) ? DARK_EVT_DEDICATED : LIGHT_EVT_DEDICATED;
-  for (const [evt, value] of Object.entries(dedicated)) {
-    el.style.setProperty(evt, value);
-  }
-  // 放在 dedicated 之后：消费方 CSS（如 --primary-text-color）优先
-  for (const evt of EVT_OVERRIDE_FROM_CSS) {
-    // 折叠换行/多空格：ctx.font 对含换行的 font 串可能解析失败
-    const value = computed.getPropertyValue(evt).trim().replace(/\s+/g, ' ');
-    if (value) {
-      el.style.setProperty(evt, value);
-    }
-  }
+  // 强制完成当前样式计算，随后 Config.updateCssVar() 读取最新级联值。
+  getComputedStyle(el).getPropertyValue('--evt-border-color');
 }
 
 export type CanvasTableThemeHandle = {
@@ -115,7 +34,7 @@ export function bindCanvasTableThemeSync(options: {
   const observer = new MutationObserver(sync);
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['theme-mode', 'class', 'data-theme'],
+    attributeFilter: ['theme-mode', 'class', 'data-theme', 'style'],
   });
 
   sync();

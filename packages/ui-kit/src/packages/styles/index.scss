@@ -121,11 +121,14 @@
   .p-form-wrapper {
     z-index: 4;
   }
+  .p-canvas-grid-footer {
+    padding: 16px 0;
+  }
   .p-canvas-pagination.ant-pagination {
     display: flex;
+    flex-shrink: 0;
     justify-content: flex-end;
-    width: 100%;
-    padding: 16px 0;
+    margin-left: auto;
   }
   .p-error-hang-out {
     .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(
