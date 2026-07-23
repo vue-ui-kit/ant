@@ -37,6 +37,7 @@
     Ref,
     computed,
     nextTick,
+    onActivated,
     onBeforeUnmount,
     onMounted,
     reactive,
@@ -496,6 +497,8 @@
         return;
       }
       const wrapperH = tableWrapperEl.value.clientHeight;
+      // keep-alive / flex 激活瞬间 clientHeight 常为 0，写入 100 会造成高度闪缩；保留上次有效值
+      if (wrapperH <= 0) return;
       const footerH = tableFooterEl.value?.offsetHeight ?? 0;
       const tableHeaderEl = resolveTableHeaderEl(tableWrapperEl.value);
       const headerH = tableHeaderEl?.getBoundingClientRect().height ?? 0;
@@ -578,6 +581,13 @@
     nextTick(() => {
       if (props.autoBoxSize) syncAutoViewportBox();
       resizeTable();
+    });
+  });
+  // keep-alive 再激活：等布局稳定后再量高（与 resizeTable 内跳过 0 高度配合）
+  onActivated(() => {
+    nextTick(() => {
+      if (props.autoBoxSize) autoViewportBoxCtrl?.update();
+      requestAnimationFrame(() => resizeTable());
     });
   });
   const renderContent = (content: string | (() => any)) => {

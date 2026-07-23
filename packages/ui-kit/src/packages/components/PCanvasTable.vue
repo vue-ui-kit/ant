@@ -30,6 +30,12 @@
   import { watchPreviousDeep } from '@/utils/core';
   import '../styles/canvas-theme.scss';
 
+  type SelectorRange = {
+    enable: boolean;
+    xArr: [number, number];
+    yArr: [number, number];
+  };
+
   const emit = defineEmits<{
     (e: 'change', value: any[]): void; // 需要默认实现change，不能动态绑定
     (e: 'selectionChange', value: T[]): void;
@@ -41,6 +47,12 @@
   }>();
 
   const selectedRecords = ref<T[]>([]);
+  /** 框选区域（Canvas selector）；框选时 overlayer 不重绘，需独立响应式驱动 class */
+  const selectorRange = ref<SelectorRange>({
+    enable: false,
+    xArr: [-1, -1],
+    yArr: [-1, -1],
+  });
   const props = withDefaults(defineProps<CanvasTableProps<T, B>>(), {
     config: () => ({}),
   });
@@ -68,6 +80,44 @@
   const overlayerView = ref<OverlayerContainer>();
   const cacheEditorSlotColumns: Record<string, CanvasColumnProps<T>> = {};
   const cacheEditorRenders: Record<string, CellRender> = {};
+
+  /** 与 Canvas drawSelector 一致：多格选区才铺选中叠色；footer 不铺 */
+  const isOverlayerCellSelected = (cell: {
+    rowIndex?: number;
+    colIndex?: number;
+    cellType?: string;
+  }) => {
+    const { enable, xArr, yArr } = selectorRange.value;
+    if (!enable) return false;
+    const [minX, maxX] = xArr;
+    const [minY, maxY] = yArr;
+    if (minX < 0 || minY < 0) return false;
+    if (minX === maxX && minY === maxY) return false;
+    if (cell.cellType === 'footer' || cell.cellType === 'header') return false;
+    const { rowIndex, colIndex } = cell;
+    if (rowIndex == null || colIndex == null) return false;
+    return colIndex >= minX && colIndex <= maxX && rowIndex >= minY && rowIndex <= maxY;
+  };
+
+  const resetSelectorRange = () => {
+    selectorRange.value = {
+      enable: false,
+      xArr: [-1, -1],
+      yArr: [-1, -1],
+    };
+  };
+
+  const syncSelectorRange = (selector?: { enable?: boolean; xArr?: number[]; yArr?: number[] }) => {
+    if (!selector) {
+      resetSelectorRange();
+      return;
+    }
+    selectorRange.value = {
+      enable: !!selector.enable,
+      xArr: [selector.xArr?.[0] ?? -1, selector.xArr?.[1] ?? -1],
+      yArr: [selector.yArr?.[0] ?? -1, selector.yArr?.[1] ?? -1],
+    };
+  };
 
   /** e-virt-table CSS 写死 stage border-radius:8px，需按 config.BORDER_RADIUS 覆盖 */
   const applyBorderRadius = (config = propsWithDefaults.value.config) => {
@@ -148,7 +198,7 @@
       cacheEditorRenders[column.field! || column.key!] = column.editRender;
     }
     return {
-      ...omit(column, ['formatter', 'formatterSelectorValue']),
+      ...omit(column, ['formatter', 'formatterSelectorValue', 'formatterFinderValue']),
       key: column.key || column.field || uuidv4(),
       formatter: isString(column.formatter)
         ? transferFormatter(getFormatter(column.formatter as string))
@@ -160,6 +210,10 @@
       // e-virt-table 1.4.5+：框选复制取值；函数直接透传（签名为 CellParams）
       formatterSelectorValue: isFunction(column.formatterSelectorValue)
         ? column.formatterSelectorValue
+        : undefined,
+      // e-virt-table 1.4.8+：Ctrl+F 查找取值（slot 列 displayText 为空时用）
+      formatterFinderValue: isFunction(column.formatterFinderValue)
+        ? column.formatterFinderValue
         : undefined,
       editorType:
         column.editorType ??
@@ -177,7 +231,7 @@
     if (!eVirtTableRef.value) {
       return;
     }
-    syncCanvasThemeCssVars();
+    syncCanvasThemeCssVars(eVirtTableRef.value as HTMLElement);
     eVirtTable = new EVirtTable(eVirtTableRef.value, {
       config: propsWithDefaults.value.config,
       columns: props.columns.map((col) => parseToEVirtColumn(col)),
@@ -202,6 +256,12 @@
     eVirtTable.on('overlayerChange', (overlayer: OverlayerContainer) => {
       overlayerView.value = overlayer;
     });
+    eVirtTable.on('setSelector', (selector) => {
+      syncSelectorRange(selector);
+    });
+    eVirtTable.on('clearSelector', () => {
+      resetSelectorRange();
+    });
     eVirtTable.on('startEdit', (cell) => {
       editorCell.value = cell;
       editorType.value = cell.editorType;
@@ -225,6 +285,7 @@
     themeSyncHandle = bindCanvasTableThemeSync({
       getTable: () => eVirtTable,
       getConfig: () => propsWithDefaults.value.config,
+      getEl: () => eVirtTableRef.value as HTMLElement | null,
     });
   });
   onUnmounted(() => {
@@ -352,7 +413,7 @@
         >
           <div :style="view.style" v-for="view in wrapper.views" :key="view.key">
             <div
-              class="canvas-cell"
+              :class="['canvas-cell', { 'evt-selected-cell-layer': isOverlayerCellSelected(cell) }]"
               v-for="cell in view.cells"
               :key="`${cell.rowKey}_${cell.key}`"
               :style="{

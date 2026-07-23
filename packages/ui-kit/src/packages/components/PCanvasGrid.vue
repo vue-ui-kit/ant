@@ -37,6 +37,7 @@
     Ref,
     computed,
     nextTick,
+    onActivated,
     onBeforeUnmount,
     onMounted,
     reactive,
@@ -484,6 +485,8 @@
       resizeRaf = null;
       if (!tableBodyEl.value) return;
       const bodyH = tableBodyEl.value.clientHeight;
+      // keep-alive / flex 激活瞬间 clientHeight 常为 0，写入 100 会造成高度闪缩；保留上次有效值
+      if (bodyH <= 0) return;
       const reserve = props.fitHeight ?? 0;
       renderHeight.value = Math.max(bodyH - reserve, 100);
     });
@@ -543,6 +546,13 @@
     nextTick(() => {
       if (props.autoBoxSize) syncAutoViewportBox();
       resizeTable();
+    });
+  });
+  // keep-alive 再激活：等布局稳定后再量高（与 resizeTable 内跳过 0 高度配合）
+  onActivated(() => {
+    nextTick(() => {
+      if (props.autoBoxSize) autoViewportBoxCtrl?.update();
+      requestAnimationFrame(() => resizeTable());
     });
   });
   onBeforeUnmount(() => {

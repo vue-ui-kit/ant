@@ -1,14 +1,14 @@
 <script setup lang="tsx">
-  import { ref } from 'vue';
-  import { Student } from '../Mock/apis/type';
   import { CanvasColumnProps, PCanvasTableInstance } from '@vue-ui-kit/ant';
   import {
     Button as AButton,
-    Space as ASpace,
-    RadioGroup as ARadioGroup,
     RadioButton as ARadioButton,
+    RadioGroup as ARadioGroup,
+    Space as ASpace,
   } from 'ant-design-vue';
+  import { ref } from 'vue';
   import { sample } from 'xe-utils';
+  import { Student } from '../Mock/apis/type';
 
   const canvasTableInstance = ref<PCanvasTableInstance<Student>>();
 
@@ -142,21 +142,24 @@
       width: 200,
       slots: {
         default: ({ row, column, rowIndex }) => (
-          <div
-            style={{
-              display: 'flex',
-              height: '100%',
-              padding: '4px',
-              flexWrap: 'wrap',
-              gap: '4px',
-              alignItems: 'center',
-            }}
-          >
-            {(row.hobby ?? []).map((o, index) => (
-              <a-tag color="blue" key={index}>
-                {o}
-              </a-tag>
-            ))}
+          <div>
+            <div>如下：</div>
+            <div
+              style={{
+                display: 'flex',
+                height: '100%',
+                padding: '4px',
+                flexWrap: 'wrap',
+                gap: '4px',
+                alignItems: 'center',
+              }}
+            >
+              {(row.hobby ?? []).map((o, index) => (
+                <a-tag color="blue" key={index}>
+                  {o}
+                </a-tag>
+              ))}
+            </div>
           </div>
         ),
       },
@@ -268,13 +271,21 @@
   const canvasTableConfig = ref({
     DISABLED: true,
     HEIGHT: 500,
+    ENABLE_SELECTOR: true,
   });
 </script>
 
 <template>
-  <div>
-    <a-typography-title :level="3">PCanvasGrid - Canvas虚拟表格</a-typography-title>
+  <div class="p-canvas-table-example">
+    <a-typography-title :level="3">PCanvasTable - Canvas虚拟表格</a-typography-title>
     <p>基于e-virt-table的高性能虚拟滚动表格组件，支持大数据量渲染</p>
+    <a-typography-paragraph type="secondary">
+      框选多格时，slot 列（如「爱好」tag）会加上
+      <code>evt-selected-cell-layer</code>
+      ，用 SVG filter 叠
+      <code>--evt-select-area-color</code>
+      ，与 Canvas 选区叠色一致。单格选中不铺叠色（与 e-virt 行为一致）。
+    </a-typography-paragraph>
     <a-space>
       <span>编辑状态：</span>
       <a-radio-group v-model:value="canvasTableConfig.DISABLED">

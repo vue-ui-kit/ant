@@ -1,5 +1,6 @@
 import type EVirtTable from 'e-virt-table';
 import type { ConfigType } from 'e-virt-table';
+import { syncSelectAreaSvgFilter } from '@/utils/canvasSelectAreaFilter';
 
 /**
  * 默认值和 --p-* 映射由 canvas-theme.scss 处理。
@@ -9,6 +10,8 @@ import type { ConfigType } from 'e-virt-table';
 export function syncCanvasThemeCssVars(el: HTMLElement = document.documentElement): void {
   // 强制完成当前样式计算，随后 Config.updateCssVar() 读取最新级联值。
   getComputedStyle(el).getPropertyValue('--evt-border-color');
+  // 从表格根读取生效色（可继承业务侧局部 --evt-select-area-color）
+  syncSelectAreaSvgFilter(el);
 }
 
 export type CanvasTableThemeHandle = {
@@ -22,9 +25,11 @@ export type CanvasTableThemeHandle = {
 export function bindCanvasTableThemeSync(options: {
   getTable: () => EVirtTable | null;
   getConfig: () => ConfigType;
+  /** 用于读取局部 CSS 变量（如示例页容器上的 --evt-select-area-color） */
+  getEl?: () => HTMLElement | null;
 }): CanvasTableThemeHandle {
   const sync = () => {
-    syncCanvasThemeCssVars();
+    syncCanvasThemeCssVars(options.getEl?.() || document.documentElement);
     const table = options.getTable();
     if (table) {
       table.loadConfig(options.getConfig());

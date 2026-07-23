@@ -12,6 +12,8 @@
   --evt-stripe-color: var(--p-striped-bg-color, #f2f3f6);
   --evt-highlight-hover-row-color: var(--p-table-row-hover-bg-color, #e6e7ea);
   --evt-select-border-color: var(--p-primary-color, #4096ff);
+  /* 可用 --p-select-area-color 覆盖；勿写死以免压过业务/示例 :root */
+  --evt-select-area-color: var(--p-select-area-color, rgba(82, 146, 247, 0.1));
   --evt-sort-icon-color: var(--p-primary-color, #4096ff);
   --evt-required-color: var(--p-danger-color, #f5222d);
   --evt-error-tip-color: var(--p-danger-color, #f5222d);
@@ -19,11 +21,11 @@
   --evt-readonly-color: var(--p-table-row-bg-color, #fff);
   --evt-scroller-track-color: var(--p-table-row-bg-color, #fff);
 
-  /* Canvas 文字色：storybook 默认；业务项目请在 variables 映射 --primary-text-color 等覆盖 */
-  --evt-header-text-color: #1d2129;
-  --evt-body-text-color: #4e5969;
-  --evt-footer-text-color: #4e5969;
-  --evt-readonly-text-color: #4e5969;
+  /* Canvas / HTML overlayer 共用文字色（业务可覆盖 --p-text-color） */
+  --evt-header-text-color: var(--p-text-color, #000000);
+  --evt-body-text-color: var(--p-text-color, #000000);
+  --evt-footer-text-color: var(--p-text-color, #000000);
+  --evt-readonly-text-color: var(--p-text-color, #000000);
   /* 默认 14px。font 简写必须是「字重 字号 字体」；表头 bold、表体 normal */
   --evt-header-font:
     bold 14px 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -35,9 +37,9 @@
   --evt-footer-bg-color: #fafafa;
   --evt-autofill-point-border-color: #fff;
   --evt-editor-bg-color: #fff;
-  --evt-editor-text-color: #333;
+  --evt-editor-text-color: var(--p-text-color, #000000);
   --evt-context-menu-bg-color: #fff;
-  --evt-context-menu-text-color: #333;
+  --evt-context-menu-text-color: var(--p-text-color, #000000);
   --evt-context-menu-item-hover-bg-color: #f5f5f5;
 }
 
@@ -45,10 +47,10 @@
 html[theme-mode='dark'],
 :root[data-theme='dark'],
 :root.dark {
-  --evt-header-text-color: #a3a6ad;
-  --evt-body-text-color: #cfd3dc;
-  --evt-footer-text-color: #cfd3dc;
-  --evt-readonly-text-color: #a3a6ad;
+  --evt-header-text-color: var(--p-text-color, #ffffff);
+  --evt-body-text-color: var(--p-text-color, #ffffff);
+  --evt-footer-text-color: var(--p-text-color, #ffffff);
+  --evt-readonly-text-color: var(--p-text-color, #ffffff);
   --evt-scroller-color: #414243;
   --evt-scroller-track-color: #141414;
   --evt-scroller-focus-color: #a3a6ad;
@@ -56,9 +58,9 @@ html[theme-mode='dark'],
   --evt-footer-bg-color: #262727;
   --evt-autofill-point-border-color: #a3a6ad;
   --evt-editor-bg-color: #434343;
-  --evt-editor-text-color: #cfd3dc;
+  --evt-editor-text-color: var(--p-text-color, #ffffff);
   --evt-context-menu-bg-color: #141414;
-  --evt-context-menu-text-color: #cfd3dc;
+  --evt-context-menu-text-color: var(--p-text-color, #ffffff);
   --evt-context-menu-item-hover-bg-color: #414243;
 }
 
@@ -69,11 +71,22 @@ html[theme-mode='dark'],
   justify-content: center;
   align-items: start;
   padding: 0 8px;
+  /* 与 Canvas BODY_TEXT_COLOR 一致，避免 slot HTML 继承页面色偏深/偏浅 */
+  color: var(--evt-body-text-color);
 }
 
 /* e-virt-table 给 .canvas-cell 写死 userSelect:none；不改单元格本身，只放开插槽后代以便框选文字 */
 .canvas-cell * {
   -webkit-user-select: text !important;
   user-select: text !important;
+}
+
+/**
+ * HTML overlayer 选中态：SVG 滤镜只给「文字/标签」叠 --evt-select-area-color，
+ * 不给透明底再铺一层（底色交给 Canvas 那一次，避免加深）。
+ */
+.canvas-cell.evt-selected-cell-layer {
+  background: transparent;
+  filter: url(#evt-select-area-overlay-filter);
 }
 /* #endregion */
