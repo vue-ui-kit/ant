@@ -726,14 +726,11 @@
         <div ref="tableFooterEl" class="flex-shrink-0">
           <div
             v-if="mode !== 'pagination' && staticConfig?.selectable && staticConfig.showCount"
-            class="w-full text-slate-5 pt-8px px-16px"
+            class="p-grid-footer text-slate-5"
           >
             已选：{{ selectedRowKeys.length }}
           </div>
-          <div
-            v-else-if="mode === 'pagination'"
-            class="p-canvas-grid-footer flex w-full items-center gap-12px"
-          >
+          <div v-else-if="mode === 'pagination'" class="p-grid-footer">
             <div class="flex-1 min-w-0 flex items-center text-slate-5">
               <slot name="__pagerLeft">
                 <template v-if="staticConfig?.selectable && staticConfig.showCount">

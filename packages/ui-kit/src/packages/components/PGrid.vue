@@ -804,14 +804,11 @@
         <div ref="tableFooterEl" class="flex-shrink-0">
           <div
             v-if="mode !== 'pagination' && showSelectionCount"
-            class="w-full pt-8px px-16px text-slate-5"
+            class="p-grid-footer text-slate-5"
           >
             已选：{{ selectedRowKeys.length }}
           </div>
-          <div
-            v-else-if="mode === 'pagination'"
-            class="flex w-full items-center gap-12px pt-8px px-16px"
-          >
+          <div v-else-if="mode === 'pagination'" class="p-grid-footer">
             <div class="flex-1 min-w-0 text-slate-5 flex items-center">
               <template v-if="showSelectionCount"> 已选：{{ selectedRowKeys.length }} </template>
             </div>

@@ -121,8 +121,13 @@
   .p-form-wrapper {
     z-index: 4;
   }
-  .p-canvas-grid-footer {
-    padding: 16px 0;
+  /* PGrid / PCanvasGrid 底部栏（已选统计、分页）统一间距 */
+  .p-grid-footer {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px 0;
   }
   .p-canvas-pagination.ant-pagination {
     display: flex;
