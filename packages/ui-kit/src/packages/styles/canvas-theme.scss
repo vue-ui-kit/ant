@@ -14,6 +14,9 @@
   --evt-select-border-color: var(--p-primary-color, #4096ff);
   /* 可用 --p-select-area-color 覆盖；勿写死以免压过业务/示例 :root */
   --evt-select-area-color: var(--p-select-area-color, rgba(82, 146, 247, 0.1));
+  /* 固定列阴影：靠近列边界 → 渐隐末端（宽度由 config.FIXED_COLUMN_SHADOW_WIDTH 控制） */
+  --evt-fixed-column-shadow-color: rgba(0, 0, 0, 0.1);
+  --evt-fixed-column-shadow-fade-color: rgba(0, 0, 0, 0);
   --evt-sort-icon-color: var(--p-primary-color, #4096ff);
   --evt-required-color: var(--p-danger-color, #f5222d);
   --evt-error-tip-color: var(--p-danger-color, #f5222d);
