@@ -8,11 +8,11 @@ allowBuilds:
 overrides:
   'brace-expansion@^2.0.1': 2.1.2
   'brace-expansion@^5.0.0': 5.0.7
-  fast-uri: 3.1.4
+  fast-uri: 3.1.5
 minimumReleaseAgeExclude:
   - e-virt-table
   - brace-expansion@2.1.2 || 5.0.7
-  - fast-uri@3.1.4
+  - fast-uri@3.1.5
   - yaml@2.8.3
   - lodash-es@4.17.24
   - postcss@8.5.10
