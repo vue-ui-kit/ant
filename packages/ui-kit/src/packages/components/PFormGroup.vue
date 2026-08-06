@@ -132,7 +132,7 @@
   );
   /** 外部 menuHandler 直接改 model 时，同步清掉已删除项的错误标记 */
   watch(
-    () => model.value.map((m) => m.__index),
+    () => model.value.map((m) => m.__index as number | undefined),
     (indexes, prev) => {
       if (!prev) return;
       const alive = indexes.filter((v): v is number => typeof v === 'number');
@@ -147,7 +147,7 @@
       if (toString(key) === 'delete') {
         nextTick(() => {
           const alive = model.value
-            .map((m) => m.__index)
+            .map((m) => m.__index as number | undefined)
             .filter((v): v is number => typeof v === 'number');
           pruneErrorIndexes(alive);
           syncBlockInstances();
