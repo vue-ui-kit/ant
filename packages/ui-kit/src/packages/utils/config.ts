@@ -31,6 +31,12 @@ export interface UIKitConfig {
    */
   icon?: {
     render?: (name: string) => unknown;
+    /**
+     * CollapseCard / PFormGroup 折叠箭头：
+     * - `string`：单图标，靠旋转区分（默认收起 0° / 展开 -90°）
+     * - `[collapsed, expanded]`：双图标切换，不旋转
+     */
+    collapseExpandIcon?: string | [collapsed: string, expanded: string];
   };
 }
 

@@ -400,6 +400,11 @@
     display: flex;
     align-items: center;
     font-weight: 600;
+    /* 业务侧可用 --collapsible-card-header-bg 覆盖为 --amp-bg-secondary 等 */
+    background-color: var(--collapsible-card-header-bg, transparent);
+    .ant-collapse-expand-icon {
+      padding-inline-end: 8px;
+    }
   }
   .ant-collapse-content {
     border-color: var(--p-border-light-color, #f0f0f0);
@@ -409,6 +414,9 @@
   }
   .ant-collapse-item {
     border-color: var(--p-border-light-color, #f0f0f0);
+  }
+  .collapsible-card__expand-icon {
+    transition: transform 0.2s;
   }
 }
 /* #endregion */

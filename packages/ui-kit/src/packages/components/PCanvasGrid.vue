@@ -644,14 +644,16 @@
                   :ghost="btn.ghost"
                   :block="btn.block"
                 >
-                  <div class="flex items-center gap-4px">
-                    <Icon v-if="btn.icon" :icon="btn.icon" />
+                  <template v-if="btn.icon" #icon>
+                    <Icon :icon="btn.icon" />
+                  </template>
+                  <span class="inline-flex items-center gap-4px">
                     <template v-if="btn.content && isStringContent(renderContent(btn.content))">
                       {{ renderContent(btn.content) }}
                     </template>
                     <component v-else-if="btn.content" :is="renderContent(btn.content)" />
                     <DownOutlined />
-                  </div>
+                  </span>
                 </a-button>
               </a-dropdown>
               <a-button
@@ -666,13 +668,13 @@
                 :block="btn.block"
                 @click="debounceToolBtnClick(btn.code)"
               >
-                <div class="flex items-center gap-4px">
-                  <Icon v-if="btn.icon" :icon="btn.icon" />
-                  <template v-if="btn.content && isStringContent(renderContent(btn.content))">
-                    {{ renderContent(btn.content) }}
-                  </template>
-                  <component v-else-if="btn.content" :is="renderContent(btn.content)" />
-                </div>
+                <template v-if="btn.icon" #icon>
+                  <Icon :icon="btn.icon" />
+                </template>
+                <template v-if="btn.content && isStringContent(renderContent(btn.content))">
+                  {{ renderContent(btn.content) }}
+                </template>
+                <component v-else-if="btn.content" :is="renderContent(btn.content)" />
               </a-button>
               <div v-else></div>
             </template>
@@ -693,13 +695,13 @@
               @click="debounceToolToolClick(tool.code)"
               :loading="loading.toolbar || (!!tool.code && codeLoadings[tool.code])"
             >
-              <div class="flex items-center gap-4px">
-                <Icon v-if="tool.icon" :icon="tool.icon" />
-                <template v-if="tool.content && isStringContent(renderContent(tool.content))">
-                  {{ renderContent(tool.content) }}
-                </template>
-                <component v-else-if="tool.content" :is="renderContent(tool.content)" />
-              </div>
+              <template v-if="tool.icon" #icon>
+                <Icon :icon="tool.icon" />
+              </template>
+              <template v-if="tool.content && isStringContent(renderContent(tool.content))">
+                {{ renderContent(tool.content) }}
+              </template>
+              <component v-else-if="tool.content" :is="renderContent(tool.content)" />
             </a-button>
           </template>
         </span>

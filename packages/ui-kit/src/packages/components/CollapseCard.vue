@@ -1,5 +1,7 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { computed, h, ref } from 'vue';
+  import Icon from '@/renders/Icon';
+  import { getUIKitConfig } from '@/utils/config';
 
   interface Props {
     /** 是否默认折叠 */
@@ -15,6 +17,39 @@
     collapsible: false,
   });
   const activeKey = ref(props.defaultCollapsed ? [] : ['content']);
+
+  /** 单图标默认旋转：与业务 b-collapse-card 对齐 */
+  const SINGLE_ICON_COLLAPSED_ROTATE = 0;
+  const SINGLE_ICON_EXPANDED_ROTATE = -90;
+
+  const collapseExpandIcon = computed(() => getUIKitConfig().icon?.collapseExpandIcon);
+
+  const renderExpandIcon = ({ isActive }: { isActive?: boolean }) => {
+    const cfg = collapseExpandIcon.value;
+    if (!cfg) return null;
+
+    const icon = typeof cfg === 'string' ? cfg : isActive ? cfg[1] : cfg[0];
+    const rotate =
+      typeof cfg === 'string'
+        ? isActive
+          ? SINGLE_ICON_EXPANDED_ROTATE
+          : SINGLE_ICON_COLLAPSED_ROTATE
+        : 0;
+
+    return h(
+      'span',
+      {
+        class: 'collapsible-card__expand-icon',
+        style: {
+          fontSize: '18px',
+          display: 'inline-flex',
+          transform: `rotate(${rotate}deg)`,
+        },
+      },
+      [h(Icon, { icon })],
+    );
+  };
+
   defineExpose({
     collapse: () => {
       activeKey.value = [];
@@ -26,7 +61,12 @@
 </script>
 
 <template>
-  <a-collapse v-if="collapsible" v-model:active-key="activeKey" class="collapsible-card">
+  <a-collapse
+    v-if="collapsible"
+    v-model:active-key="activeKey"
+    class="collapsible-card"
+    :expand-icon="collapseExpandIcon ? renderExpandIcon : undefined"
+  >
     <a-collapse-panel key="content" force-render :header="title">
       <template v-for="(_, name) in $slots" :key="name" #[name]>
         <slot :name="name" />
