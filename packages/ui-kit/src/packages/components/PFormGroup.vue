@@ -32,6 +32,49 @@
   const activeKey = ref(0);
   const error_indexes = ref<number[]>([]);
   const blockInstance = ref<PFormBlockInstance[]>([]);
+  /** 稳定块 key：优先 __index，避免删除后数组下标复用导致表单校验状态串台 */
+  const getItemKey = (item: Partial<F & { __index: number }>, idx: number) =>
+    valued(item.__index) ? (item.__index as number) : idx;
+  const nextItemIndex = () => (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1;
+  const ensureItemIndexes = () => {
+    model.value.forEach((item) => {
+      if (!valued(item.__index)) {
+        // @ts-ignore
+        item.__index = nextItemIndex();
+      }
+    });
+  };
+  const syncBlockInstances = () => {
+    blockInstance.value = blockInstance.value.filter((f) => !!f);
+  };
+  const pruneErrorIndexes = (aliveIndexes: number[]) => {
+    error_indexes.value = error_indexes.value.filter((f) => aliveIndexes.includes(f));
+  };
+  /** 删除指定下标项，并同步清理校验缓存 / 激活态（供内置菜单与外部 menuHandler 共用） */
+  const removeItem = (idx: number) => {
+    const target = model.value[idx];
+    if (!target) return;
+    const removedIndex = target.__index;
+    model.value = model.value.filter((_, i) => i !== idx);
+    if (valued(removedIndex)) {
+      error_indexes.value = error_indexes.value.filter((f) => f !== removedIndex);
+    }
+    nextTick(() => {
+      syncBlockInstances();
+      if (model.value.length === 0) {
+        activeKey.value = 0;
+        return;
+      }
+      if (activeKey.value >= model.value.length) {
+        activeKey.value = model.value.length - 1;
+      } else if (idx < activeKey.value) {
+        activeKey.value = Math.max(0, activeKey.value - 1);
+      } else if (idx === activeKey.value) {
+        // 删的是当前 tab：保持落在同下标（原后一项前移）或末项
+        activeKey.value = Math.min(idx, model.value.length - 1);
+      }
+    });
+  };
   const setActiveKey = (key: number) => {
     activeKey.value = key;
   };
@@ -43,7 +86,7 @@
         ...model.value,
         {
           ...item,
-          __index: (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1,
+          __index: nextItemIndex(),
         } as Partial<F & { __index: number }>,
       ];
       activeKey.value = idx;
@@ -82,31 +125,41 @@
   watch(
     () => model.value,
     () => {
-      if (!props.keepSerial) {
-        const unSortItems = model.value.filter((f) => !valued(f.__index));
-        if (unSortItems.length > 0) {
-          unSortItems.forEach((item) => {
-            // @ts-ignore
-            item.__index = (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1;
-          });
-        }
-      }
+      // 无论是否 keepSerial，都保证每项有稳定 __index（编号展示仍由 keepSerial 控制）
+      ensureItemIndexes();
     },
     { immediate: true },
+  );
+  /** 外部 menuHandler 直接改 model 时，同步清掉已删除项的错误标记 */
+  watch(
+    () => model.value.map((m) => m.__index),
+    (indexes, prev) => {
+      if (!prev) return;
+      const alive = indexes.filter((v): v is number => typeof v === 'number');
+      pruneErrorIndexes(alive);
+      nextTick(syncBlockInstances);
+    },
   );
   const handleMenu = ({ key }: MenuInfo, item: Partial<F & { __index: number }>, idx: number) => {
     if (props.menuHandler && isFunction(props.menuHandler)) {
       props.menuHandler({ code: toString(key), data: item, index: idx });
+      // 自定义删除后，下个 tick 按存活 __index 收敛状态（model 由业务侧改）
+      if (toString(key) === 'delete') {
+        nextTick(() => {
+          const alive = model.value
+            .map((m) => m.__index)
+            .filter((v): v is number => typeof v === 'number');
+          pruneErrorIndexes(alive);
+          syncBlockInstances();
+          if (activeKey.value >= model.value.length) {
+            activeKey.value = Math.max(0, model.value.length - 1);
+          }
+        });
+      }
     } else {
       switch (key) {
         case 'delete':
-          model.value = model.value.filter((_, i) => i !== idx);
-          nextTick(() => {
-            blockInstance.value = blockInstance.value.filter((f) => !!f);
-            if (idx <= activeKey.value && activeKey.value > 0) {
-              activeKey.value--;
-            }
-          });
+          removeItem(idx);
           break;
         case 'copy':
           if (model.value.length >= maxLen.value) {
@@ -117,7 +170,7 @@
             ...model.value,
             clone({
               ...omit(item, ['id', '__index']),
-              __index: (max(model.value, (m) => m.__index ?? -1)?.__index ?? -1) + 1,
+              __index: nextItemIndex(),
             }),
           ] as Partial<F & { __index: number }>[];
           break;
@@ -161,6 +214,7 @@
     },
     activeKey: computed(() => activeKey.value),
     setActiveKey,
+    removeItem,
     validateAll: () => {
       const promiseList = fr.value
         ? blockInstance.value.map((block) => block.$form?.validate())
@@ -306,11 +360,12 @@
             </template>
           </a-dropdown>
         </template>
+        <!-- 表单块必须用稳定 __index 作 key，避免删除后下标复用导致校验状态残留 -->
         <p-group-block
           ref="blockInstance"
-          :key="idx"
+          :key="getItemKey(item, idx)"
           :source="item"
-          :name="name ? `${name}_${idx}` : undefined"
+          :name="name ? `${name}_${getItemKey(item, idx)}` : undefined"
           :get-form-setting="getFormSetting"
           @focus.capture="debounceHandleBlockFocus(idx)"
           @click.capture="debounceHandleBlockFocus(idx)"

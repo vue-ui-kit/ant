@@ -503,6 +503,8 @@ export interface PFormBlockInstance {
 export interface PFormGroupInstance {
   activeKey: number;
   setActiveKey: (activeKey: number) => void;
+  /** 按数组下标删除一项，并清理校验缓存 / 激活态 */
+  removeItem: (index: number) => void;
   validateAll: () => Promise<void>;
   validate: (index: number, ignoreTabError?: boolean) => Promise<void>;
   validateFields: (index: number, fields: string[], ignoreTabError?: boolean) => Promise<void>;
