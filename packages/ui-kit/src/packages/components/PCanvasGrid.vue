@@ -20,7 +20,7 @@
     type AutoViewportBoxController,
     type AutoViewportBoxOffsetInput,
   } from '@/utils/autoViewportBox';
-  import { getCanvasTableDefaults, getGridDefaults } from '@/utils/config';
+  import { getCanvasTableDefaults, getGridDefaults, resolveShowQuickJumper } from '@/utils/config';
   import { defaultLabelCol } from '@/utils/core';
   import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
@@ -122,6 +122,7 @@
         : 'list'
       : 'bad',
   );
+  const showQuickJumper = computed(() => resolveShowQuickJumper(pageConfig.value));
   const pg = computed(() =>
     mode.value === 'pagination'
       ? {
@@ -747,7 +748,7 @@
               :page-size="pagination.size"
               :page-size-options="pageSizeOptions"
               :show-size-changer="pageConfig?.showSizeChanger ?? true"
-              :show-quick-jumper="pageConfig?.showQuickJumper"
+              :show-quick-jumper="showQuickJumper"
               :show-total="(total: number) => `共${total}条数据`"
               :total="totalCount"
               @change="handleTableChange"

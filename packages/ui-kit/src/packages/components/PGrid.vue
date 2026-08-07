@@ -19,7 +19,7 @@
     type AutoViewportBoxController,
     type AutoViewportBoxOffsetInput,
   } from '@/utils/autoViewportBox';
-  import { getGridDefaults } from '@/utils/config';
+  import { getGridDefaults, resolveShowQuickJumper } from '@/utils/config';
   import { cleanCol, defaultLabelCol } from '@/utils/core';
   import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
@@ -207,6 +207,7 @@
         : 'list'
       : 'bad',
   );
+  const showQuickJumper = computed(() => resolveShowQuickJumper(pageConfig.value));
   /** 底部展示「已选」统计（与 multiple 无关，仅看 showCount） */
   const showSelectionCount = computed(() => !!selectConfig.value?.showCount);
   const attrs = useAttrs();
@@ -818,6 +819,7 @@
               size="small"
               :responsive="false"
               :show-size-changer="true"
+              :show-quick-jumper="showQuickJumper"
               :show-total="(total: number) => `共${total}条数据`"
               :current="pagination.page"
               :page-size="pagination.size"

@@ -16,6 +16,8 @@ export interface UIKitConfig {
     fitHeight?: number;
     fitCanvasHeight?: number;
     striped?: boolean;
+    /** `PGrid` / `PCanvasGrid` 分页是否显示「跳至」；`pageConfig.showQuickJumper` 优先 */
+    showQuickJumper?: boolean;
     /** `PGrid` 开启 `autoBoxSize` 且未传 `autoBoxSizeOffset` 时的视口边距，与 props 类型一致 */
     autoBoxSizeOffset?: AutoViewportBoxOffsetInput;
   };
@@ -51,6 +53,7 @@ const defaultConfig: UIKitConfig = {
     lazyReset: false,
     fitHeight: 30,
     striped: false,
+    showQuickJumper: true,
   },
   canvasTable: {
     DISABLED: true,
@@ -114,6 +117,14 @@ export function getGridDefaults(): Partial<PGridProps> {
     striped: currentConfig.grid?.striped,
     autoBoxSizeOffset: currentConfig.grid?.autoBoxSizeOffset,
   };
+}
+
+/** 分页「跳至」：局部 pageConfig 优先，否则读全局 grid.showQuickJumper，默认 true */
+export function resolveShowQuickJumper(pageConfig?: { showQuickJumper?: boolean }): boolean {
+  if (pageConfig?.showQuickJumper !== undefined) {
+    return pageConfig.showQuickJumper;
+  }
+  return currentConfig.grid?.showQuickJumper ?? true;
 }
 
 // 获取CanvasTable默认配置
