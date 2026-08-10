@@ -12,13 +12,13 @@
     "@ant-design/icons-vue": "^7.0.1",
     "@vue-ui-kit/ant": "workspace:^",
     "ant-design-vue": "^4.2.6",
-    "vue": "^3.5.33"
+    "vue": "^3.5.41"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.5",
-    "@vitejs/plugin-vue-jsx": "^5.1.5",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitejs/plugin-vue-jsx": "^5.1.6",
     "typescript": "~5.8.3",
-    "vite": "^8.0.8",
+    "vite": "^8.2.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vue-tsc": "^3.2.6"
   }
