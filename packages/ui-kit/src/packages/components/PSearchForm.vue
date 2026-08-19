@@ -10,7 +10,7 @@
     autoReset: true,
     labelCol: () => ({ flex: 'none' }),
     showActions: true,
-    wrapperCol: () => ({ flex: 'auto' }),
+    wrapperCol: () => ({ flex: '1 1 0' }),
   });
   const emit = defineEmits<{
     search: [data: F];
@@ -18,6 +18,7 @@
   }>();
 
   const formRef = useTemplateRef<PFormInstance>('formRef');
+  const containerRef = useTemplateRef<HTMLElement>('containerRef');
   const formProps = computed(() =>
     omit(props, ['autoReset', 'data', 'items', 'loading', 'showActions']),
   );
@@ -45,7 +46,7 @@
         : item,
     ),
   );
-  const { isSingleRow } = useFormRowLayout(searchItems);
+  const { isSingleRow, resolvedItems } = useFormRowLayout(searchItems, containerRef);
   const keepActionsInline = computed(() => props.showActions && isSingleRow.value);
   const searchFormClass = computed(() =>
     ['p-search-form', keepActionsInline.value && 'p-search-form--single-row']
@@ -74,7 +75,7 @@
     },
   }));
   const formItems = computed<PFormItemProps<F>[]>(() =>
-    props.showActions ? [...searchItems.value, actionItem.value] : searchItems.value,
+    props.showActions ? [...resolvedItems.value, actionItem.value] : resolvedItems.value,
   );
 
   defineExpose({
@@ -85,13 +86,15 @@
 
 <template>
   <a-spin :spinning="loading" :wrapper-class-name="searchFormClass">
-    <p-form
-      ref="formRef"
-      v-bind="formProps"
-      :data="data"
-      :items="formItems"
-      @apply="emit('search', $event)"
-      @reset="emit('reset')"
-    />
+    <div ref="containerRef">
+      <p-form
+        ref="formRef"
+        v-bind="formProps"
+        :data="data"
+        :items="formItems"
+        @apply="emit('search', $event)"
+        @reset="emit('reset')"
+      />
+    </div>
   </a-spin>
 </template>
