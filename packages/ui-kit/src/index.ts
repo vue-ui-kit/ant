@@ -1,6 +1,7 @@
 import { App } from 'vue';
 import type { Component } from 'vue';
 import PForm from '@/components/PForm.vue';
+import PSearchForm from '@/components/PSearchForm.vue';
 import PGrid from '@/components/PGrid.vue';
 import PCanvasTable from '@/components/PCanvasTable.vue';
 import PCanvasGrid from '@/components/PCanvasGrid.vue';
@@ -28,6 +29,7 @@ function setup(config?: Partial<UIKitConfig>) {
 export default {
   install(app: App) {
     app.component('PForm', PForm);
+    app.component('PSearchForm', PSearchForm);
     app.component('PGrid', PGrid);
     app.component('PCanvasTable', PCanvasTable);
     app.component('PCanvasGrid', PCanvasGrid);
@@ -59,6 +61,7 @@ export {
 // 直接导出组件，使用户可以直接导入使用
 export {
   PForm,
+  PSearchForm,
   PGrid,
   PCanvasTable,
   PCanvasGrid,

@@ -101,7 +101,7 @@
       },
     ],
     formConfig: {
-      items: [
+      searchItems: [
         {
           field: 'keyword',
           title: '关键字',
