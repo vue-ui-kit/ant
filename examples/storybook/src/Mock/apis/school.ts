@@ -23,13 +23,17 @@ export const queryStudents = (params: {
   size: number;
   keyword?: string;
   grade?: string;
+  age?: number;
+  score?: number;
 }) => {
-  const { page, size, keyword, grade } = params;
+  const { page, size, keyword, grade, age, score } = params;
   const start = (page - 1) * size;
   const end = start + size;
   const data = students.filter(
     (item) =>
       (!grade || item.grade === grade) &&
+      (age === undefined || item.age === age) &&
+      (score === undefined || item.score === score) &&
       (!keyword || item.name.includes(keyword) || item.enName.includes(keyword)),
   );
   return Promise.resolve({

@@ -279,7 +279,7 @@ Enhanced data table component with integrated search form, pagination, and toolb
       { field: 'age', title: 'Age', width: 100 },
     ],
     formConfig: {
-      items: [
+      searchItems: [
         {
           field: 'keyword',
           title: 'Keyword',
@@ -483,6 +483,37 @@ Enhanced Form component with simplified configuration and dynamic fields.
   }));
 </script>
 ```
+
+### PSearchForm
+
+A search-form wrapper based on `PForm`. Pass only search fields; it appends search and reset buttons automatically and keeps the action column inline when the fields occupy one row. Labels size to their content by default, and search controls default to `width: 100%`; override it through `itemRender.attrs.style.width` when needed.
+
+```vue
+<p-search-form
+  :data="queryData"
+  :items="searchItems"
+  :loading="loading"
+  @search="handleSearch"
+  @reset="handleReset"
+/>
+```
+
+`PGrid` and `PCanvasGrid` expose the same behavior through `formConfig.searchItems`. It takes precedence over legacy `formConfig.items`; legacy configurations render unchanged without automatic buttons.
+
+| Prop | Type | Description | Default |
+| --- | --- | --- | --- |
+| items | `PFormItemProps[]` | Search fields; do not include an action item | - |
+| data | `T` | Search data object | - |
+| loading | `boolean` | Search button loading state | `false` |
+| autoReset | `boolean` | Whether to use PForm's existing reset flow | `true` |
+| labelCol | `ColProps` | Label layout | `{ flex: 'none' }` |
+| wrapperCol | `ColProps` | Control layout | `{ flex: 'auto' }` |
+| ...others | `PFormProps` | Props forwarded to PForm | - |
+
+| Event | Description | Parameters |
+| --- | --- | --- |
+| search | Triggered by search or form submission | `(data: T) => void` |
+| reset | Triggered by reset | `() => void` |
 
 ### PFormGroup
 

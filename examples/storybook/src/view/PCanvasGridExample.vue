@@ -1,7 +1,7 @@
 <script setup lang="tsx">
   import { computed, h, ref } from 'vue';
   import { queryStudents } from '../Mock/apis/school';
-  import { PCanvasGridProps, labelColDict, getButtonResponsive } from '@vue-ui-kit/ant';
+  import { PCanvasGridProps, labelColDict } from '@vue-ui-kit/ant';
   import {
     Card as ACard,
     Button as AButton,
@@ -23,7 +23,10 @@
 
   // ── 自适应容器高度模式 ──
   const studentsGridSetting = computed<
-    PCanvasGridProps<any, { keyword?: string; grade?: string } & IPage>
+    PCanvasGridProps<
+      any,
+      { keyword?: string; grade?: string; age?: number; score?: number } & IPage
+    >
   >(() => ({
     columns: [
       {
@@ -84,13 +87,14 @@
       },
     ],
     formConfig: {
-      items: [
+      searchItems: [
         {
           field: 'keyword',
           title: '关键字',
           labelCol: labelColDict[3],
           itemRender: {
             name: '$input',
+            attrs: { style: { width: '100%' } },
             props: { placeholder: '请输入姓名或地址' },
           },
         },
@@ -100,6 +104,7 @@
           labelCol: labelColDict[2],
           itemRender: {
             name: '$select',
+            attrs: { style: { width: '100%' } },
             props: {
               placeholder: '请选择年级',
               allowClear: true,
@@ -115,14 +120,23 @@
           },
         },
         {
-          col: getButtonResponsive(2),
-          align: 'right',
+          field: 'age',
+          title: '年龄',
+          labelCol: labelColDict[2],
           itemRender: {
-            name: '$buttons',
-            children: [
-              { props: { content: '查询', htmlType: 'submit', type: 'primary' } },
-              { props: { content: '重置', htmlType: 'reset' } },
-            ],
+            name: '$number',
+            attrs: { style: { width: '100%' } },
+            props: { placeholder: '请输入年龄', min: 0, max: 120 },
+          },
+        },
+        {
+          field: 'score',
+          title: '成绩',
+          labelCol: labelColDict[2],
+          itemRender: {
+            name: '$number',
+            attrs: { style: { width: '100%' } },
+            props: { placeholder: '请输入成绩', min: 0, max: 100 },
           },
         },
       ],
@@ -191,8 +205,7 @@
     proxyConfig: {
       response: { result: 'list', total: 'total' },
       ajax: {
-        query: ({ form, page }) =>
-          queryStudents({ ...form, ...page } as IPage & { keyword?: string; grade?: string }),
+        query: ({ form, page }) => queryStudents({ ...form, ...page }),
       },
     },
     config: {
@@ -233,7 +246,7 @@
         { field: 'address', minWidth: 200, title: '地址' },
       ],
       formConfig: {
-        items: [
+        searchItems: [
           {
             field: 'keyword',
             title: '关键字',
@@ -241,17 +254,6 @@
             itemRender: {
               name: '$input',
               props: { placeholder: '请输入关键字' },
-            },
-          },
-          {
-            col: getButtonResponsive(1),
-            align: 'right',
-            itemRender: {
-              name: '$buttons',
-              children: [
-                { props: { content: '查询', htmlType: 'submit', type: 'primary' } },
-                { props: { content: '重置', htmlType: 'reset' } },
-              ],
             },
           },
         ],

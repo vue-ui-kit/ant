@@ -126,7 +126,7 @@ const gridSetting = computed<PGridProps<Student, { keyword?: string }>>(() => ({
     { field: 'age', title: '年龄', width: 100 },
   ],
   formConfig: {
-    items: [
+    searchItems: [
       {
         field: 'keyword',
         title: '关键字',
@@ -334,6 +334,37 @@ const formSetting = computed(() => ({
 }));
 </script>
 ```
+
+### PSearchForm
+
+基于 `PForm` 的查询表单。只需传入查询字段，组件会自动在末尾添加查询、重置按钮，并在字段仅占一行时保持操作列同行。标签默认按文字内容自适应宽度，查询控件默认宽度为 `100%`；可通过 `itemRender.attrs.style.width` 覆盖。
+
+```vue
+<p-search-form
+  :data="queryData"
+  :items="searchItems"
+  :loading="loading"
+  @search="handleSearch"
+  @reset="handleReset"
+/>
+```
+
+`PGrid` 和 `PCanvasGrid` 可通过 `formConfig.searchItems` 使用相同能力；它优先于旧的 `formConfig.items`。旧配置仍按原样渲染，不会自动追加按钮。
+
+| 属性 | 类型 | 说明 | 默认值 |
+| --- | --- | --- | --- |
+| items | `PFormItemProps[]` | 查询字段配置，不需要添加按钮项 | - |
+| data | `T` | 查询数据对象 | - |
+| loading | `boolean` | 查询按钮加载状态 | `false` |
+| autoReset | `boolean` | 是否复用 PForm 原有 reset 流程重置 data | `true` |
+| labelCol | `ColProps` | 标签布局 | `{ flex: 'none' }` |
+| wrapperCol | `ColProps` | 控件布局 | `{ flex: 'auto' }` |
+| ...其他 | `PFormProps` | 透传给 PForm 的属性 | - |
+
+| 事件 | 说明 | 参数 |
+| --- | --- | --- |
+| search | 点击查询或提交表单时触发 | `(data: T) => void` |
+| reset | 点击重置时触发 | `() => void` |
 
 ### PFormGroup
 

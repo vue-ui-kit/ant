@@ -84,6 +84,26 @@ export interface PFormProps<F extends Recordable = Recordable> extends FormProps
   customReset?: () => void;
 }
 
+export interface PSearchFormProps<F extends Recordable = Recordable> extends Omit<
+  PFormProps<F>,
+  'items'
+> {
+  data: F;
+  items: PFormItemProps<F>[];
+  loading?: boolean;
+  /** 是否通过 PForm 的原有 reset 流程重置 data，默认 true */
+  autoReset?: boolean;
+  /** 是否自动追加查询、重置操作项，默认 true */
+  showActions?: boolean;
+}
+
+export type PGridFormConfig<F extends Recordable = Recordable> = Omit<PFormProps<F>, 'items'> & {
+  /** 查询表单项；传入后自动追加查询、重置按钮，并优先于 items */
+  searchItems?: PFormItemProps<F>[];
+  /** 兼容旧用法，按原配置渲染，不自动追加按钮 */
+  items?: PFormItemProps<F>[];
+};
+
 export interface PDescriptionItemProps<D extends Recordable = Recordable> {
   field?: string;
   label?: string;
@@ -261,7 +281,7 @@ export type PGridProps<D extends Recordable = Recordable, F extends Recordable =
   striped?: boolean;
   manualFetch?: boolean;
   align?: 'left' | 'right' | 'center';
-  formConfig?: PFormProps<F>;
+  formConfig?: PGridFormConfig<F>;
   columns?: ColumnProps<D>[];
   toolbarConfig?: ToolbarConfig;
   pageConfig?: PageConfig;
@@ -419,7 +439,7 @@ export interface PCanvasGridProps<
     tree?: boolean;
   };
   manualFetch?: boolean;
-  formConfig?: PFormProps<F>;
+  formConfig?: PGridFormConfig<F>;
   columns: CanvasColumnProps<D>[];
   toolbarConfig?: ToolbarConfig;
   pageConfig?: PageConfig;

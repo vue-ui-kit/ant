@@ -4,11 +4,17 @@
   name="PGrid"
   setup
 >
-  import { ColumnProps, PFormItemProps, PGridProps, ResponsePathConfig } from '#/antProxy';
+  import {
+    ColumnProps,
+    PFormInstance,
+    PFormItemProps,
+    PGridProps,
+    ResponsePathConfig,
+  } from '#/antProxy';
   // 锚定 ant-design-vue 间接依赖的类型路径，避免 vue-tsc 推断默认导出时引用 .pnpm 物理路径触发 TS2742
   import type {} from 'scroll-into-view-if-needed';
   import type {} from 'vue-types';
-  import PFormCol from '@/components/PFormCol.vue';
+  import PSearchForm from '@/components/PSearchForm.vue';
   import RenderDefaultSlots from '@/components/RenderDefaultSlots';
   import RenderTitleSlots from '@/components/RenderTitleSlots';
   import { $confirm } from '@/hooks/useMessage';
@@ -24,14 +30,7 @@
   import { isGoodValue } from '@/utils/is';
   import { eachTree } from '@/utils/treeHelper';
   import { DownOutlined } from '@ant-design/icons-vue';
-  import {
-    message as $message,
-    Button as AButton,
-    Form as AForm,
-    Row as ARow,
-    Spin as ASpin,
-    Table as ATable,
-  } from 'ant-design-vue';
+  import { message as $message, Button as AButton, Table as ATable } from 'ant-design-vue';
   import { v4 as uuid_v4 } from 'uuid';
   import {
     Ref,
@@ -79,6 +78,9 @@
     selectConfig,
     scrollMode,
   } = toRefs(props);
+  const resolvedSearchItems = computed(
+    () => formConfig.value?.searchItems ?? formConfig.value?.items ?? [],
+  );
 
   /** 局部 `autoBoxSizeOffset` 优先，否则用 `getGridDefaults().autoBoxSizeOffset`（`setUIKitConfig`） */
   const resolvedAutoBoxSizeOffset = computed<AutoViewportBoxOffsetInput>(() => {
@@ -157,7 +159,7 @@
     });
     return cols;
   });
-  const formEl = ref<InstanceType<typeof AForm>>();
+  const formEl = ref<PFormInstance>();
   const tableEl = ref<InstanceType<typeof ATable>>();
   const renderFormKey = ref(uuid_v4());
   const renderTableKey = ref(uuid_v4());
@@ -255,12 +257,12 @@
     emit('pick', { row, field });
   };
   const resetQueryFormData = (lazy?: boolean) => {
-    if (formConfig.value && formConfig.value.items.length > 0) {
-      if (formConfig.value.customReset) {
+    if (resolvedSearchItems.value.length > 0) {
+      if (formConfig.value?.customReset) {
         formConfig.value.customReset();
       } else {
         const obj: Partial<F> = {};
-        eachTree(formConfig.value.items, (item) => {
+        eachTree(resolvedSearchItems.value, (item) => {
           if (item.field && item.itemRender) {
             if (isGoodValue(item.itemRender.defaultValue)) {
               obj[item.field as keyof F] = item.itemRender.defaultValue;
@@ -417,8 +419,15 @@
         : {},
     ),
   );
-  /*omit({labelCol:defaultLabelCol,...formConfig},['items'])*/
-  const fc = computed(() => omit({ labelCol: defaultLabelCol, ...formConfig.value }, ['items']));
+  const fc = computed(() =>
+    omit(
+      {
+        ...(formConfig.value?.searchItems === undefined ? { labelCol: defaultLabelCol } : {}),
+        ...formConfig.value,
+      },
+      ['items', 'searchItems'],
+    ),
+  );
   const handleFormSubmit = () => {
     resetPage();
   };
@@ -534,7 +543,7 @@
     selectedRowKeys: computed(() => selectedRowKeys.value),
     setBtnLoading,
     selectedRecords,
-    $form: computed(() => formEl.value),
+    $form: computed(() => formEl.value?.$form),
     getFormData: () => queryFormData.value,
     setLoadings,
     resizeTable,
@@ -639,30 +648,23 @@
     <div v-if="mode === 'bad'">请检查配置</div>
     <template v-else>
       <div
-        v-if="formConfig?.items?.some((s: PFormItemProps<F>) => s.field && s.itemRender)"
-        class="p-pane p-form-wrapper"
+        v-if="resolvedSearchItems.some((s: PFormItemProps<F>) => s.field && s.itemRender)"
         ref="pFormWrapper"
+        class="p-form-wrapper"
       >
-        <a-spin :spinning="loading.form">
-          <a-form
-            :name="formConfig?.name"
-            :key="renderFormKey"
-            ref="formEl"
-            :model="queryFormData"
-            v-bind="fc"
-            @submit="handleFormSubmit"
-          >
-            <a-row :gutter="[6, 12]">
-              <p-form-col
-                v-for="(item, idx) in formConfig!.items"
-                :key="`_col_${item.field || idx}`"
-                :form-data="queryFormData"
-                :item="item as PFormItemProps<Partial<F>>"
-                @reset="resetQueryFormData(props.lazyReset)"
-              />
-            </a-row>
-          </a-form>
-        </a-spin>
+        <p-search-form
+          :name="formConfig?.name"
+          :key="renderFormKey"
+          ref="formEl"
+          v-bind="fc"
+          :auto-reset="false"
+          :data="queryFormData"
+          :items="resolvedSearchItems as PFormItemProps<Partial<F>>[]"
+          :loading="loading.form"
+          :show-actions="formConfig?.searchItems !== undefined"
+          @reset="resetQueryFormData(props.lazyReset)"
+          @search="handleFormSubmit"
+        />
       </div>
       <div
         v-if="toolbarConfig"
