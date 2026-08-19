@@ -208,19 +208,18 @@
       loading.table = value;
     }
   };
+  const resolveRowKey = (row: D): string | number => {
+    const rowKey = propsWithDefaults.value.config?.ROW_KEY ?? 'id';
+    return typeof rowKey === 'function' ? rowKey(row) : (row[rowKey] as string | number);
+  };
   const selectedRecords = computed<D[]>(() =>
-    uniq(
-      Object.values(pageSelections.value).flat(),
-      (f) => f[propsWithDefaults.value.config?.ROW_KEY ?? 'id'] as string | number,
-    ),
+    uniq(Object.values(pageSelections.value).flat(), resolveRowKey),
   );
   const handleFormSubmit = () => {
     resetPage();
   };
   const selectedRowKeys = computed<Array<string | number>>(() =>
-    selectedRecords.value.map(
-      (f) => f[propsWithDefaults.value.config?.ROW_KEY ?? 'id'] as string | number,
-    ),
+    selectedRecords.value.map(resolveRowKey),
   );
   const handleResponse = (response: Recordable, pathConfig?: ResponsePathConfig<D>) =>
     pathConfig
