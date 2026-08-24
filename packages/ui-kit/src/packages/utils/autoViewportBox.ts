@@ -100,6 +100,8 @@ export interface AutoViewportBoxControllerOptions {
 
 export interface AutoViewportBoxController {
   attach: () => void;
+  /** 暂停尺寸监听，保留当前写入的宽高，用于 keep-alive 停用场景 */
+  detach: () => void;
   update: () => void;
   destroy: () => void;
 }
@@ -150,6 +152,7 @@ export function createAutoViewportBoxController(
 
   return {
     attach,
+    detach: disconnect,
     update,
     destroy: () => {
       disconnect();

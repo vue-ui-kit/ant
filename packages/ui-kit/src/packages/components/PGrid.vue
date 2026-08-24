@@ -38,6 +38,7 @@
     nextTick,
     onActivated,
     onBeforeUnmount,
+    onDeactivated,
     onMounted,
     reactive,
     ref,
@@ -445,6 +446,7 @@
     { flush: 'post' },
   );
 
+  let layoutObserversActive = false;
   let autoViewportBoxCtrl: AutoViewportBoxController | null = null;
   const clearAutoViewportBox = () => {
     autoViewportBoxCtrl?.destroy();
@@ -469,13 +471,13 @@
     () => props.autoBoxSize,
     (on) => {
       if (!on) clearAutoViewportBox();
-      else nextTick(() => syncAutoViewportBox());
+      else if (layoutObserversActive) nextTick(() => syncAutoViewportBox());
     },
   );
   watch(
     resolvedAutoBoxSizeOffset,
     () => {
-      if (props.autoBoxSize) autoViewportBoxCtrl?.update();
+      if (props.autoBoxSize && layoutObserversActive) autoViewportBoxCtrl?.update();
     },
     { deep: true },
   );
@@ -491,6 +493,7 @@
   };
 
   const resizeTable = () => {
+    if (!layoutObserversActive) return;
     if (resizeRaf) cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = null;
@@ -518,19 +521,87 @@
     });
   };
 
-  // 监听表单区域高度变化（响应式布局换行/收起时自动重算）
+  // 布局监听仅在组件激活时存在；keep-alive 停用后不再量取隐藏容器。
+  let observer: MutationObserver | null = null;
   let formWrapperResizeObserver: ResizeObserver | null = null;
-  watch(
-    pFormWrapper,
-    (el) => {
-      formWrapperResizeObserver?.disconnect();
-      formWrapperResizeObserver = null;
-      if (!el) return;
-      formWrapperResizeObserver = new ResizeObserver(() => resizeTable());
-      formWrapperResizeObserver.observe(el);
-    },
-    { immediate: true },
-  );
+  let boxElResizeObserver: ResizeObserver | null = null;
+  let tableWrapperResizeObserver: ResizeObserver | null = null;
+  let tableFooterResizeObserver: ResizeObserver | null = null;
+
+  const observeFormWrapper = () => {
+    formWrapperResizeObserver?.disconnect();
+    formWrapperResizeObserver = null;
+    if (!layoutObserversActive || !pFormWrapper.value) return;
+    formWrapperResizeObserver = new ResizeObserver(() => resizeTable());
+    formWrapperResizeObserver.observe(pFormWrapper.value);
+  };
+
+  watch(pFormWrapper, () => observeFormWrapper(), { flush: 'post' });
+
+  const stopLayoutObservers = () => {
+    layoutObserversActive = false;
+    if (resizeRaf) {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = null;
+    }
+    window.removeEventListener('resize', resizeTable);
+    observer?.disconnect();
+    observer = null;
+    formWrapperResizeObserver?.disconnect();
+    formWrapperResizeObserver = null;
+    boxElResizeObserver?.disconnect();
+    boxElResizeObserver = null;
+    tableWrapperResizeObserver?.disconnect();
+    tableWrapperResizeObserver = null;
+    tableFooterResizeObserver?.disconnect();
+    tableFooterResizeObserver = null;
+    autoViewportBoxCtrl?.detach();
+  };
+
+  const startLayoutObservers = () => {
+    if (layoutObserversActive) return;
+    layoutObserversActive = true;
+    window.addEventListener('resize', resizeTable);
+
+    // 组件根节点由不可见转为可见时重新计算（display:none 切换场景）
+    observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const el = mutation.target as HTMLElement;
+          if (window.getComputedStyle(el).display !== 'none') {
+            resizeTable();
+          }
+        }
+      });
+    });
+
+    if (boxEl.value) {
+      observer.observe(boxEl.value, { attributes: true, attributeFilter: ['style'] });
+      // 往上观察多级祖先，感知 flex 容器等更高层布局的变化。
+      boxElResizeObserver = new ResizeObserver(() => resizeTable());
+      let ancestor: Element | null = boxEl.value.parentElement;
+      for (let i = 0; i < 5 && ancestor && ancestor !== document.body; i++) {
+        boxElResizeObserver.observe(ancestor);
+        ancestor = ancestor.parentElement;
+      }
+    }
+
+    tableWrapperResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableWrapperEl.value) {
+      tableWrapperResizeObserver.observe(tableWrapperEl.value);
+    }
+    tableFooterResizeObserver = new ResizeObserver(() => resizeTable());
+    if (tableFooterEl.value) {
+      tableFooterResizeObserver.observe(tableFooterEl.value);
+    }
+    observeFormWrapper();
+
+    if (props.autoBoxSize) {
+      if (autoViewportBoxCtrl) autoViewportBoxCtrl.attach();
+      else syncAutoViewportBox();
+    }
+    resizeTable();
+  };
   defineExpose({
     commitProxy: {
       query: debounceFetchData,
@@ -549,57 +620,21 @@
     resizeTable,
   });
 
-  let observer: MutationObserver;
-  let boxElResizeObserver: ResizeObserver | null = null;
-  let tableWrapperResizeObserver: ResizeObserver | null = null;
-  let tableFooterResizeObserver: ResizeObserver | null = null;
   onMounted(() => {
-    resizeTable();
-    window.addEventListener('resize', resizeTable);
-    // 组件根节点由不可见转为可见时重新计算（display:none 切换场景）
-    observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-          const el = mutation.target as HTMLElement;
-          if (window.getComputedStyle(el).display !== 'none') {
-            resizeTable();
-          }
-        }
-      });
-    });
-
-    if (boxEl.value) {
-      observer.observe(boxEl.value, { attributes: true, attributeFilter: ['style'] });
-      // 往上观察多级祖先：父容器可能是内容撑开的，真正因外部兄弟变化而 resize
-      // 的元素可能在更高层（如 flex 容器）。观察多层确保能感知到
-      boxElResizeObserver = new ResizeObserver(() => resizeTable());
-      let ancestor: Element | null = boxEl.value.parentElement;
-      for (let i = 0; i < 5 && ancestor && ancestor !== document.body; i++) {
-        boxElResizeObserver.observe(ancestor);
-        ancestor = ancestor.parentElement;
-      }
-    }
-    tableWrapperResizeObserver = new ResizeObserver(() => resizeTable());
-    if (tableWrapperEl.value) {
-      tableWrapperResizeObserver.observe(tableWrapperEl.value);
-    }
-    tableFooterResizeObserver = new ResizeObserver(() => resizeTable());
-    if (tableFooterEl.value) {
-      tableFooterResizeObserver.observe(tableFooterEl.value);
-    }
+    startLayoutObservers();
     resetQueryFormData(props.manualFetch);
     nextTick(() => {
-      if (props.autoBoxSize) syncAutoViewportBox();
       resizeTable();
     });
   });
-  // keep-alive 再激活：等布局稳定后再量高（与 resizeTable 内跳过 0 高度配合）
+  // keep-alive 再激活：恢复监听，等布局稳定后再量高。
   onActivated(() => {
+    startLayoutObservers();
     nextTick(() => {
-      if (props.autoBoxSize) autoViewportBoxCtrl?.update();
       requestAnimationFrame(() => resizeTable());
     });
   });
+  onDeactivated(stopLayoutObservers);
   const renderContent = (content: string | (() => any)) => {
     if (isFunction(content)) {
       return content();
@@ -621,15 +656,40 @@
       ),
       ...c,
     }));
+
+  const DEFAULT_COLUMN_WIDTH = 100;
+  const normalizeColumnWidths = (columns: ColumnProps<D>[]): ColumnProps<D>[] =>
+    columns.map((column) =>
+      column.children?.length
+        ? {
+            ...column,
+            children: normalizeColumnWidths(column.children),
+          }
+        : {
+            ...column,
+            width: column.width ?? DEFAULT_COLUMN_WIDTH,
+          },
+    );
+  const sumColumnWidths = (columns: ColumnProps<D>[]): number =>
+    columns.reduce((total, column) => {
+      if (column.children?.length) {
+        return total + sumColumnWidths(column.children);
+      }
+      const width =
+        typeof column.width === 'number'
+          ? column.width
+          : Number.parseInt(column.width as string, 10);
+      return total + (Number.isFinite(width) ? width : DEFAULT_COLUMN_WIDTH);
+    }, 0);
+  const tableColumns = computed(() =>
+    normalizeColumnWidths(passDefaultColumnProps(columns.value ?? [])).map((column) =>
+      cleanCol(column as ColumnProps),
+    ),
+  );
+  const tableScrollX = computed(() => sumColumnWidths(normalizeColumnWidths(columns.value ?? [])));
   onBeforeUnmount(() => {
+    stopLayoutObservers();
     clearAutoViewportBox();
-    if (resizeRaf) cancelAnimationFrame(resizeRaf);
-    window.removeEventListener('resize', resizeTable);
-    observer.disconnect();
-    formWrapperResizeObserver?.disconnect();
-    boxElResizeObserver?.disconnect();
-    tableWrapperResizeObserver?.disconnect();
-    tableFooterResizeObserver?.disconnect();
   });
 </script>
 <template>
@@ -776,13 +836,13 @@
             :row-class-name="
               striped ? (_record, index) => (index % 2 === 1 ? 'p-grid-row-striped' : '') : ''
             "
-            :columns="passDefaultColumnProps(columns ?? []).map((c) => cleanCol(c as ColumnProps))"
+            :columns="tableColumns"
             :data-source="tableData"
             :loading="loading.table"
             :pagination="false"
             v-bind="tc"
             :scroll="{
-              x: 'max-content',
+              x: tableScrollX,
               y: renderHeight,
             }"
           >
