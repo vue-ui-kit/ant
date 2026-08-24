@@ -148,13 +148,35 @@
         break;
     }
   };
+  /**
+   * Ant Table 通过 column.key 将 bodyCell/headerCell 插槽与列配置关联起来。
+   * 没有 field 的纯渲染列（例如 ButtonTree 操作列）需要在生成 tableColumns 前补齐稳定 key，
+   * 否则首次渲染时插槽无法命中，只会落回空值占位。
+   */
+  const columnsWithHolderFields = computed(() => {
+    let holderIndex = 0;
+    const normalize = (source: ColumnProps<D>[]): ColumnProps<D>[] =>
+      source.map((col) => {
+        const column = { ...col };
+        const needsSlotKey =
+          !!column.slots?.title ||
+          !!column.slots?.default ||
+          !!column.formatter ||
+          !!column.cellRender;
+        if (!column.field && needsSlotKey) {
+          column.field = `__holder__${holderIndex++}`;
+        }
+        if (column.children?.length) {
+          column.children = normalize(column.children);
+        }
+        return column;
+      });
+    return normalize(columns.value ?? []);
+  });
   const slotTitleColumns = computed(() => {
     const cols: ColumnProps<D>[] = [];
-    eachTree(columns.value ?? [], (col) => {
+    eachTree(columnsWithHolderFields.value, (col) => {
       if (col.slots && col.slots.title) {
-        if (!col.field) {
-          col.field = '__holder__' + cols.length;
-        }
         cols.push(col);
       }
     });
@@ -186,11 +208,8 @@
   const debounceRefreshTable = debounce(refreshTable, 100);
   const slotDefaultColumns = computed(() => {
     const cols: ColumnProps<D>[] = [];
-    eachTree(columns.value ?? [], (col) => {
+    eachTree(columnsWithHolderFields.value, (col) => {
       if ((col.slots && col.slots.default) || col.formatter || col.cellRender) {
-        if (!col.field) {
-          col.field = '__holder__' + cols.length;
-        }
         cols.push(col);
       }
     });
@@ -682,11 +701,13 @@
       return total + (Number.isFinite(width) ? width : DEFAULT_COLUMN_WIDTH);
     }, 0);
   const tableColumns = computed(() =>
-    normalizeColumnWidths(passDefaultColumnProps(columns.value ?? [])).map((column) =>
+    normalizeColumnWidths(passDefaultColumnProps(columnsWithHolderFields.value)).map((column) =>
       cleanCol(column as ColumnProps),
     ),
   );
-  const tableScrollX = computed(() => sumColumnWidths(normalizeColumnWidths(columns.value ?? [])));
+  const tableScrollX = computed(() =>
+    sumColumnWidths(normalizeColumnWidths(columnsWithHolderFields.value)),
+  );
   onBeforeUnmount(() => {
     stopLayoutObservers();
     clearAutoViewportBox();
