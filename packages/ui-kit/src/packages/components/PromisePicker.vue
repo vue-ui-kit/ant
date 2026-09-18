@@ -100,6 +100,7 @@
 <template>
   <a-modal
     v-model:open="visible.modal"
+    wrap-class-name="p-promise-picker"
     destroy-on-close
     :title="title"
     :width="width"
@@ -107,8 +108,13 @@
     @cancel="handleCancel"
     :body-style="bodyStyle"
   >
-    <div :style="pickerBodyStyle">
-      <p-grid v-bind="mergedGridSetting" ref="gridEl" @pick="selectRow" />
+    <div class="p-promise-picker-body" :style="pickerBodyStyle">
+      <p-grid
+        class="p-promise-picker-grid"
+        v-bind="mergedGridSetting"
+        ref="gridEl"
+        @pick="selectRow"
+      />
     </div>
     <template v-if="isMultiple" #footer>
       <div class="w-full text-right p-2">
