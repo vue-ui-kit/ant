@@ -51,6 +51,18 @@ export default defineConfig({
         'e-virt-table',
       ],
     }),
+    {
+      name: 'write-cjs-package-scope',
+      writeBundle(outputOptions) {
+        if (outputOptions.format === 'cjs') {
+          // 保留既有入口路径，在 type:module 包中明确标记 CommonJS 目录。
+          writeFileSync(
+            resolve(outputOptions.dir || 'dist', 'cjs/package.json'),
+            '{"type":"commonjs"}\n',
+          );
+        }
+      },
+    },
     // 自定义插件来创建完整的scss文件
     {
       name: 'create-standalone-scss',

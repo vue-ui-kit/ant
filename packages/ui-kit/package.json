@@ -1,6 +1,6 @@
 {
   "name": "@vue-ui-kit/ant",
-  "version": "2.6.10",
+  "version": "2.6.11",
   "description": "Vue3 UI Kit based on Ant Design",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -10,9 +10,9 @@
   "sass": "./src/packages/styles/index.scss",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/cjs/index.js",
-      "import": "./dist/es/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/es/index.js"
     },
     "./style.css": "./dist/style.css",
     "./style.scss": "./src/packages/styles/index.scss",
@@ -47,7 +47,7 @@
     "email": "adoin@qq.com"
   },
   "dependencies": {
-    "e-virt-table": "1.4.13",
+    "e-virt-table": "1.4.17",
     "uuid": "^11.1.1",
     "xe-utils": "^3.7.6"
   },
